@@ -1,5 +1,6 @@
 package com.practica.finazapp.RepositoriosApiRest
 
+import android.content.Context
 import com.practica.finazapp.Entidades.GastoDTO
 import com.practica.finazapp.Utils.Cliente
 import com.practica.finazapp.Utils.GastoService
@@ -8,12 +9,14 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class SpendRepository {
+class SpendRepository (context: Context)  {
 
-    private val gastoService: GastoService =
-        Cliente.getCliente("http://192.168.10.6:8862/Finanzapp/Gastos/").create(GastoService::class.java)
+    private val gastoService: GastoService by lazy {
+        Cliente.getCliente("http://192.168.10.6:8862/Finanzapp/Gastos/", context)
+            .create(GastoService::class.java)
+    }
 
-     fun registrarGasto(idUsuario: Long, gasto: GastoDTO, callback: (GastoDTO?, String?) -> Unit) {
+    fun registrarGasto(idUsuario: Long, gasto: GastoDTO, callback: (GastoDTO?, String?) -> Unit) {
         gastoService.registrarGasto(idUsuario, gasto).enqueue(object : Callback<GastoDTO> {
             override fun onResponse(call: Call<GastoDTO>, response: Response<GastoDTO>) {
                 if (response.isSuccessful) {

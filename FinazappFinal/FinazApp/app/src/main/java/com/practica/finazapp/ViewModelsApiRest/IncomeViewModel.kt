@@ -1,6 +1,8 @@
 package com.practica.finazapp.ViewModelsApiRest
 
+import android.app.Application
 import android.util.Log
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -9,9 +11,11 @@ import com.practica.finazapp.Entidades.IngresoDTO
 import com.practica.finazapp.RepositoriosApiRest.IncomeRepository
 import kotlinx.coroutines.launch
 
-class IncomeViewModel : ViewModel() {
+class IncomeViewModel (application: Application) : AndroidViewModel(application) {
 
-    private val repository: IncomeRepository = IncomeRepository()
+    private val repository: IncomeRepository by lazy {
+        IncomeRepository(getApplication<Application>().applicationContext)
+    }
 
     private val _ingresosCasualesLiveData = MutableLiveData<List<IngresoDTO>?>()
     val ingresosCasualesLiveData: LiveData<List<IngresoDTO>?> = _ingresosCasualesLiveData

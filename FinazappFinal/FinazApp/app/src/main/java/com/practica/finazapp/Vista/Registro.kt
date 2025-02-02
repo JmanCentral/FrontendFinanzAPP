@@ -66,9 +66,10 @@ class Registro : AppCompatActivity() {
             val nuevoUsuario = UsuarioDTO(
                 id_usuario = 0,
                 username = usuario,
-                password = contrasena,
+                contrasena = contrasena,
                 nombre = nombres,
-                apellido = apellidos
+                apellido = apellidos,
+                roles = setOf("USER")
             )
 
             usuarioViewModel.registrarUsuario(nuevoUsuario)
@@ -80,7 +81,7 @@ class Registro : AppCompatActivity() {
                 Toast.makeText(this, "Registro exitoso", Toast.LENGTH_LONG).show()
 
 
-                val intent = Intent(this, MainActivity2::class.java)
+                val intent = Intent(this, Login::class.java)
                 intent.putExtra("usuario_id", usuario.id_usuario)
                 startActivity(intent)
                 finish()

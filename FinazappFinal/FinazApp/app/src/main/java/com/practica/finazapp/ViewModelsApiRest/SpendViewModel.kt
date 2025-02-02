@@ -1,6 +1,8 @@
 package com.practica.finazapp.ViewModelsApiRest
 
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import com.practica.finazapp.RepositoriosApiRest.SpendRepository
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -12,9 +14,11 @@ import retrofit2.Response
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 
-    class SpendViewModel : ViewModel()  {
+    class SpendViewModel (application: Application) : AndroidViewModel(application)   {
 
-        private val repository: SpendRepository = SpendRepository()
+        private val repository: SpendRepository by lazy {
+            SpendRepository(getApplication<Application>().applicationContext)
+        }
 
         // LiveData para el dinero disponible
         private val _dineroDisponibleLiveData = MutableLiveData<Double?>()

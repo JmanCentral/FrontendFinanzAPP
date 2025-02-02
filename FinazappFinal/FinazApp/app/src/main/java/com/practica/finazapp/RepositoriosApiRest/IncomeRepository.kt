@@ -1,5 +1,6 @@
 package com.practica.finazapp.RepositoriosApiRest
 
+import android.content.Context
 import android.util.Log
 import com.practica.finazapp.Entidades.IngresoDTO
 import com.practica.finazapp.Utils.Cliente
@@ -9,10 +10,12 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class IncomeRepository {
+class IncomeRepository(context: Context) {
 
-    private val ingresoService: IngresoService =
-        Cliente.getCliente("http://192.168.10.6:8862/Finanzapp/Ingresos/").create(IngresoService::class.java)
+    private val ingresoService: IngresoService by lazy {
+        Cliente.getCliente("http://192.168.10.6:8862/Finanzapp/Ingresos/", context)
+            .create(IngresoService::class.java)
+    }
 
     fun registrarIngreso(idUsuario: Long, ingreso: IngresoDTO, callback: (IngresoDTO?, String?) -> Unit) {
         ingresoService.registrarIngreso(idUsuario, ingreso).enqueue(object : Callback<IngresoDTO> {
