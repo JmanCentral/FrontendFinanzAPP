@@ -505,7 +505,7 @@ class DashboardFragment : Fragment(), OnItemClickListener2 {
     private fun mostrarListaDeGastos(recyclerView: RecyclerView, categoria: String) {
         gastosViewModel.gastosMesCategoriaLiveData.removeObservers(viewLifecycleOwner)
         gastosViewModel.obtenerGastosMesCategoria(usuarioId, categoria)
-        gastosViewModel.gastosMesCategoriaLiveData.observe(viewLifecycleOwner) { gastosCat ->
+        gastosViewModel.gastosMesCategoriaLiveData.observeOnce(viewLifecycleOwner) { gastosCat ->
             if (gastosCat != null) {
                 Log.d("mostrarListaDeGastos", "Gastos cargados: ${gastosCat.size}")
                 val adapter = GastoAdapterPrincipal(gastosCat)
@@ -635,91 +635,77 @@ class DashboardFragment : Fragment(), OnItemClickListener2 {
         }
     }
 
+    // Variables globales para almacenar los valores a medida que se obtienen
+    private var disponible1: Float = 0f
+    private var gastosHormiga: Float = 0f
+    private var alimentos: Float = 0f
+    private var transporte: Float = 0f
+    private var servicios: Float = 0f
+    private var mercado: Float = 0f
+
     private fun cargarDona() {
         Log.d("CargarDona", "Método cargarDona() llamado")
+
         gastosViewModel.obtenerDineroDisponible(usuarioId)
-        gastosViewModel.dineroDisponibleLiveData.observeOnce(viewLifecycleOwner) { disponible ->
-            Log.d("CargarDona", "Valor de disponible: $disponible")
-            gastosViewModel.obtenerValorGastosMesCategoria(usuarioId, "Gastos Hormiga")
-            gastosViewModel.valorGastosMesCategoriaLiveData
-                .observeOnce(viewLifecycleOwner) { cantGastosVarios ->
-                    Log.d("CargarDona", "Valor de cantGastosVarios: $cantGastosVarios")
-                    gastosViewModel.obtenerValorGastosMesCategoria1(usuarioId, "Alimentos")
-                    gastosViewModel.valorGastosMesCategoriaLiveData1
-                        .observeOnce(viewLifecycleOwner) { cantAlimentos ->
-                            Log.d("CargarDona", "Valor de cantAlimentos: $cantAlimentos")
-                            gastosViewModel.obtenerValorGastosMesCategoria2(usuarioId, "Transporte")
-                            gastosViewModel.valorGastosMesCategoriaLiveData2
-                                .observeOnce(viewLifecycleOwner) { cantTransporte ->
-                                    Log.d("CargarDona", "Valor de cantTransporte: $cantTransporte")
-                                    gastosViewModel.obtenerValorGastosMesCategoria3(usuarioId, "Servicios")
-                                    gastosViewModel.valorGastosMesCategoriaLiveData3
-                                        .observeOnce(viewLifecycleOwner) { cantServicios ->
-                                            Log.d("CargarDona", "Valor de cantServicios: $cantServicios")
-                                            gastosViewModel.obtenerValorGastosMesCategoria4(usuarioId, "Mercado")
-                                            gastosViewModel.valorGastosMesCategoriaLiveData4
-                                                .observeOnce(viewLifecycleOwner){ cantMercado ->
-                                                    Log.d("CargarDona", "Valor de cantMercado: $cantMercado")
-                                            val pieChart = binding.dona1
-                                            val pieData = mutableListOf<SliceValue>()
-                                            if (cantAlimentos != null) {
-                                                pieData.add(
-                                                    SliceValue(
-                                                        cantAlimentos.toFloat(),
-                                                        obtenerColorCategoria("Alimentos")
-                                                    )
-                                                )
-                                            }
-                                            if (cantGastosVarios != null) {
-                                                pieData.add(
-                                                    SliceValue(
-                                                        cantGastosVarios.toFloat(),
-                                                        obtenerColorCategoria("Gastos Hormiga")
-                                                    )
-                                                )
-                                            }
-                                            if (cantTransporte != null) {
-                                                pieData.add(
-                                                    SliceValue(
-                                                        cantTransporte.toFloat(),
-                                                        obtenerColorCategoria("Transporte")
-                                                    )
-                                                )
-                                            }
-                                            if (cantServicios != null) {
-                                                pieData.add(
-                                                    SliceValue(
-                                                        cantServicios.toFloat(),
-                                                            obtenerColorCategoria("Servicios")
-                                                    )
-                                                )
-                                            }
-                                            if (cantMercado != null) {
-                                                pieData.add(
-                                                    SliceValue(
-                                                        cantMercado.toFloat(),
-                                                        obtenerColorCategoria("Mercado")
-                                                    )
-                                                )
-                                            }
-                                            if (disponible != null && disponible >= 0) {
-                                                pieData.add(
-                                                    SliceValue(
-                                                        disponible.toFloat(),
-                                                        obtenerColorCategoria("disponible")
-                                                    )
-                                                )
-                                            }
-                                            val pieChartData = PieChartData(pieData)
-                                            pieChartData.setHasCenterCircle(true)
-                                            pieChartData.setCenterCircleScale(0.8f)
-                                            pieChartData.setCenterCircleColor(Color1.WHITE)
-                                            pieChart.pieChartData = pieChartData
-                                        }
-                                    }
-                                }
-                        }
-                }
+        gastosViewModel.dineroDisponibleLiveData.observe(viewLifecycleOwner) { valor ->
+            disponible1 = (valor ?: 0f).toFloat()
+            actualizarGrafico() // Actualiza el gráfico con el nuevo dato
+        }
+
+        gastosViewModel.obtenerValorGastosMesCategoria(usuarioId, "Gastos Hormiga")
+        gastosViewModel.valorGastosMesCategoriaLiveData.observe(viewLifecycleOwner) { valor ->
+            gastosHormiga = (valor ?: 0f).toFloat()
+            actualizarGrafico()
+        }
+
+        gastosViewModel.obtenerValorGastosMesCategoria1(usuarioId, "Alimentos")
+        gastosViewModel.valorGastosMesCategoriaLiveData1.observe(viewLifecycleOwner) { valor ->
+            alimentos = (valor ?: 0f).toFloat()
+            actualizarGrafico()
+        }
+
+        gastosViewModel.obtenerValorGastosMesCategoria2(usuarioId, "Transporte")
+        gastosViewModel.valorGastosMesCategoriaLiveData2.observe(viewLifecycleOwner) { valor ->
+            transporte = (valor ?: 0f).toFloat()
+            actualizarGrafico()
+        }
+
+        gastosViewModel.obtenerValorGastosMesCategoria3(usuarioId, "Servicios")
+        gastosViewModel.valorGastosMesCategoriaLiveData3.observe(viewLifecycleOwner) { valor ->
+            servicios = (valor ?: 0f).toFloat()
+            actualizarGrafico()
+        }
+
+        gastosViewModel.obtenerValorGastosMesCategoria4(usuarioId, "Mercado")
+        gastosViewModel.valorGastosMesCategoriaLiveData4.observe(viewLifecycleOwner) { valor ->
+            mercado = (valor ?: 0f).toFloat()
+            actualizarGrafico()
+        }
+    }
+
+    // Función que se llama cada vez que un dato se actualiza
+    private fun actualizarGrafico() {
+        val pieChart = binding.dona1
+        val pieData = mutableListOf<SliceValue>()
+
+        if (alimentos > 0) pieData.add(SliceValue(alimentos, obtenerColorCategoria("Alimentos")))
+        if (gastosHormiga > 0) pieData.add(SliceValue(gastosHormiga, obtenerColorCategoria("Gastos Hormiga")))
+        if (transporte > 0) pieData.add(SliceValue(transporte, obtenerColorCategoria("Transporte")))
+        if (servicios > 0) pieData.add(SliceValue(servicios, obtenerColorCategoria("Servicios")))
+        if (mercado > 0) pieData.add(SliceValue(mercado, obtenerColorCategoria("Mercado")))
+        if (disponible1 > 0) pieData.add(SliceValue(disponible1, obtenerColorCategoria("disponible")))
+
+        // Si al menos hay un dato válido, se actualiza el gráfico
+        if (pieData.isNotEmpty()) {
+            val pieChartData = PieChartData(pieData)
+            pieChartData.setHasCenterCircle(true)
+            pieChartData.setCenterCircleScale(0.8f)
+            pieChartData.setCenterCircleColor(Color1.WHITE)
+            pieChart.pieChartData = pieChartData
+
+            Log.d("CargarDona", "Gráfico de dona dibujado con datos: $pieData")
+        } else {
+            Log.d("CargarDona", "No hay datos suficientes para dibujar el gráfico.")
         }
     }
 
