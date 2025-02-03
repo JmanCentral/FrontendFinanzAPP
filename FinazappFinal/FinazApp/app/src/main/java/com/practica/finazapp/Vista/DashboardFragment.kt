@@ -64,9 +64,18 @@ class DashboardFragment : Fragment(), OnItemClickListener2 {
 
         sharedViewModel.idUsuario.observe(viewLifecycleOwner) { usuarioId ->
             Log.d("FragmentGastos", "id usuario: $usuarioId")
+
             usuarioId?.let {
+                Log.d("FragmentGastos", "Usuario ID no es nulo: $it")
                 this.usuarioId = it
-                cargarDatos()
+
+                try {
+                    cargarDatos()
+                    Log.d("FragmentGastos", "Datos cargados correctamente")
+                } catch (e: Exception) {
+                    Log.e("FragmentGastos", "Error al cargar datos: ${e.message}", e)
+                }
+
                 val bloqueTransporte = binding.bloqueTransporte
                 val bloqueGastosVarios = binding.bloqueGastosVarios
                 val bloqueMercado = binding.bloqueMercado
@@ -78,27 +87,37 @@ class DashboardFragment : Fragment(), OnItemClickListener2 {
                 val recyclrerViewServicios = binding.recyclerViewServicios
                 val recyclrerViewAlimentos = binding.recyclerViewAlimentos
 
+                Log.d("FragmentGastos", "Configurando listeners para los bloques de gastos")
 
                 bloqueTransporte.setOnClickListener {
+                    Log.d("FragmentGastos", "Clic en bloque Transporte")
                     mostrarListaDeGastos(recyclrerViewTransporte, "Transporte")
                 }
+
                 bloqueMercado.setOnClickListener {
+                    Log.d("FragmentGastos", "Clic en bloque Mercado")
                     mostrarListaDeGastos(recyclrerViewMercado, "Mercado")
                 }
+
                 bloqueServicios.setOnClickListener {
+                    Log.d("FragmentGastos", "Clic en bloque Servicios")
                     mostrarListaDeGastos(recyclrerViewServicios, "Servicios")
                 }
+
                 bloqueAlimentos.setOnClickListener {
+                    Log.d("FragmentGastos", "Clic en bloque Alimentos")
                     mostrarListaDeGastos(recyclrerViewAlimentos, "Alimentos")
                 }
+
                 bloqueGastosVarios.setOnClickListener {
+                    Log.d("FragmentGastos", "Clic en bloque Gastos Varios")
                     mostrarListaDeGastos(recyclrerViewGastosVarios, "Gastos Hormiga")
                 }
 
-
+            } ?: run {
+                Log.e("FragmentGastos", "El ID de usuario es nulo")
             }
         }
-
         gastosViewModel.operacionCompletada.observe(viewLifecycleOwner) { completada ->
             if (completada == true) {
                 cargarDatos()// Actualizar la UI

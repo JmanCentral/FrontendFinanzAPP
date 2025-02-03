@@ -15,13 +15,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.practica.finazapp.R
 import com.practica.finazapp.ViewModelsApiRest.SharedViewModel
-import com.practica.finazapp.ViewModel.UsuarioViewModel
 import com.practica.finazapp.databinding.FragmentPerfilBinding
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+/*
 class Perfil : Fragment() {
     private lateinit var sharedViewModel: SharedViewModel
     private lateinit var usuarioViewModel: UsuarioViewModel
@@ -248,3 +248,5 @@ class Perfil : Fragment() {
                 _binding = null
         }
 }
+
+ */

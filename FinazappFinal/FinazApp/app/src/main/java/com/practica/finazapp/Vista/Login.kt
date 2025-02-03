@@ -24,9 +24,11 @@ class Login : AppCompatActivity() {
         setContentView(R.layout.activity_login)
 
         usuarioId = intent.getLongExtra("usuario_id", -1)
+
         sharedViewModel = ViewModelProvider(this)[SharedViewModel::class.java]
-        sharedViewModel.setUsuarioId(usuarioId)
         userViewModel = ViewModelProvider(this).get(UserViewModel::class.java)
+        sharedViewModel.setUsuarioId(usuarioId)
+
 
         val btnIngresar = findViewById<Button>(R.id.btnIngresar)
         val btnRegistrarse = findViewById<TextView>(R.id.btnRegistrarse)
@@ -44,7 +46,6 @@ class Login : AppCompatActivity() {
                 val intent = Intent(this, Dashboard::class.java)
                 intent.putExtra("usuario_id", usuarioId)
                 startActivity(intent)
-                finish()
             }
         }
 
