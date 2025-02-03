@@ -1,6 +1,5 @@
 package com.practica.finazapp.Vista
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
@@ -12,7 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.practica.finazapp.Entidades.UsuarioDTO
 import com.practica.finazapp.R
-import com.practica.finazapp.ViewModel.SharedViewModel
+import com.practica.finazapp.ViewModelsApiRest.SharedViewModel
 import com.practica.finazapp.ViewModelsApiRest.UserViewModel
 
 

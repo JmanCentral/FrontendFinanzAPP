@@ -1,4 +1,4 @@
-package com.practica.finazapp.ViewModel
+package com.practica.finazapp.ViewModelsApiRest
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

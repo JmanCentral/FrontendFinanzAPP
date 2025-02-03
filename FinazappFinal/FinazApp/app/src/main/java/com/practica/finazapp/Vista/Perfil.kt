@@ -14,7 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.practica.finazapp.R
-import com.practica.finazapp.ViewModel.SharedViewModel
+import com.practica.finazapp.ViewModelsApiRest.SharedViewModel
 import com.practica.finazapp.ViewModel.UsuarioViewModel
 import com.practica.finazapp.databinding.FragmentPerfilBinding
 import com.google.android.material.textfield.TextInputEditText

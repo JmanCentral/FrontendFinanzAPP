@@ -8,7 +8,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.practica.finazapp.R
-import com.practica.finazapp.ViewModel.SharedViewModel
+import com.practica.finazapp.ViewModelsApiRest.SharedViewModel
 import com.practica.finazapp.ViewModelsApiRest.IncomeViewModel
 
 class MainActivity2 : AppCompatActivity() {

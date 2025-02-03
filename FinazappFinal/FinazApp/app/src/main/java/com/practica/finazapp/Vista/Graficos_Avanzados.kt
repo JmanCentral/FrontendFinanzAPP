@@ -1,37 +1,7 @@
 package com.practica.finazapp.Vista
-import android.graphics.Color
-import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.lifecycle.ViewModelProvider
-import com.practica.finazapp.ViewModel.GastosViewModel
-import com.practica.finazapp.ViewModel.IngresoViewModel
-import com.practica.finazapp.ViewModel.SharedViewModel
-import com.practica.finazapp.databinding.FragmentGraficosAvanzadosBinding
-import com.github.mikephil.charting.components.Legend
-import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.data.BarData
-import com.github.mikephil.charting.data.BarDataSet
-import com.github.mikephil.charting.data.BarEntry
-import com.github.mikephil.charting.data.CombinedData
-import com.github.mikephil.charting.data.Entry
-import com.github.mikephil.charting.data.LineData
-import com.github.mikephil.charting.data.LineDataSet
-import com.github.mikephil.charting.data.RadarData
-import com.github.mikephil.charting.data.RadarDataSet
-import com.github.mikephil.charting.data.RadarEntry
-import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
-import com.github.mikephil.charting.formatter.ValueFormatter
-import com.github.mikephil.charting.interfaces.datasets.IBarDataSet
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 
-
+/*
 class Graficos_Avanzados : Fragment() {
     private var usuarioId: Long = -1
     private lateinit var sharedViewModel: SharedViewModel
@@ -289,7 +259,7 @@ class Graficos_Avanzados : Fragment() {
     }
 
 }
-
+*/
 
 
 

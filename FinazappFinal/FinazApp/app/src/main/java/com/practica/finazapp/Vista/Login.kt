@@ -8,11 +8,10 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.practica.finazapp.R
-import com.practica.finazapp.ViewModel.SharedViewModel
+import com.practica.finazapp.ViewModelsApiRest.SharedViewModel
 import com.practica.finazapp.ViewModelsApiRest.UserViewModel
 import com.google.android.material.textfield.TextInputEditText
 import com.practica.finazapp.Entidades.LoginDTO
-import com.practica.finazapp.Entidades.UsuarioDTO
 
 class Login : AppCompatActivity() {
 
@@ -42,7 +41,7 @@ class Login : AppCompatActivity() {
                 guardarToken(usuario.token)
 
                 // Navegar al Dashboard
-                val intent = Intent(this, MainActivity2::class.java)
+                val intent = Intent(this, Dashboard::class.java)
                 intent.putExtra("usuario_id", usuarioId)
                 startActivity(intent)
                 finish()

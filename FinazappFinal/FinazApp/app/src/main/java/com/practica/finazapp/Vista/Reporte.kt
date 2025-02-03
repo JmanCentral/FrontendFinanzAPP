@@ -1,33 +1,6 @@
 package com.practica.finazapp.Vista
 
-import android.annotation.SuppressLint
-import android.graphics.Color
-import android.os.Build
-import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.annotation.RequiresApi
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
-import com.practica.finazapp.Entidades.Gasto
-import com.practica.finazapp.ViewModel.GastosViewModel
-import com.practica.finazapp.ViewModel.SharedViewModel
-import com.practica.finazapp.databinding.FragmentReporteBinding
-import lecho.lib.hellocharts.formatter.SimpleAxisValueFormatter
-import lecho.lib.hellocharts.model.Axis
-import lecho.lib.hellocharts.model.AxisValue
-import lecho.lib.hellocharts.model.Line
-import lecho.lib.hellocharts.model.LineChartData
-import lecho.lib.hellocharts.model.PointValue
-import lecho.lib.hellocharts.view.LineChartView
-import java.time.DayOfWeek
-import java.time.LocalDate
-import java.time.Month
-import java.time.format.DateTimeFormatter
-import java.time.temporal.TemporalAdjusters
-
+/*
 class Reporte : Fragment() {
     private var usuarioId: Long = -1
     private var _binding: FragmentReporteBinding? = null
@@ -558,3 +531,5 @@ class Reporte : Fragment() {
         _binding = null
     }
 }
+
+ */

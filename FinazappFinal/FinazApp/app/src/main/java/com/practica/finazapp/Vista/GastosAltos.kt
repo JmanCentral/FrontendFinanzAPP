@@ -1,16 +1,5 @@
 package com.practica.finazapp.Vista
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.practica.finazapp.ViewModel.GastosViewModel
-import com.practica.finazapp.ViewModel.SharedViewModel
-import com.practica.finazapp.databinding.FragmentGastosAltosBinding
 /*
 
 class GastosAltos : Fragment() {

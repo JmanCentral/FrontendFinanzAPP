@@ -20,23 +20,16 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.practica.finazapp.Entidades.Gasto
-import com.practica.finazapp.ViewModel.GastosViewModel
-import com.practica.finazapp.ViewModel.IngresoViewModel
 import com.practica.finazapp.R
-import com.practica.finazapp.ViewModel.SharedViewModel
+import com.practica.finazapp.ViewModelsApiRest.SharedViewModel
 import com.practica.finazapp.databinding.FragmentCategoriasBinding
 import com.practica.finazapp.ui.Estilos.CustomSpinnerAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.practica.finazapp.Entidades.GastoDTO
 import com.practica.finazapp.ViewModelsApiRest.IncomeViewModel
 import com.practica.finazapp.ViewModelsApiRest.SpendViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.text.NumberFormat
 
 class FragmentCategorias : Fragment(), OnItemClickListener1 {

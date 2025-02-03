@@ -19,8 +19,7 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.practica.finazapp.R
-import com.practica.finazapp.ViewModel.SharedViewModel
-import com.practica.finazapp.ViewModel.UsuarioViewModel
+import com.practica.finazapp.ViewModelsApiRest.SharedViewModel
 import com.practica.finazapp.databinding.ActivityDashboardBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
@@ -53,6 +52,14 @@ class Dashboard : AppCompatActivity() {
         ), drawerLayout
         )
         val usuarioId: Long = intent.getLongExtra("usuario_id", -1)
+
+        if (usuarioId == -1L) {
+
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+            finish()
+            return
+        }
 
         Log.d("ActivityDashboard","IdUsuario: $usuarioId")
         val viewModel: SharedViewModel = ViewModelProvider(this).get(SharedViewModel::class.java)
