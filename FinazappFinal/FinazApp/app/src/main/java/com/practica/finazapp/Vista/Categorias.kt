@@ -13,6 +13,8 @@ import com.practica.finazapp.ViewModelsApiRest.SharedViewModel
 import com.practica.finazapp.ViewModelsApiRest.IncomeViewModel
 import com.practica.finazapp.ViewModelsApiRest.SpendViewModel
 
+
+/*
 class Categorias : AppCompatActivity() {
 
     private lateinit var sharedViewModel: SharedViewModel
@@ -93,5 +95,7 @@ class Categorias : AppCompatActivity() {
         // No hacemos nada aquí para evitar que el usuario regrese a la actividad anterior
     }
 }
+
+ */
 
 

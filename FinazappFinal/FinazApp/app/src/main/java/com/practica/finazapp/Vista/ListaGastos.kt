@@ -51,6 +51,7 @@ class ListaGastos : AppCompatActivity(), OnItemClickListener2 {
         }
     }
 
+
     // Implementación del método de la interfaz OnItemClickListener2
     override fun onItemClick2(gasto: GastoDTO) {
         Log.d("onItemClick", "Gasto clickeado: ${gasto.nombre_gasto}")

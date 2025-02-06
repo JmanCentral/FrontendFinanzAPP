@@ -11,6 +11,7 @@ import com.practica.finazapp.R
 import com.practica.finazapp.ViewModelsApiRest.SharedViewModel
 import com.practica.finazapp.ViewModelsApiRest.IncomeViewModel
 
+/*
 class MainActivity2 : AppCompatActivity() {
 
 
@@ -94,3 +95,5 @@ class MainActivity2 : AppCompatActivity() {
 
 
 }
+
+ */

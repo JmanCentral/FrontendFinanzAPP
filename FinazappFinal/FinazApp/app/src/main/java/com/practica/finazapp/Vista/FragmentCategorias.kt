@@ -31,7 +31,7 @@ import com.practica.finazapp.Entidades.GastoDTO
 import com.practica.finazapp.ViewModelsApiRest.IncomeViewModel
 import com.practica.finazapp.ViewModelsApiRest.SpendViewModel
 import java.text.NumberFormat
-
+/*
 class FragmentCategorias : Fragment(), OnItemClickListener1 {
 
     private var usuarioId: Long = -1
@@ -471,3 +471,5 @@ class FragmentCategorias : Fragment(), OnItemClickListener1 {
 
 
 }
+
+ */

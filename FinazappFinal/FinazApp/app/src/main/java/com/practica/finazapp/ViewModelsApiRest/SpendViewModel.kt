@@ -60,12 +60,12 @@ import kotlinx.coroutines.launch
         val gastosAscendentesLiveData: LiveData<List<GastoDTO>?> = _gastosAscendentesLiveData
 
         // LiveData para la lista de gastos ordenados por valor alto
-        private val _gastosAltosLiveData = MutableLiveData<List<GastoDTO>?>()
-        val gastosAltosLiveData: LiveData<List<GastoDTO>?> = _gastosAltosLiveData
+        private val _gastosAltosLiveData = MutableLiveData <GastoDTO?>()
+        val gastosAltosLiveData: LiveData<GastoDTO?> = _gastosAltosLiveData
 
         // LiveData para la lista de gastos ordenados por valor bajo
-        private val _gastosBajosLiveData = MutableLiveData<List<GastoDTO>?>()
-        val gastosBajosLiveData: LiveData<List<GastoDTO>?> = _gastosBajosLiveData
+        private val _gastosBajosLiveData = MutableLiveData<GastoDTO?>()
+        val gastosBajosLiveData: LiveData<GastoDTO?> = _gastosBajosLiveData
 
         // LiveData para la lista de gastos ordenados descendentemente
         private val _gastosDescendentesLiveData = MutableLiveData<List<GastoDTO>?>()

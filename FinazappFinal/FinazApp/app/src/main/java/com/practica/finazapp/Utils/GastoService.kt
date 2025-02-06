@@ -57,13 +57,13 @@ interface GastoService {
     @GET("ObtenerGastoAlto/{id_usuario}")
      fun listarGastosAlto(
         @Path("id_usuario") idUsuario: Long
-    ): Call<List<GastoDTO>>
+    ): Call <GastoDTO>
 
     // Obtener gastos ordenados por valor bajo
     @GET("ObtenerGastoBajo/{id_usuario}")
      fun listarGastosBajo(
         @Path("id_usuario") idUsuario: Long
-    ): Call<List<GastoDTO>>
+    ): Call <GastoDTO>
 
     // Obtener gastos ordenados descendentemente
     @GET("ObtenerGastosDescendentemente/{id_usuario}")

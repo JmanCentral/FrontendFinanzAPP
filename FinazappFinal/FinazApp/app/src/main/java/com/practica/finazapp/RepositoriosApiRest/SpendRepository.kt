@@ -127,25 +127,24 @@ class SpendRepository (context: Context)  {
             }
         })
     }
-    fun listarGastosAlto(idUsuario: Long, callback: (List<GastoDTO>?, String?) -> Unit) {
-        gastoService.listarGastosAlto(idUsuario).enqueue(object : Callback<List<GastoDTO>> {
-            override fun onResponse(call: Call<List<GastoDTO>>, response: Response<List<GastoDTO>>) {
+    fun listarGastosAlto(idUsuario: Long, callback: (GastoDTO?, String?) -> Unit) {
+        gastoService.listarGastosAlto(idUsuario).enqueue(object : Callback<GastoDTO> {
+            override fun onResponse(call: Call<GastoDTO>, response: Response <GastoDTO> ) {
                 if (response.isSuccessful) {
                     callback(response.body(), null)
                 } else {
                     callback(null, "Error al obtener gastos altos: ${response.code()}")
                 }
             }
-
-            override fun onFailure(call: Call<List<GastoDTO>>, t: Throwable) {
+            override fun onFailure(call: Call<GastoDTO>, t: Throwable) {
                 callback(null, "Fallo en la conexión: ${t.message}")
             }
         })
     }
 
-    fun listarGastosBajo(idUsuario: Long, callback: (List<GastoDTO>?, String?) -> Unit) {
-        gastoService.listarGastosBajo(idUsuario).enqueue(object : Callback<List<GastoDTO>> {
-            override fun onResponse(call: Call<List<GastoDTO>>, response: Response<List<GastoDTO>>) {
+    fun listarGastosBajo(idUsuario: Long, callback: (GastoDTO?, String?) -> Unit) {
+        gastoService.listarGastosBajo(idUsuario).enqueue(object : Callback<GastoDTO> {
+            override fun onResponse(call: Call<GastoDTO>, response: Response<GastoDTO>) {
                 if (response.isSuccessful) {
                     callback(response.body(), null)
                 } else {
@@ -153,7 +152,7 @@ class SpendRepository (context: Context)  {
                 }
             }
 
-            override fun onFailure(call: Call<List<GastoDTO>>, t: Throwable) {
+            override fun onFailure(call: Call<GastoDTO>, t: Throwable) {
                 callback(null, "Fallo en la conexión: ${t.message}")
             }
         })
