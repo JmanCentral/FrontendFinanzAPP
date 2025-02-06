@@ -35,6 +35,11 @@ import lecho.lib.hellocharts.model.*
 import java.text.NumberFormat
 import android.graphics.Color as Color1
 import android.content.SharedPreferences
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 
 class DashboardFragment : Fragment(), OnItemClickListener2 {
@@ -136,11 +141,6 @@ class DashboardFragment : Fragment(), OnItemClickListener2 {
                 Log.e("FragmentGastos", "El ID de usuario es nulo")
             }
         }
-        gastosViewModel.operacionCompletada.observe(viewLifecycleOwner) { completada ->
-            if (completada == true) {
-                cargarDatos()// Actualizar la UI
-            }
-        }
         val btnNuevoGasto = view.findViewById<FloatingActionButton>(R.id.floatingActionButton)
 
         btnNuevoGasto.setOnClickListener {
@@ -233,63 +233,7 @@ class DashboardFragment : Fragment(), OnItemClickListener2 {
     }
 
     private fun verificarAlertasExcedidas() {
-        Log.d("DashboardFragment", "Llamando al método verificarAlertasExcedidas...")
 
-        alertaViewModel.obtenerAlertaPorMes(usuarioId)
-
-        alertaViewModel.alertasPorMesLiveData.observe(viewLifecycleOwner) { alertas ->
-            Log.d("DashboardFragment", "Alertas: $alertas")
-
-            if (alertas.isNullOrEmpty()) {
-                Log.d("DashboardFragment", "No hay alertas configuradas para este mes.")
-                return@observe
-            }
-
-            val categoriasSpinner = listOf("disponible", "Gastos Hormiga", "Alimentos", "Transporte", "Servicios", "Mercado")
-
-            for (alerta in alertas) {
-                Log.d("DashboardFragment", "Procesando alerta: ${alerta.nombre}")
-
-                // Verificar si la alerta está en el Spinner
-                if (!categoriasSpinner.contains(alerta.descripcion)) continue
-
-                Log.d("DashboardFragment", "Alerta válida en Spinner: ${alerta.descripcion}")
-
-                if (alerta.descripcion == "disponible") {
-                    Log.d("DashboardFragment", "Obteniendo gasto total")
-
-                    gastosViewModel.obtenerValorGastosMes(usuarioId)
-                    gastosViewModel.valorGastosMesLiveData.observeOnce(viewLifecycleOwner) { totalGastos ->
-                        if (totalGastos != null && totalGastos > alerta.valor) {
-                            Log.d("DashboardFragment", "Gasto total excede la alerta (${alerta.valor}): $totalGastos")
-
-                            if (!notificacionesEnviadas.contains(alerta.id_alerta)) {
-                                val mensaje = "La alerta '${alerta.nombre}' para el gasto disponible ha sido excedida. Límite: ${alerta.valor}, Gasto total: $totalGastos"
-                                notificationHelper.sendNotification("Gasto Excedido", mensaje)
-                                notificacionesEnviadas.add(alerta.id_alerta)
-                                Log.d("DashboardFragment", "Notificación enviada para alerta: ${alerta.nombre}")
-                            }
-                        }
-                    }
-                } else {
-                    Log.d("DashboardFragment", "Obteniendo gasto por categoría: ${alerta.descripcion}")
-                    gastosViewModel.obtenerValorGastosMesCategoria5(usuarioId, alerta.descripcion)
-                    gastosViewModel.valorGastosMesCategoriaLiveData5.observe(viewLifecycleOwner) { gastoCategoria ->
-                        Log.d("DashboardFragment", "Gasto por categoría: $gastoCategoria")
-                        if (gastoCategoria != null && gastoCategoria > alerta.valor) {
-                            Log.d("DashboardFragment", "Gasto en categoría '${alerta.descripcion}' excede la alerta (${alerta.valor}): $gastoCategoria")
-
-                            if (!notificacionesEnviadas.contains(alerta.id_alerta)) {
-                                val mensaje = "La alerta '${alerta.nombre}' para la categoría '${alerta.descripcion}' ha sido excedida. Límite: ${alerta.valor}, Gasto: $gastoCategoria"
-                                notificationHelper.sendNotification("Gasto Excedido", mensaje)
-                                notificacionesEnviadas.add(alerta.id_alerta)
-                                Log.d("DashboardFragment", "Notificación enviada para alerta: ${alerta.nombre}")
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
 
 
@@ -332,7 +276,8 @@ class DashboardFragment : Fragment(), OnItemClickListener2 {
     private fun cargarDatos() {
 
         gastosViewModel.obtenerDineroDisponible(usuarioId)
-        gastosViewModel.dineroDisponibleLiveData.observeOnce(viewLifecycleOwner) { disp ->
+        viewLifecycleOwner.lifecycleScope.launch {
+        gastosViewModel.dineroDisponibleFlow.collect { disp ->
             val numberFormat = NumberFormat.getInstance()
             numberFormat.maximumFractionDigits = 2
             if (disp != null) {
@@ -343,9 +288,10 @@ class DashboardFragment : Fragment(), OnItemClickListener2 {
                 cargarBarraDisp(disponible, barraDisponible)
             }
         }
+            }
         gastosViewModel.obtenerValorGastosMesCategoria(usuarioId, "Gastos Hormiga")
-        gastosViewModel.valorGastosMesCategoriaLiveData
-            .observeOnce(viewLifecycleOwner) { cantidad ->
+        viewLifecycleOwner.lifecycleScope.launch {
+            gastosViewModel.valorGastosMesCategoriaFlow.collect { cantidad ->
                 if (cantidad != null) {
                     val numberFormat = NumberFormat.getInstance()
                     numberFormat.maximumFractionDigits = 2
@@ -356,24 +302,27 @@ class DashboardFragment : Fragment(), OnItemClickListener2 {
                     cargarBarra(cantidadCategoria, barraGastosVarios)
                 }
             }
+        }
 
         gastosViewModel.obtenerValorGastosMesCategoria1(usuarioId, "Alimentos")
-        gastosViewModel.valorGastosMesCategoriaLiveData1
-            .observeOnce(viewLifecycleOwner) { cantidad ->
-                if (cantidad != null) {
-                    val numberFormat = NumberFormat.getInstance()
-                    numberFormat.maximumFractionDigits = 2
-                    val cantidadCategoria = cantidad
-                    val AlimentosTextView = binding.cantidadAlimentos
-                    AlimentosTextView.setText("${numberFormat.format(cantidadCategoria)}$")
-                    val barraAlimentos = binding.barraAlimentos
-                    cargarBarra(cantidadCategoria, barraAlimentos)
+        viewLifecycleOwner.lifecycleScope.launch {
+            gastosViewModel.valorGastosMesCategoriaFlow1
+                .collect { cantidad ->
+                    if (cantidad != null) {
+                        val numberFormat = NumberFormat.getInstance()
+                        numberFormat.maximumFractionDigits = 2
+                        val cantidadCategoria = cantidad
+                        val AlimentosTextView = binding.cantidadAlimentos
+                        AlimentosTextView.setText("${numberFormat.format(cantidadCategoria)}$")
+                        val barraAlimentos = binding.barraAlimentos
+                        cargarBarra(cantidadCategoria, barraAlimentos)
+                    }
                 }
-            }
+        }
 
         gastosViewModel.obtenerValorGastosMesCategoria2(usuarioId, "Transporte")
-        gastosViewModel.valorGastosMesCategoriaLiveData2
-            .observeOnce(viewLifecycleOwner) { cantidad ->
+        viewLifecycleOwner.lifecycleScope.launch {
+            gastosViewModel.valorGastosMesCategoriaFlow2.collect { cantidad ->
                 if (cantidad != null) {
                     val numberFormat = NumberFormat.getInstance()
                     numberFormat.maximumFractionDigits = 2
@@ -384,10 +333,11 @@ class DashboardFragment : Fragment(), OnItemClickListener2 {
                     cargarBarra(cantidadCategoria, barraTransporte)
                 }
             }
+        }
 
         gastosViewModel.obtenerValorGastosMesCategoria3(usuarioId, "Servicios")
-        gastosViewModel.valorGastosMesCategoriaLiveData3
-            .observeOnce(viewLifecycleOwner) { cantidad ->
+        viewLifecycleOwner.lifecycleScope.launch {
+            gastosViewModel.valorGastosMesCategoriaFlow3.collect { cantidad ->
                 if (cantidad != null) {
                     val numberFormat = NumberFormat.getInstance()
                     numberFormat.maximumFractionDigits = 2
@@ -398,10 +348,12 @@ class DashboardFragment : Fragment(), OnItemClickListener2 {
                     cargarBarra(cantidadCategoria, barraServicios)
                 }
             }
+        }
+
 
         gastosViewModel.obtenerValorGastosMesCategoria4(usuarioId, "Mercado")
-        gastosViewModel.valorGastosMesCategoriaLiveData4
-            .observeOnce(viewLifecycleOwner) { cantidad ->
+        viewLifecycleOwner.lifecycleScope.launch {
+            gastosViewModel.valorGastosMesCategoriaFlow4.collect { cantidad ->
                 if (cantidad != null) {
                     val numberFormat = NumberFormat.getInstance()
                     numberFormat.maximumFractionDigits = 2
@@ -412,17 +364,20 @@ class DashboardFragment : Fragment(), OnItemClickListener2 {
                     cargarBarra(cantidadCategoria, barraMercado)
                 }
             }
+        }
 
         gastosViewModel.obtenerValorGastosMes(usuarioId)
-        gastosViewModel.valorGastosMesLiveData.observe(viewLifecycleOwner) { gastosMes ->
-            Log.d("DashboardComporbacion", "Valor de gastosMes: $gastosMes")
-            if (gastosMes != null) {
-                val numberFormat = NumberFormat.getInstance()
-                numberFormat.maximumFractionDigits = 2
-                val cantidadGastos = gastosMes
-                val gastadosTextView = binding.TxtGastoTotal
-                gastadosTextView.setText("${numberFormat.format(cantidadGastos)}$")
-                cargarDona()
+        viewLifecycleOwner.lifecycleScope.launch {
+            gastosViewModel.valorGastosMesFlow.collect { gastosMes ->
+                Log.d("DashboardComporbacion", "Valor de gastosMes: $gastosMes")
+                if (gastosMes != null) {
+                    val numberFormat = NumberFormat.getInstance()
+                    numberFormat.maximumFractionDigits = 2
+                    val cantidadGastos = gastosMes
+                    val gastadosTextView = binding.TxtGastoTotal
+                    gastadosTextView.setText("${numberFormat.format(cantidadGastos)}$")
+                    cargarDona()
+                }
             }
         }
 
@@ -439,56 +394,76 @@ class DashboardFragment : Fragment(), OnItemClickListener2 {
     private fun verificarPorcentajeDeGastos(ingresoMensual: Double) {
         // Gastos Hormiga
         gastosViewModel.obtenerValorGastosMesCategoria(usuarioId, "Gastos Hormiga")
-        gastosViewModel.valorGastosMesCategoriaLiveData
-            .observeOnce(viewLifecycleOwner) { cantidadGastosVarios ->
+        viewLifecycleOwner.lifecycleScope.launch {
+            gastosViewModel.valorGastosMesCategoriaFlow2.collect { cantidadGastosVarios ->
                 cantidadGastosVarios?.let {
                     val porcentajeGastosVarios = (cantidadGastosVarios / ingresoMensual) * 100
-                    if (porcentajeGastosVarios > obtenerLimitePorCategoria("Gastos Hormiga", ingresoMensual)) {
+                    if (porcentajeGastosVarios > obtenerLimitePorCategoria(
+                            "Gastos Hormiga",
+                            ingresoMensual
+                        )
+                    ) {
                         mostrarAdvertencia("Gastos Hormiga", porcentajeGastosVarios)
-        }
+                    }
                 }
             }
+        }
 
         // Alimentos
         gastosViewModel.obtenerValorGastosMesCategoria1(usuarioId, "Alimentos")
-        gastosViewModel.valorGastosMesCategoriaLiveData1
-            .observeOnce(viewLifecycleOwner) { cantidadAlimentos ->
+        viewLifecycleOwner.lifecycleScope.launch {
+            gastosViewModel.valorGastosMesCategoriaFlow1.collect { cantidadAlimentos ->
                 cantidadAlimentos?.let {
                     val porcentajeAlimentos = (cantidadAlimentos / ingresoMensual) * 100
-                    if (porcentajeAlimentos > obtenerLimitePorCategoria("Alimentos", ingresoMensual)) {
+                    if (porcentajeAlimentos > obtenerLimitePorCategoria(
+                            "Alimentos",
+                            ingresoMensual
+                        )
+                    ) {
                         mostrarAdvertencia("Alimentos", porcentajeAlimentos)
                     }
                 }
             }
+        }
 
         // Transporte
         gastosViewModel.obtenerValorGastosMesCategoria2(usuarioId, "Transporte")
-        gastosViewModel.valorGastosMesCategoriaLiveData2
-            .observeOnce(viewLifecycleOwner) { cantidadTransporte ->
+        viewLifecycleOwner.lifecycleScope.launch {
+            gastosViewModel.valorGastosMesCategoriaFlow2.collect { cantidadTransporte ->
                 cantidadTransporte?.let {
                     val porcentajeTransporte = (cantidadTransporte / ingresoMensual) * 100
-                    if (porcentajeTransporte > obtenerLimitePorCategoria("Transporte", ingresoMensual)) {
+                    if (porcentajeTransporte > obtenerLimitePorCategoria(
+                            "Transporte",
+                            ingresoMensual
+                        )
+                    ) {
                         mostrarAdvertencia("Transporte", porcentajeTransporte)
                     }
                 }
             }
+        }
 
         // Servicios
         gastosViewModel.obtenerValorGastosMesCategoria3(usuarioId, "Servicios")
-        gastosViewModel.valorGastosMesCategoriaLiveData3
-            .observeOnce(viewLifecycleOwner) { cantidadServicios ->
+        viewLifecycleOwner.lifecycleScope.launch {
+            gastosViewModel.valorGastosMesCategoriaFlow3.collect { cantidadServicios ->
                 cantidadServicios?.let {
                     val porcentajeServicios = (cantidadServicios / ingresoMensual) * 100
-                    if (porcentajeServicios > obtenerLimitePorCategoria("Servicios", ingresoMensual)) {
+                    if (porcentajeServicios > obtenerLimitePorCategoria(
+                            "Servicios",
+                            ingresoMensual
+                        )
+                    ) {
                         mostrarAdvertencia("Servicios", porcentajeServicios)
                     }
                 }
             }
+        }
 
         // Mercado
         gastosViewModel.obtenerValorGastosMesCategoria4(usuarioId, "Mercado")
-        gastosViewModel.valorGastosMesCategoriaLiveData4
-            .observeOnce(viewLifecycleOwner) { cantidadMercado ->
+        viewLifecycleOwner.lifecycleScope.launch {
+            gastosViewModel.valorGastosMesCategoriaFlow4.collect { cantidadMercado ->
                 cantidadMercado?.let {
                     val porcentajeMercado = (cantidadMercado / ingresoMensual) * 100
                     if (porcentajeMercado > obtenerLimitePorCategoria("Mercado", ingresoMensual)) {
@@ -496,6 +471,7 @@ class DashboardFragment : Fragment(), OnItemClickListener2 {
                     }
                 }
             }
+        }
     }
 
     private fun obtenerLimitePorCategoria(categoria: String, ingresoMensual: Double): Double {
@@ -582,22 +558,33 @@ class DashboardFragment : Fragment(), OnItemClickListener2 {
 
 
     private fun mostrarListaDeGastos(recyclerView: RecyclerView, categoria: String) {
-        gastosViewModel.gastosMesCategoriaLiveData.removeObservers(viewLifecycleOwner)
+        // Llamamos al método para obtener los gastos filtrados por categoría
         gastosViewModel.obtenerGastosMesCategoria(usuarioId, categoria)
-        gastosViewModel.gastosMesCategoriaLiveData.observeOnce(viewLifecycleOwner) { gastosCat ->
-            if (gastosCat != null) {
-                Log.d("mostrarListaDeGastos", "Gastos cargados: ${gastosCat.size}")
-                val adapter = GastoAdapterPrincipal(gastosCat)
-                adapter.setOnItemClickListener2(this) // Pasamos el Fragment como listener
-                recyclerView.adapter = adapter
-                recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-                recyclerView.visibility = if (recyclerView.visibility == View.GONE) View.VISIBLE else View.GONE
-            } else {
-                Log.d("mostrarListaDeGastos", "No hay gastos para la categoría: $categoria")
+        // Cancelamos cualquier colección previa para evitar múltiples colecciones activas
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                gastosViewModel.gastosMesCategoriaFlow.collectLatest { gastosCat ->
+                    if (gastosCat != null) {
+                        Log.d("mostrarListaDeGastos", "Gastos cargados: ${gastosCat.size}")
+
+                        // Configuramos el adapter con la nueva lista
+                        val adapter = GastoAdapterPrincipal(gastosCat)
+                        adapter.setOnItemClickListener2(this@GastoAdapterPrincipal) // Pasamos el Fragment como listener
+                        recyclerView.adapter = adapter
+                        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+                        // Alternamos la visibilidad del RecyclerView
+                        recyclerView.visibility =
+                            if (recyclerView.visibility == View.GONE) View.VISIBLE else View.GONE
+                    } else {
+                        Log.d("mostrarListaDeGastos", "No hay gastos para la categoría: $categoria")
+                    }
+                }
             }
         }
     }
+
 
 
     override fun onItemClick2(gasto: GastoDTO) {
@@ -671,18 +658,20 @@ class DashboardFragment : Fragment(), OnItemClickListener2 {
 
     fun cargarBarra(cantidad: Double, barra: View) {
         gastosViewModel.obtenerValorGastosMes(usuarioId)
-        gastosViewModel.valorGastosMesLiveData.observe(viewLifecycleOwner) { gastosMes ->
-            if (gastosMes != null) {
-                gastosViewModel.obtenerDineroDisponible(usuarioId)
-                gastosViewModel.dineroDisponibleLiveData.observe(viewLifecycleOwner) { disponible ->
-                    if (disponible != null) {
-                        val barraGris = binding.barraGrisDisponible
-                        val cien = barraGris.width
-                        val total = disponible + gastosMes
-                        val layoutParams = barra.layoutParams as ConstraintLayout.LayoutParams
-                        layoutParams.width = ((cien*cantidad)/total).toInt()
-                        barra.layoutParams = layoutParams
-                        barra.visibility = View.VISIBLE
+        viewLifecycleOwner.lifecycleScope.launch {
+            gastosViewModel.gastosMesCategoriaFlow.collect { gastosMes ->
+                if (gastosMes != null) {
+                    gastosViewModel.obtenerDineroDisponible(usuarioId)
+                    gastosViewModel.dineroDisponibleFlow.collect { disponible ->
+                        if (disponible != null) {
+                            val barraGris = binding.barraGrisDisponible
+                            val cien = barraGris.width
+                            val total = disponible + gastosMes
+                            val layoutParams = barra.layoutParams as ConstraintLayout.LayoutParams
+                            layoutParams.width = ((cien * cantidad) / total).toInt()
+                            barra.layoutParams = layoutParams
+                            barra.visibility = View.VISIBLE
+                        }
                     }
                 }
             }
@@ -692,23 +681,25 @@ class DashboardFragment : Fragment(), OnItemClickListener2 {
 
     fun cargarBarraDisp(cantidad: Double, barra: View) {
         gastosViewModel.obtenerValorGastosMes(usuarioId)
-        gastosViewModel.valorGastosMesLiveData.observe(viewLifecycleOwner) { gastosMes ->
-            // Manejar el caso en que gastosMes sea nulo
-            val gastosMesSeguro = gastosMes ?: 0.0
-            val total = gastosMesSeguro + cantidad
+        viewLifecycleOwner.lifecycleScope.launch {
+            gastosViewModel.valorGastosMesFlow.collect { gastosMes ->
+                // Manejar el caso en que gastosMes sea nulo
+                val gastosMesSeguro = gastosMes ?: 0.0
+                val total = gastosMesSeguro + cantidad
 
-            if (cantidad >= 0 && total > 0) { // Asegurarse de que haya algo que mostrar
-                val barraGris = binding.barraGrisDisponible
-                val cien = barraGris.width
-                val layoutParams = barra.layoutParams as ConstraintLayout.LayoutParams
+                if (cantidad >= 0 && total > 0) { // Asegurarse de que haya algo que mostrar
+                    val barraGris = binding.barraGrisDisponible
+                    val cien = barraGris.width
+                    val layoutParams = barra.layoutParams as ConstraintLayout.LayoutParams
 
-                // Ajustar el tamaño de la barra basado en la cantidad y el total
-                layoutParams.width = ((cien * cantidad) / total).toInt()
-                barra.layoutParams = layoutParams
-                barra.visibility = View.VISIBLE
-            } else {
-                // Si no hay nada que mostrar, asegurarse de que la barra esté oculta
-                barra.visibility = View.INVISIBLE
+                    // Ajustar el tamaño de la barra basado en la cantidad y el total
+                    layoutParams.width = ((cien * cantidad) / total).toInt()
+                    barra.layoutParams = layoutParams
+                    barra.visibility = View.VISIBLE
+                } else {
+                    // Si no hay nada que mostrar, asegurarse de que la barra esté oculta
+                    barra.visibility = View.INVISIBLE
+                }
             }
         }
     }
@@ -725,39 +716,43 @@ class DashboardFragment : Fragment(), OnItemClickListener2 {
         Log.d("CargarDona", "Método cargarDona() llamado")
 
         gastosViewModel.obtenerDineroDisponible(usuarioId)
-        gastosViewModel.dineroDisponibleLiveData.observe(viewLifecycleOwner) { valor ->
-            disponible1 = (valor ?: 0f).toFloat()
-            actualizarGrafico() // Actualiza el gráfico con el nuevo dato
-        }
 
-        gastosViewModel.obtenerValorGastosMesCategoria(usuarioId, "Gastos Hormiga")
-        gastosViewModel.valorGastosMesCategoriaLiveData.observe(viewLifecycleOwner) { valor ->
-            gastosHormiga = (valor ?: 0f).toFloat()
-            actualizarGrafico()
-        }
+        viewLifecycleOwner.lifecycleScope.launch {
 
-        gastosViewModel.obtenerValorGastosMesCategoria1(usuarioId, "Alimentos")
-        gastosViewModel.valorGastosMesCategoriaLiveData1.observe(viewLifecycleOwner) { valor ->
-            alimentos = (valor ?: 0f).toFloat()
-            actualizarGrafico()
-        }
+            gastosViewModel.dineroDisponibleFlow.collect { valor ->
+                disponible1 = (valor ?: 0f).toFloat()
+                actualizarGrafico() // Actualiza el gráfico con el nuevo dato
+            }
 
-        gastosViewModel.obtenerValorGastosMesCategoria2(usuarioId, "Transporte")
-        gastosViewModel.valorGastosMesCategoriaLiveData2.observe(viewLifecycleOwner) { valor ->
-            transporte = (valor ?: 0f).toFloat()
-            actualizarGrafico()
-        }
+            gastosViewModel.obtenerValorGastosMesCategoria(usuarioId, "Gastos Hormiga")
+            gastosViewModel.valorGastosMesCategoriaFlow1.collect { valor ->
+                gastosHormiga = (valor ?: 0f).toFloat()
+                actualizarGrafico()
+            }
 
-        gastosViewModel.obtenerValorGastosMesCategoria3(usuarioId, "Servicios")
-        gastosViewModel.valorGastosMesCategoriaLiveData3.observe(viewLifecycleOwner) { valor ->
-            servicios = (valor ?: 0f).toFloat()
-            actualizarGrafico()
-        }
+            gastosViewModel.obtenerValorGastosMesCategoria1(usuarioId, "Alimentos")
+            gastosViewModel.valorGastosMesCategoriaFlow1.collect { valor ->
+                alimentos = (valor ?: 0f).toFloat()
+                actualizarGrafico()
+            }
 
-        gastosViewModel.obtenerValorGastosMesCategoria4(usuarioId, "Mercado")
-        gastosViewModel.valorGastosMesCategoriaLiveData4.observe(viewLifecycleOwner) { valor ->
-            mercado = (valor ?: 0f).toFloat()
-            actualizarGrafico()
+            gastosViewModel.obtenerValorGastosMesCategoria2(usuarioId, "Transporte")
+            gastosViewModel.valorGastosMesCategoriaFlow2.collect { valor ->
+                transporte = (valor ?: 0f).toFloat()
+                actualizarGrafico()
+            }
+
+            gastosViewModel.obtenerValorGastosMesCategoria3(usuarioId, "Servicios")
+            gastosViewModel.valorGastosMesCategoriaFlow3.collect { valor ->
+                servicios = (valor ?: 0f).toFloat()
+                actualizarGrafico()
+            }
+
+            gastosViewModel.obtenerValorGastosMesCategoria4(usuarioId, "Mercado")
+            gastosViewModel.valorGastosMesCategoriaFlow4.collect { valor ->
+                mercado = (valor ?: 0f).toFloat()
+                actualizarGrafico()
+            }
         }
     }
 

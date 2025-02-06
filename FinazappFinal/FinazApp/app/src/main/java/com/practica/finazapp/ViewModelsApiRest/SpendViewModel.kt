@@ -12,6 +12,9 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
     class SpendViewModel (application: Application) : AndroidViewModel(application)   {
@@ -20,89 +23,74 @@ import kotlinx.coroutines.launch
             SpendRepository(getApplication<Application>().applicationContext)
         }
 
-        // LiveData para el dinero disponible
-        private val _dineroDisponibleLiveData = MutableLiveData<Double?>()
-        val dineroDisponibleLiveData: LiveData<Double?> = _dineroDisponibleLiveData
+        private val _dineroDisponibleFlow = MutableStateFlow<Double?>(null)
+        val dineroDisponibleFlow: StateFlow<Double?> = _dineroDisponibleFlow.asStateFlow()
 
-        // LiveData para la lista de gastos por mes y categoría
-        private val _gastosMesCategoriaLiveData = MutableLiveData<List<GastoDTO>?>()
-        val gastosMesCategoriaLiveData: LiveData<List<GastoDTO>?> = _gastosMesCategoriaLiveData
+        private val _gastosMesCategoriaFlow = MutableStateFlow<List<GastoDTO>?>(null)
+        val gastosMesCategoriaFlow: StateFlow<List<GastoDTO>?> = _gastosMesCategoriaFlow.asStateFlow()
 
-        // LiveData para el valor general de gastos por mes y categoría
-        private val _valorGastosMesCategoriaLiveData = MutableLiveData<Double?>()
-        val valorGastosMesCategoriaLiveData: LiveData<Double?> = _valorGastosMesCategoriaLiveData
+        private val _valorGastosMesCategoriaFlow = MutableStateFlow<Double?>(null)
+        val valorGastosMesCategoriaFlow: StateFlow<Double?> = _valorGastosMesCategoriaFlow.asStateFlow()
 
-        private val _valorGastosMesCategoriaLiveData1 = MutableLiveData<Double?>()
-        val valorGastosMesCategoriaLiveData1: LiveData<Double?> = _valorGastosMesCategoriaLiveData1
+        private val _valorGastosMesCategoriaFlow1 = MutableStateFlow<Double?>(null)
+        val valorGastosMesCategoriaFlow1: StateFlow<Double?> = _valorGastosMesCategoriaFlow1.asStateFlow()
 
-        private val _valorGastosMesCategoriaLiveData2 = MutableLiveData<Double?>()
-        val valorGastosMesCategoriaLiveData2: LiveData<Double?> = _valorGastosMesCategoriaLiveData2
+        private val _valorGastosMesCategoriaFlow2 = MutableStateFlow<Double?>(null)
+        val valorGastosMesCategoriaFlow2: StateFlow<Double?> = _valorGastosMesCategoriaFlow2.asStateFlow()
 
-        private val _valorGastosMesCategoriaLiveData3 = MutableLiveData<Double?>()
-        val valorGastosMesCategoriaLiveData3: LiveData<Double?> = _valorGastosMesCategoriaLiveData3
+        private val _valorGastosMesCategoriaFlow3 = MutableStateFlow<Double?>(null)
+        val valorGastosMesCategoriaFlow3: StateFlow<Double?> = _valorGastosMesCategoriaFlow3.asStateFlow()
 
-        private val _valorGastosMesCategoriaLiveData4 = MutableLiveData<Double?>()
-        val valorGastosMesCategoriaLiveData4: LiveData<Double?> = _valorGastosMesCategoriaLiveData4
+        private val _valorGastosMesCategoriaFlow4 = MutableStateFlow<Double?>(null)
+        val valorGastosMesCategoriaFlow4: StateFlow<Double?> = _valorGastosMesCategoriaFlow4.asStateFlow()
 
-        private val _valorGastosMesCategoriaLiveData5 = MutableLiveData<Double?>()
-        val valorGastosMesCategoriaLiveData5: LiveData<Double?> = _valorGastosMesCategoriaLiveData5
+        private val _valorGastosMesCategoriaFlow5 = MutableStateFlow<Double?>(null)
+        val valorGastosMesCategoriaFlow5: StateFlow<Double?> = _valorGastosMesCategoriaFlow5.asStateFlow()
 
-        // LiveData para el valor general de gastos por mes
-        private val _valorGastosMesLiveData = MutableLiveData<Double?>()
-        val valorGastosMesLiveData: LiveData<Double?> = _valorGastosMesLiveData
+        private val _valorGastosMesFlow = MutableStateFlow<Double?>(null)
+        val valorGastosMesFlow: StateFlow<Double?> = _valorGastosMesFlow.asStateFlow()
 
-        // LiveData para la lista de gastos por fechas
-        private val _gastosPorFechasLiveData = MutableLiveData<List<GastoDTO>?>()
-        val gastosPorFechasLiveData: LiveData<List<GastoDTO>?> = _gastosPorFechasLiveData
+        private val _gastosPorFechasFlow = MutableStateFlow<List<GastoDTO>?>(null)
+        val gastosPorFechasFlow: StateFlow<List<GastoDTO>?> = _gastosPorFechasFlow.asStateFlow()
 
-        // LiveData para la lista de gastos ordenados ascendentemente
-        private val _gastosAscendentesLiveData = MutableLiveData<List<GastoDTO>?>()
-        val gastosAscendentesLiveData: LiveData<List<GastoDTO>?> = _gastosAscendentesLiveData
+        private val _gastosAscendentesFlow = MutableStateFlow<List<GastoDTO>?>(null)
+        val gastosAscendentesFlow: StateFlow<List<GastoDTO>?> = _gastosAscendentesFlow.asStateFlow()
 
-        // LiveData para la lista de gastos ordenados por valor alto
-        private val _gastosAltosLiveData = MutableLiveData<List<GastoDTO>?>()
-        val gastosAltosLiveData: LiveData<List<GastoDTO>?> = _gastosAltosLiveData
+        private val _gastosAltosFlow = MutableStateFlow<List<GastoDTO>?>(null)
+        val gastosAltosFlow: StateFlow<List<GastoDTO>?> = _gastosAltosFlow.asStateFlow()
 
-        // LiveData para la lista de gastos ordenados por valor bajo
-        private val _gastosBajosLiveData = MutableLiveData<List<GastoDTO>?>()
-        val gastosBajosLiveData: LiveData<List<GastoDTO>?> = _gastosBajosLiveData
+        private val _gastosBajosFlow = MutableStateFlow<List<GastoDTO>?>(null)
+        val gastosBajosFlow: StateFlow<List<GastoDTO>?> = _gastosBajosFlow.asStateFlow()
 
-        // LiveData para la lista de gastos ordenados descendentemente
-        private val _gastosDescendentesLiveData = MutableLiveData<List<GastoDTO>?>()
-        val gastosDescendentesLiveData: LiveData<List<GastoDTO>?> = _gastosDescendentesLiveData
+        private val _gastosDescendentesFlow = MutableStateFlow<List<GastoDTO>?>(null)
+        val gastosDescendentesFlow: StateFlow<List<GastoDTO>?> = _gastosDescendentesFlow.asStateFlow()
 
-        // LiveData para el promedio de gastos
-        private val _promedioGastosLiveData = MutableLiveData<Double?>()
-        val promedioGastosLiveData: LiveData<Double?> = _promedioGastosLiveData
+        private val _promedioGastosFlow = MutableStateFlow<Double?>(null)
+        val promedioGastosFlow: StateFlow<Double?> = _promedioGastosFlow.asStateFlow()
 
-        // LiveData para el gasto recurrente
-        private val _gastoRecurrenteLiveData = MutableLiveData<String?>()
-        val gastoRecurrenteLiveData: LiveData<String?> = _gastoRecurrenteLiveData
+        private val _gastoRecurrenteFlow = MutableStateFlow<String?>(null)
+        val gastoRecurrenteFlow: StateFlow<String?> = _gastoRecurrenteFlow.asStateFlow()
 
-        // LiveData para el porcentaje de gastos sobre ingresos
-        private val _porcentajeGastosLiveData = MutableLiveData<Double?>()
-        val porcentajeGastosLiveData: LiveData<Double?> = _porcentajeGastosLiveData
+        private val _porcentajeGastosFlow = MutableStateFlow<Double?>(null)
+        val porcentajeGastosFlow: StateFlow<Double?> = _porcentajeGastosFlow.asStateFlow()
 
-        // LiveData para el promedio diario de gastos
-        private val _promedioDiarioLiveData = MutableLiveData<Double?>()
-        val promedioDiarioLiveData: LiveData<Double?> = _promedioDiarioLiveData
+        private val _promedioDiarioFlow = MutableStateFlow<Double?>(null)
+        val promedioDiarioFlow: StateFlow<Double?> = _promedioDiarioFlow.asStateFlow()
 
-        // LiveData para indicar si una operación ha sido completada
-        private val _operacionCompletada = MutableLiveData<Boolean>()
-        val operacionCompletada: LiveData<Boolean> = _operacionCompletada
+        private val _operacionCompletadaFlow = MutableStateFlow<Boolean>(false)
+        val operacionCompletadaFlow: StateFlow<Boolean> = _operacionCompletadaFlow.asStateFlow()
 
-        // LiveData para manejar errores
-        private val _errorLiveData = MutableLiveData<String?>()
-        val errorLiveData: LiveData<String?> = _errorLiveData
+        private val _errorFlow = MutableStateFlow<String?>(null)
+        val errorFlow: StateFlow<String?> = _errorFlow.asStateFlow()
 
         // Función para registrar un gasto
         fun registrarGasto(idUsuario: Long, gasto: GastoDTO) {
             viewModelScope.launch {
                 repository.registrarGasto(idUsuario, gasto) { resultado, error ->
                     if (error == null) {
-                        _operacionCompletada.postValue(true) // Notificar que la operación se completó
+                        _operacionCompletadaFlow.value = true // Notificar que la operación se completó
                     } else {
-                        _errorLiveData.postValue(error)
+                        _errorFlow.value = error
                     }
                 }
             }
@@ -110,90 +98,97 @@ import kotlinx.coroutines.launch
 
         // Función para obtener el dinero disponible
         fun obtenerDineroDisponible(idUsuario: Long) {
-
-                repository.obtenerDineroDisponible(idUsuario) { dinero, error ->
+            viewModelScope.launch {
+                repository.obtenerDineroDisponible(idUsuario) { dineroDisponible, error ->
                     if (error == null) {
-                        _dineroDisponibleLiveData.postValue(dinero)
+                        _dineroDisponibleFlow.value = dineroDisponible
                     } else {
-                        _errorLiveData.postValue(error)
+                        _errorFlow.value = error
                     }
-                }
 
+                }
+            }
         }
 
         // Función para obtener gastos por mes y categoría
         fun obtenerGastosMesCategoria(idUsuario: Long, categoria: String) {
-
+            viewModelScope.launch {
                 repository.obtenerGastosMesCategoria(idUsuario, categoria) { gastos, error ->
                     if (error == null) {
-                        _gastosMesCategoriaLiveData.postValue(gastos)
+                        _gastosMesCategoriaFlow.value = gastos
                     } else {
-                        _errorLiveData.postValue(error)
-                    }
-                }
+                        _errorFlow.value = error
+            }
+        }
 
         }
+            }
 
         // Función para obtener el valor general de gastos por mes y categoría
         fun obtenerValorGastosMesCategoria(idUsuario: Long, categoria: String) {
-
+            viewModelScope.launch {
                 repository.obtenerValorGastosMesCategoria(idUsuario, categoria) { valor, error ->
                     if (error == null) {
-                        _valorGastosMesCategoriaLiveData.postValue(valor)
+                        _valorGastosMesCategoriaFlow.value = valor
                     } else {
-                        _errorLiveData.postValue(error)
+                        _errorFlow.value = error
                     }
                 }
 
+            }
         }
 
         // Función para obtener el valor general de gastos por mes y categoría
         fun obtenerValorGastosMesCategoria1(idUsuario: Long, categoria: String) {
-
-            repository.obtenerValorGastosMesCategoria(idUsuario, categoria) { valor, error ->
-                if (error == null) {
-                    _valorGastosMesCategoriaLiveData1.postValue(valor)
-                } else {
-                    _errorLiveData.postValue(error)
+            viewModelScope.launch {
+                repository.obtenerValorGastosMesCategoria(idUsuario, categoria) { valor, error ->
+                    if (error == null) {
+                        _valorGastosMesCategoriaFlow1.value = valor
+                    } else {
+                        _errorFlow.value = error
+                    }
                 }
             }
-
         }
 
         // Función para obtener el valor general de gastos por mes y categoría
         fun obtenerValorGastosMesCategoria2(idUsuario: Long, categoria: String) {
-
-            repository.obtenerValorGastosMesCategoria(idUsuario, categoria) { valor, error ->
-                if (error == null) {
-                    _valorGastosMesCategoriaLiveData2.postValue(valor)
-                } else {
-                    _errorLiveData.postValue(error)
+            viewModelScope.launch {
+                repository.obtenerValorGastosMesCategoria(idUsuario, categoria) { valor, error ->
+                    if (error == null) {
+                        _valorGastosMesCategoriaFlow2.value = valor
+                    } else {
+                        _errorFlow.value = error
+                    }
                 }
             }
-
         }
+
 
         // Función para obtener el valor general de gastos por mes y categoría
         fun obtenerValorGastosMesCategoria3(idUsuario: Long, categoria: String) {
-
-            repository.obtenerValorGastosMesCategoria(idUsuario, categoria) { valor, error ->
-                if (error == null) {
-                    _valorGastosMesCategoriaLiveData3.postValue(valor)
-                } else {
-                    _errorLiveData.postValue(error)
+            viewModelScope.launch {
+                repository.obtenerValorGastosMesCategoria(idUsuario, categoria) { valor, error ->
+                    if (error == null) {
+                        _valorGastosMesCategoriaFlow3.value = valor
+                    } else {
+                        _errorFlow.value = error
+                    }
                 }
             }
-
         }
+
 
         // Función para obtener el valor general de gastos por mes y categoría
         fun obtenerValorGastosMesCategoria4(idUsuario: Long, categoria: String) {
-
-            repository.obtenerValorGastosMesCategoria(idUsuario, categoria) { valor, error ->
-                if (error == null) {
-                    _valorGastosMesCategoriaLiveData4.postValue(valor)
-                } else {
-                    _errorLiveData.postValue(error)
+            viewModelScope.launch {
+                repository.obtenerValorGastosMesCategoria(idUsuario, categoria) { valor, error ->
+                    if (error == null) {
+                        _valorGastosMesCategoriaFlow4.value = valor
+                    }
+                    else {
+                        _errorFlow.value = error
+                    }
                 }
             }
 
@@ -202,13 +197,15 @@ import kotlinx.coroutines.launch
     // Función para obtener el valor general de gastos por mes y categoría
     fun obtenerValorGastosMesCategoria5(idUsuario: Long, categoria: String) {
 
-        repository.obtenerValorGastosMesCategoria(idUsuario, categoria) { valor, error ->
-            if (error == null) {
-                _valorGastosMesCategoriaLiveData5.postValue(valor)
-            } else {
-                _errorLiveData.postValue(error)
-            }
+        viewModelScope.launch {
+            repository.obtenerValorGastosMesCategoria(idUsuario, categoria) { valor, error ->
+                if (error == null) {
+                    _valorGastosMesCategoriaFlow5.value = valor
+                } else {
+                    _errorFlow.value = error
         }
+                }
+    }
 
     }
 
@@ -216,14 +213,15 @@ import kotlinx.coroutines.launch
 
     // Función para obtener el valor general de gastos por mes
     fun obtenerValorGastosMes(idUsuario: Long) {
-
+        viewModelScope.launch {
             repository.obtenerValorGastosMes(idUsuario) { valor, error ->
                 if (error == null) {
-                    _valorGastosMesLiveData.postValue(valor)
+                    _valorGastosMesFlow.value = valor
                 } else {
-                    _errorLiveData.postValue(error)
+                    _errorFlow.value = error
+        }
                 }
-            }
+        }
 
     }
 
@@ -232,116 +230,53 @@ import kotlinx.coroutines.launch
         viewModelScope.launch {
             repository.listarGastosPorFechas(idUsuario, fechaInicial, fechaFinal) { gastos, error ->
                 if (error == null) {
-                    _gastosPorFechasLiveData.postValue(gastos)
-                } else {
-                    _errorLiveData.postValue(error)
+                    _gastosPorFechasFlow.value = gastos
+                    } else {
+                    _errorFlow.value = error
                 }
             }
         }
+
     }
 
     // Función para obtener gastos ordenados ascendentemente
     fun listarGastosAscendentemente(idUsuario: Long) {
-        viewModelScope.launch {
-            repository.listarGastosAscendentemente(idUsuario) { gastos, error ->
-                if (error == null) {
-                    _gastosAscendentesLiveData.postValue(gastos)
-                } else {
-                    _errorLiveData.postValue(error)
-                }
-            }
-        }
+
     }
 
     // Función para obtener gastos ordenados por valor alto
     fun listarGastosAlto(idUsuario: Long) {
-        viewModelScope.launch {
-            repository.listarGastosAlto(idUsuario) { gastos, error ->
-                if (error == null) {
-                    _gastosAltosLiveData.postValue(gastos)
-                } else {
-                    _errorLiveData.postValue(error)
-                }
-            }
-        }
+
     }
 
     // Función para obtener gastos ordenados por valor bajo
     fun listarGastosBajo(idUsuario: Long) {
-        viewModelScope.launch {
-            repository.listarGastosBajo(idUsuario) { gastos, error ->
-                if (error == null) {
-                    _gastosBajosLiveData.postValue(gastos)
-                } else {
-                    _errorLiveData.postValue(error)
-                }
-            }
-        }
+
     }
 
     // Función para obtener gastos ordenados descendentemente
     fun listarGastosDescendentemente(idUsuario: Long) {
-        viewModelScope.launch {
-            repository.listarGastosDescendentemente(idUsuario) { gastos, error ->
-                if (error == null) {
-                    _gastosDescendentesLiveData.postValue(gastos)
-                } else {
-                    _errorLiveData.postValue(error)
-                }
-            }
-        }
+
     }
 
     // Función para obtener el promedio de gastos
     fun obtenerPromedioGastos(idUsuario: Long) {
-        viewModelScope.launch {
-            repository.obtenerPromedioGastos(idUsuario) { promedio, error ->
-                if (error == null) {
-                    _promedioGastosLiveData.postValue(promedio)
-                } else {
-                    _errorLiveData.postValue(error)
-                }
-            }
-        }
+
     }
 
     // Función para obtener el gasto recurrente
     fun obtenerGastoRecurrente(idUsuario: Long) {
-        viewModelScope.launch {
-            repository.obtenerGastoRecurrente(idUsuario) { gastoRecurrente, error ->
-                if (error == null) {
-                    _gastoRecurrenteLiveData.postValue(gastoRecurrente)
-                } else {
-                    _errorLiveData.postValue(error)
-                }
-            }
-        }
+
     }
 
     // Función para obtener el porcentaje de gastos sobre ingresos
     fun obtenerPorcentajeGastos(idUsuario: Long) {
-        viewModelScope.launch {
-            repository.obtenerPorcentajeGastos(idUsuario) { porcentaje, error ->
-                if (error == null) {
-                    _porcentajeGastosLiveData.postValue(porcentaje)
-                } else {
-                    _errorLiveData.postValue(error)
-                }
-            }
-        }
+
     }
 
     // Función para obtener el promedio diario de gastos
     fun obtenerPromedioDiario(idUsuario: Long) {
-        viewModelScope.launch {
-            repository.obtenerPromedioDiario(idUsuario) { promedioDiario, error ->
-                if (error == null) {
-                    _promedioDiarioLiveData.postValue(promedioDiario)
-                } else {
-                    _errorLiveData.postValue(error)
-                }
-            }
-        }
+
     }
 
     // Función para modificar un gasto
@@ -349,9 +284,9 @@ import kotlinx.coroutines.launch
         viewModelScope.launch {
             repository.modificarGasto(idGasto, gasto) { resultado, error ->
                 if (error == null) {
-                    _operacionCompletada.postValue(true)
+                    _operacionCompletadaFlow.value = true
                 } else {
-                    _errorLiveData.postValue(error)
+                    _errorFlow.value = error
                 }
             }
         }
@@ -360,13 +295,15 @@ import kotlinx.coroutines.launch
     // Función para eliminar un gasto
     fun eliminarGasto(idGasto: Long) {
         viewModelScope.launch {
-            repository.eliminarGasto(idGasto) { resultado, error ->
-                if (error == null) {
-                    _operacionCompletada.postValue(true)
+            repository.eliminarGasto(idGasto)
+            { exito, error ->
+                if (exito) {
+                    _operacionCompletadaFlow.value = true
                 } else {
-                    _errorLiveData.postValue(error)
-                }
+                    _errorFlow.value = error
+                    }
             }
         }
+
     }
 }
