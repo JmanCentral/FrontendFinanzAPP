@@ -4,8 +4,10 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.practica.finazapp.Entidades.AlertaDTO
 import com.practica.finazapp.RepositoriosApiRest.AlertRepository
+import kotlinx.coroutines.launch
 
 class AlertViewModel (application: Application) : AndroidViewModel(application) {
 
@@ -31,12 +33,14 @@ class AlertViewModel (application: Application) : AndroidViewModel(application) 
 
 
     fun registrarAlerta(idUsuario: Long, alerta: AlertaDTO) {
+        viewModelScope.launch {
         repository.registrarAlerta(idUsuario, alerta) { resultado, error ->
             if (error == null) {
                 _operacionCompletada.postValue(true) // Notificar que la operación se completó
             } else {
                 _errorLiveData.postValue(error)
             }
+        }
         }
     }
 
@@ -73,6 +77,7 @@ class AlertViewModel (application: Application) : AndroidViewModel(application) 
     }
 
     fun modificarAlerta(idAlerta: Long, alertaDTO: AlertaDTO) {
+        viewModelScope.launch {
         repository.modificarAlerta(idAlerta, alertaDTO) { resultado, error ->
             if (error == null) {
                 _operacionCompletada.postValue(true) // Notificar que la operación se completó
@@ -80,10 +85,11 @@ class AlertViewModel (application: Application) : AndroidViewModel(application) 
                 _errorLiveData.postValue(error)
             }
         }
-
+    }
             }
 
     fun eliminarAlerta(idAlerta: Long) {
+        viewModelScope.launch {
         repository.eliminarAlerta(idAlerta) { exito, error ->
             if (exito) {
                 _operacionCompletada.postValue(true) // Notificar que la operación se completó
@@ -91,7 +97,7 @@ class AlertViewModel (application: Application) : AndroidViewModel(application) 
                 _errorLiveData.postValue(error)
             }
         }
-
+        }
     }
 
 }

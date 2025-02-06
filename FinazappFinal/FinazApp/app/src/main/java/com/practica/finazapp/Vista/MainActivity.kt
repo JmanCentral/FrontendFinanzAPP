@@ -6,30 +6,42 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Base64
 import android.widget.Button
 import androidx.activity.ComponentActivity
 import com.practica.finazapp.R
+import org.json.JSONObject
 
-class
-MainActivity : ComponentActivity() {
+class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
         // Crear el canal de notificaciones
         crearCanalNotificacion(this)
 
-        val btnLogin = findViewById<Button>(R.id.btnLogin)
-
-        btnLogin.setOnClickListener {
-            val intent = Intent(this, Login::class.java)
-            startActivity(intent)
-            this.finish()
+        // Verificar si hay un token válido
+        val token = getToken()
+        if (token != null) {
+            // Redirigir a la Activity principal (Dashboard)
+            startActivity(Intent(this, Dashboard::class.java))
+        } else {
+            // Redirigir a la pantalla de inicio de sesión (Login)
+            startActivity(Intent(this, Login::class.java))
         }
 
-
+        // Cerrar la MainActivity
+        finish()
     }
 
-    fun crearCanalNotificacion(context: Context) {
+    private fun getToken(): String? {
+        val sharedPreferences = getSharedPreferences("MiApp", Context.MODE_PRIVATE)
+        return sharedPreferences.getString("TOKEN", null)
+    }
+
+
+    private fun crearCanalNotificacion(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val nombre = "CanalGastosAltos"
             val descripcion = "Notificaciones para gastos altos"
@@ -41,6 +53,5 @@ MainActivity : ComponentActivity() {
                 context.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(canal)
         }
-
     }
 }

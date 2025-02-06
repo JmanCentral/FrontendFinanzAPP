@@ -81,7 +81,6 @@ class Registro : AppCompatActivity() {
 
 
                 val intent = Intent(this, Login::class.java)
-                intent.putExtra("usuario_id", usuario.id_usuario)
                 startActivity(intent)
                 finish()
             }

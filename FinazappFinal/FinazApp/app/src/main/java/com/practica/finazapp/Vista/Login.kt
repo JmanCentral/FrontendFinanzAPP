@@ -23,11 +23,9 @@ class Login : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        usuarioId = intent.getLongExtra("usuario_id", -1)
 
         sharedViewModel = ViewModelProvider(this)[SharedViewModel::class.java]
         userViewModel = ViewModelProvider(this).get(UserViewModel::class.java)
-        sharedViewModel.setUsuarioId(usuarioId)
 
 
         val btnIngresar = findViewById<Button>(R.id.btnIngresar)
@@ -40,11 +38,9 @@ class Login : AppCompatActivity() {
         userViewModel.loginResponse.observe(this) { usuario ->
             if (usuario != null) {
                 // Guardar el token
-                guardarToken(usuario.token)
-
+                guardarDatosUsuario(usuario.id, usuario.token)
                 // Navegar al Dashboard
                 val intent = Intent(this, Dashboard::class.java)
-                intent.putExtra("usuario_id", usuarioId)
                 startActivity(intent)
             }
         }
@@ -77,11 +73,13 @@ class Login : AppCompatActivity() {
         }
     }
 
-    private fun guardarToken(token: String) {
+    private fun guardarDatosUsuario(id: Long, token: String) {
         val sharedPref = getSharedPreferences("MiApp", Context.MODE_PRIVATE)
         with(sharedPref.edit()) {
-            putString("TOKEN", token)
+            putLong("USUARIO_ID", id)  // Guardar el ID del usuario
+            putString("TOKEN", token)  // Guardar el Token
             apply()
         }
     }
+
 }

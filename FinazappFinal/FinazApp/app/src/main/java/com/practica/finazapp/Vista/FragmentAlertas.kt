@@ -20,6 +20,9 @@ import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.textfield.TextInputEditText
@@ -69,6 +72,12 @@ class FragmentAlertas : Fragment(), AlertasListener {
             usuarioId?.let {
                 this.usuarioId = it
                 cargarAlertas()  // Cargar alertas existentes
+            }
+        }
+
+        alertaViewModel.operacionCompletada.observe(viewLifecycleOwner) { completada ->
+            if (completada == true) {
+                cargarAlertas()// Actualizar la UI
             }
         }
 
@@ -123,7 +132,7 @@ class FragmentAlertas : Fragment(), AlertasListener {
 
                 // Obtener el ingreso total del mes y proceder con la comparación
                 ingresoViewModel.obtenerTotalIngresos(usuarioId)
-                ingresoViewModel.totalIngresosLiveData.observe(viewLifecycleOwner) { ingresoTotal ->
+                ingresoViewModel.totalIngresosLiveData.observeOnce(viewLifecycleOwner) { ingresoTotal ->
                     ingresoTotal?.let {
                         if (limite > it) {
                             Toast.makeText(requireContext(), "El valor de la alerta supera el ingreso total.", Toast.LENGTH_LONG).show()
@@ -163,6 +172,7 @@ class FragmentAlertas : Fragment(), AlertasListener {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
+    @SuppressLint("SetTextI18n")
     override fun onAlertasCargadas(alertas: List<AlertaDTO>, ingresoTotal: Double) {
         if (alertas.isEmpty()) {
             Toast.makeText(requireContext(), "No hay alertas configuradas para este mes.", Toast.LENGTH_SHORT).show()
@@ -201,7 +211,7 @@ class FragmentAlertas : Fragment(), AlertasListener {
     @SuppressLint("SetTextI18n")
     private fun cargarAlertas() {
         // Obtener los ingresos totales del mes del usuario
-
+        Log.d("FragmentAlertas", "Cargando alertas")
         ingresoViewModel.obtenerTotalIngresos(usuarioId)
         ingresoViewModel.totalIngresosLiveData.observe(viewLifecycleOwner) { ingresoTotal ->
             // Si el ingreso total es null, significa que no hay ingresos para el mes actual
@@ -215,6 +225,7 @@ class FragmentAlertas : Fragment(), AlertasListener {
             alertaViewModel.alertasPorMesLiveData.observe(viewLifecycleOwner) { alertas ->
                 // Notificar al listener con las alertas y el ingreso total
                 if (alertas != null) {
+                    Log.d("FragmentAlertas", "Alertas: $alertas")
                     onAlertasCargadas(alertas, ingresoTotal)
                 }
             }
@@ -345,6 +356,15 @@ class FragmentAlertas : Fragment(), AlertasListener {
         )
 
         datePickerDialog.show()
+    }
+
+    fun <T> LiveData<T>.observeOnce(lifecycleOwner: LifecycleOwner, observer: Observer<T>) {
+        observe(lifecycleOwner, object : Observer<T> {
+            override fun onChanged(value: T) {
+                removeObserver(this) // Elimina el observador después de la primera actualización
+                observer.onChanged(value)
+            }
+        })
     }
 
     override fun onDestroyView() {

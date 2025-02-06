@@ -1,5 +1,6 @@
 package com.practica.finazapp.Vista
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -28,6 +29,8 @@ import com.practica.finazapp.ViewModelsApiRest.UserViewModel
 
 class Dashboard : AppCompatActivity() {
 
+
+
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityDashboardBinding
     private lateinit var usuarioViewModel: UserViewModel
@@ -51,7 +54,9 @@ class Dashboard : AppCompatActivity() {
             R.id.nav_dashboard, R.id.nav_perfil, R.id.nav_ingresos, R.id.nav_reporte
         ), drawerLayout
         )
-        val usuarioId: Long = intent.getLongExtra("usuario_id", -1)
+
+        val sharedPref = this.getSharedPreferences("MiApp", Context.MODE_PRIVATE)
+        val usuarioId: Long = sharedPref.getLong("USUARIO_ID", -1)
 
         if (usuarioId == -1L) {
 
@@ -68,6 +73,7 @@ class Dashboard : AppCompatActivity() {
       navView.setupWithNavController(navController)
 
         usuarioViewModel = ViewModelProvider(this).get(UserViewModel::class.java)
+
 
         usuarioViewModel.ObtenerUsuario(usuarioId)
         usuarioViewModel.usuarioLiveData.observeOnce(this) { usuario ->
@@ -118,6 +124,7 @@ class Dashboard : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_logout -> {
+                
                 val intent = Intent(this, Login::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
                 startActivity(intent)
@@ -128,6 +135,7 @@ class Dashboard : AppCompatActivity() {
         }
     }
 
+
     fun <T> LiveData<T>.observeOnce(lifecycleOwner: LifecycleOwner, observer: Observer<T>) {
         observe(lifecycleOwner, object : Observer<T> {
             override fun onChanged(value: T) {
@@ -136,4 +144,6 @@ class Dashboard : AppCompatActivity() {
             }
         })
     }
+
+
 }

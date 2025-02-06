@@ -2,6 +2,7 @@ package com.practica.finazapp.Vista
 
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
+import android.content.Context
 import android.icu.util.Calendar
 import android.os.Bundle
 import android.util.Log
@@ -33,6 +34,7 @@ import com.practica.finazapp.ViewModelsApiRest.SpendViewModel
 import lecho.lib.hellocharts.model.*
 import java.text.NumberFormat
 import android.graphics.Color as Color1
+import android.content.SharedPreferences
 
 
 class DashboardFragment : Fragment(), OnItemClickListener2 {
@@ -43,6 +45,7 @@ class DashboardFragment : Fragment(), OnItemClickListener2 {
     private lateinit var ingresoViewModel: IncomeViewModel
     private lateinit var alertaViewModel: AlertViewModel
     private lateinit var notificationHelper: NotificationHelper
+    private lateinit var sharedPreferences: SharedPreferences
     private val notificacionesEnviadas = mutableSetOf<Long>()
     private var disponible: Double = 0.0
     private var _binding: FragmentDashboardBinding? = null
@@ -68,6 +71,13 @@ class DashboardFragment : Fragment(), OnItemClickListener2 {
 
 
         notificationHelper = NotificationHelper(requireContext())
+
+        // Inicializar SharedPreferences
+        sharedPreferences = requireContext().getSharedPreferences("notificaciones", Context.MODE_PRIVATE)
+
+        // Cargar los IDs ya notificados
+        val ids = sharedPreferences.getStringSet("alertas_notificadas", emptySet()) ?: emptySet()
+        notificacionesEnviadas.addAll(ids.mapNotNull { it.toLongOrNull() })
 
         sharedViewModel.idUsuario.observe(viewLifecycleOwner) { usuarioId ->
             Log.d("FragmentGastos", "id usuario: $usuarioId")
@@ -223,64 +233,57 @@ class DashboardFragment : Fragment(), OnItemClickListener2 {
     }
 
     private fun verificarAlertasExcedidas() {
-        // Obtener el ingreso total del mes
-        ingresoViewModel.obtenerTotalIngresos(usuarioId)
-        ingresoViewModel.totalIngresosLiveData.observe(viewLifecycleOwner) { ingresoTotal ->
-            if (ingresoTotal == null) {
-                Log.d("DashboardFragment", "No hay ingresos registrados para este mes.")
+        Log.d("DashboardFragment", "Llamando al método verificarAlertasExcedidas...")
+
+        alertaViewModel.obtenerAlertaPorMes(usuarioId)
+
+        alertaViewModel.alertasPorMesLiveData.observe(viewLifecycleOwner) { alertas ->
+            Log.d("DashboardFragment", "Alertas: $alertas")
+
+            if (alertas.isNullOrEmpty()) {
+                Log.d("DashboardFragment", "No hay alertas configuradas para este mes.")
                 return@observe
             }
 
-            // Obtener las alertas del mes
-            alertaViewModel.obtenerAlertaPorMes(usuarioId)
-            alertaViewModel.alertasPorMesLiveData.observe(viewLifecycleOwner) { alertas ->
-                if (alertas != null) {
-                    if (alertas.isEmpty()) {
-                        Log.d("DashboardFragment", "No hay alertas configuradas para este mes.")
-                    } else {
-                        // Recorrer todas las alertas
-                        for (alerta in alertas) {
-                            // Verificar si la alerta está asociada a una categoría del Spinner (de las alertas)
-                            val categoriasSpinner = listOf("disponible", "Gastos Hormiga", "Alimentos", "Transporte", "Servicios", "Mercado")
+            val categoriasSpinner = listOf("disponible", "Gastos Hormiga", "Alimentos", "Transporte", "Servicios", "Mercado")
 
-                            // Comprobar si la descripción de la alerta está en las categorías del spinner
-                            if (categoriasSpinner.contains(alerta.descripcion)) {
-                                if (alerta.descripcion == "disponible") {
-                                    // Si la alerta es para "disponible", obtenemos el gasto total
+            for (alerta in alertas) {
+                Log.d("DashboardFragment", "Procesando alerta: ${alerta.nombre}")
 
-                                    gastosViewModel.obtenerValorGastosMes(usuarioId)
-                                    gastosViewModel.valorGastosMesLiveData.observe(viewLifecycleOwner)  { totalGastos ->
-                                        // Verificamos si el gasto total excede el valor de la alerta
-                                        if (totalGastos != null) {
-                                            if (totalGastos > alerta.valor) {
-                                                // Verificar si ya se envió una notificación para esta alerta
-                                                if (!notificacionesEnviadas.contains(alerta.id_alerta)) {
-                                                    val mensaje = "La alerta '${alerta.nombre}' para el gasto disponible ha sido excedida. Límite: ${alerta.valor}, Gasto total: $totalGastos"
-                                                    notificationHelper.sendNotification("Gasto Excedido", mensaje)
-                                                    notificacionesEnviadas.add(alerta.id_alerta)
-                                                    Log.d("DashboardFragment", "Notificación enviada para alerta: ${alerta.nombre}")
-                                                }
-                                            }
-                                        }
-                                    }
-                                } else {
-                                    // Si no es la categoría "disponible", usamos el gasto por categoría
-                                    gastosViewModel.obtenerValorGastosMesCategoria(usuarioId, alerta.descripcion)
-                                    gastosViewModel.valorGastosMesCategoriaLiveData5.observe(viewLifecycleOwner) { gastoCategoria ->
-                                        gastoCategoria?.let { totalGastos ->
-                                            // Verificar si el gasto en esa categoría supera el valor de la alerta
-                                            if (totalGastos > alerta.valor) {
-                                                // Verificar si ya se envió una notificación para esta alerta
-                                                if (!notificacionesEnviadas.contains(alerta.id_alerta)) {
-                                                    val mensaje = "La alerta '${alerta.nombre}' para la categoría '${alerta.descripcion}' ha sido excedida. Límite: ${alerta.valor}, Gasto: $totalGastos"
-                                                    notificationHelper.sendNotification("Gasto Excedido", mensaje)
-                                                    notificacionesEnviadas.add(alerta.id_alerta)
-                                                    Log.d("DashboardFragment", "Notificación enviada para alerta: ${alerta.nombre}")
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
+                // Verificar si la alerta está en el Spinner
+                if (!categoriasSpinner.contains(alerta.descripcion)) continue
+
+                Log.d("DashboardFragment", "Alerta válida en Spinner: ${alerta.descripcion}")
+
+                if (alerta.descripcion == "disponible") {
+                    Log.d("DashboardFragment", "Obteniendo gasto total")
+
+                    gastosViewModel.obtenerValorGastosMes(usuarioId)
+                    gastosViewModel.valorGastosMesLiveData.observeOnce(viewLifecycleOwner) { totalGastos ->
+                        if (totalGastos != null && totalGastos > alerta.valor) {
+                            Log.d("DashboardFragment", "Gasto total excede la alerta (${alerta.valor}): $totalGastos")
+
+                            if (!notificacionesEnviadas.contains(alerta.id_alerta)) {
+                                val mensaje = "La alerta '${alerta.nombre}' para el gasto disponible ha sido excedida. Límite: ${alerta.valor}, Gasto total: $totalGastos"
+                                notificationHelper.sendNotification("Gasto Excedido", mensaje)
+                                notificacionesEnviadas.add(alerta.id_alerta)
+                                Log.d("DashboardFragment", "Notificación enviada para alerta: ${alerta.nombre}")
+                            }
+                        }
+                    }
+                } else {
+                    Log.d("DashboardFragment", "Obteniendo gasto por categoría: ${alerta.descripcion}")
+                    gastosViewModel.obtenerValorGastosMesCategoria5(usuarioId, alerta.descripcion)
+                    gastosViewModel.valorGastosMesCategoriaLiveData5.observe(viewLifecycleOwner) { gastoCategoria ->
+                        Log.d("DashboardFragment", "Gasto por categoría: $gastoCategoria")
+                        if (gastoCategoria != null && gastoCategoria > alerta.valor) {
+                            Log.d("DashboardFragment", "Gasto en categoría '${alerta.descripcion}' excede la alerta (${alerta.valor}): $gastoCategoria")
+
+                            if (!notificacionesEnviadas.contains(alerta.id_alerta)) {
+                                val mensaje = "La alerta '${alerta.nombre}' para la categoría '${alerta.descripcion}' ha sido excedida. Límite: ${alerta.valor}, Gasto: $gastoCategoria"
+                                notificationHelper.sendNotification("Gasto Excedido", mensaje)
+                                notificacionesEnviadas.add(alerta.id_alerta)
+                                Log.d("DashboardFragment", "Notificación enviada para alerta: ${alerta.nombre}")
                             }
                         }
                     }
@@ -288,6 +291,7 @@ class DashboardFragment : Fragment(), OnItemClickListener2 {
             }
         }
     }
+
 
     @SuppressLint("MissingSuperCall")
     @Override
@@ -411,6 +415,7 @@ class DashboardFragment : Fragment(), OnItemClickListener2 {
 
         gastosViewModel.obtenerValorGastosMes(usuarioId)
         gastosViewModel.valorGastosMesLiveData.observe(viewLifecycleOwner) { gastosMes ->
+            Log.d("DashboardComporbacion", "Valor de gastosMes: $gastosMes")
             if (gastosMes != null) {
                 val numberFormat = NumberFormat.getInstance()
                 numberFormat.maximumFractionDigits = 2
@@ -644,7 +649,6 @@ class DashboardFragment : Fragment(), OnItemClickListener2 {
                             fecha = fecha
                         )
                         gastosViewModel.modificarGasto(gasto.id_gasto, gastoActualizado)
-
                         dialog.dismiss()
                     } catch (e: NumberFormatException) {
                         Toast.makeText(requireContext(), "La cantidad ingresada no es válida", Toast.LENGTH_SHORT).show()
