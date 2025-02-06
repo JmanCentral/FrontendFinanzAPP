@@ -17,7 +17,6 @@ class Login : AppCompatActivity() {
 
     private lateinit var sharedViewModel: SharedViewModel
     private lateinit var userViewModel: UserViewModel
-    private var usuarioId: Long = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

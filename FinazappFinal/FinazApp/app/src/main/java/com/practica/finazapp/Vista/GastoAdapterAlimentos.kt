@@ -12,8 +12,8 @@ import com.practica.finazapp.R
 import java.text.NumberFormat
 
 
-class GastoAdapter(private val gastos: List<GastoDTO>) :
-    RecyclerView.Adapter<GastoAdapter.GastoViewHolder>() {
+class GastoAdapterAlimentos(private val gastos: List<GastoDTO>) :
+    RecyclerView.Adapter<GastoAdapterAlimentos.GastoViewHolder>() {
 
     private var listener1: OnItemClickListener1? = null
 

@@ -3,6 +3,8 @@ package com.practica.finazapp.Vista
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.content.Context
+import android.content.Intent
+import android.content.SharedPreferences
 import android.icu.util.Calendar
 import android.os.Bundle
 import android.util.Log
@@ -13,6 +15,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
@@ -22,22 +25,21 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.practica.finazapp.R
-import com.practica.finazapp.ViewModelsApiRest.SharedViewModel
-import com.practica.finazapp.databinding.FragmentDashboardBinding
-import com.practica.finazapp.ui.Estilos.CustomSpinnerAdapter
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.practica.finazapp.Entidades.GastoDTO
+import com.practica.finazapp.R
 import com.practica.finazapp.ViewModelsApiRest.AlertViewModel
 import com.practica.finazapp.ViewModelsApiRest.IncomeViewModel
+import com.practica.finazapp.ViewModelsApiRest.SharedViewModel
 import com.practica.finazapp.ViewModelsApiRest.SpendViewModel
+import com.practica.finazapp.databinding.FragmentDashboardBinding
+import com.practica.finazapp.ui.Estilos.CustomSpinnerAdapter
 import lecho.lib.hellocharts.model.*
 import java.text.NumberFormat
 import android.graphics.Color as Color1
-import android.content.SharedPreferences
 
 
-class DashboardFragment : Fragment(), OnItemClickListener2 {
+class DashboardFragment : Fragment() {
 
     private var usuarioId: Long = -1
     private lateinit var sharedViewModel: SharedViewModel
@@ -63,6 +65,15 @@ class DashboardFragment : Fragment(), OnItemClickListener2 {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+
+        // Registrar un OnBackPressedCallback
+        val callback: OnBackPressedCallback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                // Cierra la aplicación
+                requireActivity().finishAffinity()
+            }
+        }
 
         gastosViewModel = ViewModelProvider(this)[SpendViewModel::class.java]
         sharedViewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
@@ -93,6 +104,8 @@ class DashboardFragment : Fragment(), OnItemClickListener2 {
                 } catch (e: Exception) {
                     Log.e("FragmentGastos", "Error al cargar datos: ${e.message}", e)
                 }
+
+
 
                 val bloqueTransporte = binding.bloqueTransporte
                 val bloqueGastosVarios = binding.bloqueGastosVarios
@@ -136,11 +149,13 @@ class DashboardFragment : Fragment(), OnItemClickListener2 {
                 Log.e("FragmentGastos", "El ID de usuario es nulo")
             }
         }
+
         gastosViewModel.operacionCompletada.observe(viewLifecycleOwner) { completada ->
             if (completada == true) {
                 cargarDatos()// Actualizar la UI
             }
         }
+
         val btnNuevoGasto = view.findViewById<FloatingActionButton>(R.id.floatingActionButton)
 
         btnNuevoGasto.setOnClickListener {
@@ -579,95 +594,15 @@ class DashboardFragment : Fragment(), OnItemClickListener2 {
         dialog.show()
     }
 
-
-
     private fun mostrarListaDeGastos(recyclerView: RecyclerView, categoria: String) {
-        gastosViewModel.gastosMesCategoriaLiveData.removeObservers(viewLifecycleOwner)
-        gastosViewModel.obtenerGastosMesCategoria(usuarioId, categoria)
-        gastosViewModel.gastosMesCategoriaLiveData.observeOnce(viewLifecycleOwner) { gastosCat ->
-            if (gastosCat != null) {
-                Log.d("mostrarListaDeGastos", "Gastos cargados: ${gastosCat.size}")
-                val adapter = GastoAdapterPrincipal(gastosCat)
-                adapter.setOnItemClickListener2(this) // Pasamos el Fragment como listener
-                recyclerView.adapter = adapter
-                recyclerView.layoutManager = LinearLayoutManager(requireContext())
-
-                recyclerView.visibility = if (recyclerView.visibility == View.GONE) View.VISIBLE else View.GONE
-            } else {
-                Log.d("mostrarListaDeGastos", "No hay gastos para la categoría: $categoria")
-            }
+        val intent = Intent(requireContext(), ListaGastos::class.java).apply {
+            putExtra("usuarioId", usuarioId)
+            putExtra("categoria", categoria)
         }
+        startActivity(intent)
     }
 
 
-    override fun onItemClick2(gasto: GastoDTO) {
-        Log.d("onItemClick", "Gasto clickeado: ${gasto.nombre_gasto}")
-        val dialogView = layoutInflater.inflate(R.layout.dialog_modificar_gasto, null)
-        val spinnerCategoria = dialogView.findViewById<Spinner>(R.id.spinnerCategoria)
-        val items = resources.getStringArray(R.array.categorias).toList()
-        val adapter = CustomSpinnerAdapter(requireContext(), items)
-        spinnerCategoria.adapter = adapter
-        val editTextCantidad = dialogView.findViewById<EditText>(R.id.editTextCantidad)
-        val editTextFecha = dialogView.findViewById<EditText>(R.id.editTextFecha)
-        val editTextDescripcion = dialogView.findViewById<EditText>(R.id.editTextDescripcion)
-        val btnEliminar = dialogView.findViewById<Button>(R.id.btnEliminarGasto)
-        editTextCantidad.setText(gasto.valor.toString())
-        val parts = gasto.fecha.split("-")
-        val fechaFormateada = "${parts[2]}/${parts[1]}/${parts[0]}"
-        editTextFecha.setText(fechaFormateada)
-        editTextDescripcion.setText(gasto.nombre_gasto)
-        val posicionCategoria = items.indexOf(gasto.categoria)
-        if (posicionCategoria != -1) {
-            spinnerCategoria.setSelection(posicionCategoria)
-        }
-
-        editTextFecha.setOnClickListener {
-            showDatePickerDialog(editTextFecha)
-        }
-
-        val dialog = AlertDialog.Builder(requireContext())
-            .setView(dialogView)
-            .setPositiveButton("Guardar") { dialog, _ ->
-                val categoria = spinnerCategoria.selectedItem.toString()
-                val cantidad = editTextCantidad.text.toString()
-                val fechaOriginal = editTextFecha.text.toString()
-                val descripcion = editTextDescripcion.text.toString()
-
-                if (categoria.isNotBlank() && cantidad.isNotBlank() && fechaOriginal.isNotBlank() && descripcion.isNotBlank()) {
-                    try {
-                        val valor = cantidad.toDouble()
-                        val partes = fechaOriginal.split("/")
-                        val dia = partes[0].padStart(2, '0')
-                        val mes = partes[1].padStart(2, '0')
-                        val anio = partes[2]
-                        val fecha = "${anio}-${mes}-${dia}"
-                        val gastoActualizado = GastoDTO(
-                            id_gasto = gasto.id_gasto,
-                            categoria = categoria,
-                            valor = valor,
-                            nombre_gasto = descripcion,
-                            fecha = fecha
-                        )
-                        gastosViewModel.modificarGasto(gasto.id_gasto, gastoActualizado)
-                        dialog.dismiss()
-                    } catch (e: NumberFormatException) {
-                        Toast.makeText(requireContext(), "La cantidad ingresada no es válida", Toast.LENGTH_SHORT).show()
-                    }
-                } else {
-                    Toast.makeText(requireContext(), "Por favor complete todos los campos", Toast.LENGTH_SHORT).show()
-                }
-            }
-            .setNegativeButton("Cancelar") { dialog, _ ->
-                dialog.dismiss()
-            }
-            .create()
-
-        btnEliminar.setOnClickListener {
-            gastosViewModel.eliminarGasto(gasto.id_gasto)
-            dialog.dismiss()
-        }
-        dialog.show()
-    }
 
     fun cargarBarra(cantidad: Double, barra: View) {
         gastosViewModel.obtenerValorGastosMes(usuarioId)
@@ -809,6 +744,8 @@ class DashboardFragment : Fragment(), OnItemClickListener2 {
             }
         })
     }
+
+
 
 }
 

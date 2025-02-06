@@ -318,7 +318,7 @@ class FragmentCategorias : Fragment(), OnItemClickListener1 {
         gastosViewModel.gastosMesCategoriaLiveData.observe(viewLifecycleOwner) { gastosCat ->
             if (gastosCat != null) {
                 Log.d("mostrarListaDeGastos", "Gastos cargados: ${gastosCat.size}")
-                val adapter = GastoAdapter(gastosCat)
+                val adapter = GastoAdapterAlimentos(gastosCat)
                 adapter.setOnItemClickListener1(this) // Pasamos el Fragment como listener
                 recyclerView.adapter = adapter
                 recyclerView.layoutManager = LinearLayoutManager(requireContext())

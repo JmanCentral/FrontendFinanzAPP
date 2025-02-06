@@ -8,6 +8,7 @@ import okhttp3.Response
 import java.io.IOException
 
 class AuthInterceptor(private val context: Context) : Interceptor {
+
     private val sharedPreferences = context.getSharedPreferences("MiApp", Context.MODE_PRIVATE)
 
     @Throws(IOException::class)

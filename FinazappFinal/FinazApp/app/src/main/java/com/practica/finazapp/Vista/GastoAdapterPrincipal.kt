@@ -17,10 +17,9 @@ class GastoAdapterPrincipal(private val gastos: List<GastoDTO>) :
 
     private var listener2: OnItemClickListener2? = null
 
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GastoViewHolder {
         val itemView = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_gasto, parent, false)
+            .inflate(R.layout.listelement, parent, false)
         return GastoViewHolder(itemView)
     }
 
@@ -29,33 +28,15 @@ class GastoAdapterPrincipal(private val gastos: List<GastoDTO>) :
         val numberFormat = NumberFormat.getInstance()
         numberFormat.maximumFractionDigits = 2
 
-        holder.descripcionTextView.text = currentGasto.nombre_gasto
+        holder.nameTextView.text = currentGasto.nombre_gasto
         holder.valorTextView.text = "${numberFormat.format(currentGasto.valor)}$"
-
-
+        holder.categoria.text = currentGasto.categoria
+        holder.fecha.text = currentGasto.fecha
 
         holder.itemView.setOnClickListener {
             listener2?.onItemClick2(currentGasto)
         }
-
     }
-
-
-    private fun mostrarDialogo(context: Context, descripcion: String) {
-        AlertDialog.Builder(context)
-            .setTitle("Aviso de Gasto Alto")
-            .setMessage("El gasto en \"$descripcion\" es mayor a 500$. ¿Deseas revisarlo?")
-            .setPositiveButton("Revisar") { dialog, _ ->
-                // Acción al pulsar "Revisar"
-                dialog.dismiss()
-            }
-            .setNegativeButton("Cancelar") { dialog, _ ->
-                dialog.dismiss()
-            }
-            .create()
-            .show()
-    }
-
 
     fun setOnItemClickListener2(listener2: OnItemClickListener2) {
         this.listener2 = listener2
@@ -64,7 +45,9 @@ class GastoAdapterPrincipal(private val gastos: List<GastoDTO>) :
     override fun getItemCount() = gastos.size
 
     inner class GastoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val descripcionTextView: TextView = itemView.findViewById(R.id.txtDescripcion)
-        val valorTextView: TextView = itemView.findViewById(R.id.txtValor)
+        val nameTextView: TextView = itemView.findViewById(R.id.nombregasto)
+        val valorTextView: TextView = itemView.findViewById(R.id.valor)
+        val categoria: TextView = itemView.findViewById(R.id.categoria)
+        val fecha: TextView = itemView.findViewById(R.id.fecha)
     }
 }

@@ -35,6 +35,7 @@ class Dashboard : AppCompatActivity() {
     private lateinit var binding: ActivityDashboardBinding
     private lateinit var usuarioViewModel: UserViewModel
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -57,6 +58,7 @@ class Dashboard : AppCompatActivity() {
 
         val sharedPref = this.getSharedPreferences("MiApp", Context.MODE_PRIVATE)
         val usuarioId: Long = sharedPref.getLong("USUARIO_ID", -1)
+
 
         if (usuarioId == -1L) {
 
@@ -116,6 +118,8 @@ class Dashboard : AppCompatActivity() {
         return true
     }
 
+
+
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
@@ -124,17 +128,18 @@ class Dashboard : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_logout -> {
-                
+
+
                 val intent = Intent(this, Login::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
                 startActivity(intent)
+                limpiarTokenYRedirigirALogin()
                 finish()
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
     }
-
 
     fun <T> LiveData<T>.observeOnce(lifecycleOwner: LifecycleOwner, observer: Observer<T>) {
         observe(lifecycleOwner, object : Observer<T> {
@@ -145,5 +150,13 @@ class Dashboard : AppCompatActivity() {
         })
     }
 
+    private fun limpiarTokenYRedirigirALogin() {
+        val sharedPref1 = this.getSharedPreferences("MiApp", Context.MODE_PRIVATE)
+        // Limpiar el token en SharedPreferences
+        with( sharedPref1.edit()) {
+            remove("TOKEN")
+            apply()
+        }
+}
 
 }
