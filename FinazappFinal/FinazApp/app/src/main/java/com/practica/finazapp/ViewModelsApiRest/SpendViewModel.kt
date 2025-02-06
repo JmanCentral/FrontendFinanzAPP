@@ -196,7 +196,6 @@ import kotlinx.coroutines.launch
 
     // Función para obtener el valor general de gastos por mes y categoría
     fun obtenerValorGastosMesCategoria5(idUsuario: Long, categoria: String) {
-
         viewModelScope.launch {
             repository.obtenerValorGastosMesCategoria(idUsuario, categoria) { valor, error ->
                 if (error == null) {

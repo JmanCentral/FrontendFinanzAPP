@@ -73,8 +73,6 @@ class DashboardFragment : Fragment(), OnItemClickListener2 {
         sharedViewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
         ingresoViewModel = ViewModelProvider(this)[IncomeViewModel::class.java]
         alertaViewModel = ViewModelProvider(this)[AlertViewModel::class.java]
-
-
         notificationHelper = NotificationHelper(requireContext())
 
         // Inicializar SharedPreferences
@@ -560,7 +558,6 @@ class DashboardFragment : Fragment(), OnItemClickListener2 {
     private fun mostrarListaDeGastos(recyclerView: RecyclerView, categoria: String) {
         // Llamamos al método para obtener los gastos filtrados por categoría
         gastosViewModel.obtenerGastosMesCategoria(usuarioId, categoria)
-
         // Cancelamos cualquier colección previa para evitar múltiples colecciones activas
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -570,7 +567,7 @@ class DashboardFragment : Fragment(), OnItemClickListener2 {
 
                         // Configuramos el adapter con la nueva lista
                         val adapter = GastoAdapterPrincipal(gastosCat)
-                        adapter.setOnItemClickListener2(this@GastoAdapterPrincipal) // Pasamos el Fragment como listener
+                        adapter.setOnItemClickListener2(this) // Pasamos el Fragment como listener
                         recyclerView.adapter = adapter
                         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
