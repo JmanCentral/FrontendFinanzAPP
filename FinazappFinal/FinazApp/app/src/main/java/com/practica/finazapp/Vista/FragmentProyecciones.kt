@@ -91,25 +91,22 @@ class FragmentProyecciones : Fragment() {
         }
 
         gastosViewModel.obtenerGastoRecurrente(usuarioId)
-        gastosViewModel.gastoRecurrenteLiveData.observe(viewLifecycleOwner) { descripcionRecurrente ->
+        gastosViewModel.gastoRecurrenteLiveData.observe(viewLifecycleOwner) {descripcionRecurrente ->
             descripcionRecurrente?.let {
                 Log.d("descripcionRecurrente", "recurrente: $descripcionRecurrente")
                 // Encuentra el TextView para mostrar el resultado
                 val textViewGastosRecurrentes = view?.findViewById<TextView>(R.id.textpromedio)
-                val mensaje = "Tienes un gasto recurrente en : $descripcionRecurrente revisa si es esencial ese gasto"
+                val mensaje =
+                    "Tienes un gasto recurrente en : $descripcionRecurrente revisa si es esencial ese gasto"
 
                 textViewGastosRecurrentes?.text = mensaje
-            } ?: run {
-                // Maneja el caso en que no haya datos recurrentes
-                val textViewGastosRecurrentes = view?.findViewById<TextView>(R.id.textpromedio)
-                textViewGastosRecurrentes?.text = "No se encontraron gastos recurrentes"
             }
-
         }
         gastosViewModel.obtenerPorcentajeGastos(usuarioId)
         gastosViewModel.porcentajeGastosLiveData
             .observe(viewLifecycleOwner) { porcentaje  ->
                 porcentaje?.let {
+                    Log.d("pruebis", "recurrente: $porcentaje")
                     val textViewGastoPorcentaje = view?.findViewById<TextView>(R.id.textRecurrente)
 
                     // Calcular el mensaje con el porcentaje y el comentario
@@ -123,13 +120,38 @@ class FragmentProyecciones : Fragment() {
                     textViewGastoPorcentaje?.text = mensaje
                 }
             }
+        ingresosViewModel.obtenerProyeccionIngresos(usuarioId)
+        ingresosViewModel.proyeccionIngresosLiveData.observe(viewLifecycleOwner) { proyectado ->
+            proyectado?.let {
+
+                val textViewProyectado = view?.findViewById<TextView>(R.id.textProyeciones)
+                val mensaje = "Ingresos proyectados para el siguiente mes : $${String.format("%.2f", it)}"
+                textViewProyectado?.text = mensaje
+
+            }
+        }
+        gastosViewModel.CategoriaMasAlta.observe(viewLifecycleOwner) { listaCategorias ->
+            listaCategorias?.let {
+                if (!listaCategorias.isNullOrEmpty()) {
+                    val categoriaMasAlta = listaCategorias[0] // Asumiendo que la lista está ordenada de mayor a menor
+                    val textViewRecomendacion = view?.findViewById<TextView>(R.id.textRecomendacion)
+                    val mensaje = "Revisa tus gastos en '${categoriaMasAlta.categoria}', ya que suman ${categoriaMasAlta.totalValor} y es la categoría que más gastas"
+                    textViewRecomendacion?.text = mensaje
+                }
+            }
+        }
+        gastosViewModel.obtenerPromedioDiario(usuarioId)
+        gastosViewModel.promedioDiarioLiveData.observe(viewLifecycleOwner) { gastosPromedioDiario ->
+
+            gastosPromedioDiario?.let{
+                val textViewPromedioDiario = view?.findViewById<TextView>(R.id.textRecomendacion1)
+                val mensaje = "El promedio diario de tus gastos es de  : $${String.format("%.2f", it)}"
+                textViewPromedioDiario?.text = mensaje
+
+            }
+        }
 
         /*
-
-
-
-
-
 
         /*
         // Observa el ingreso total del mes actual
@@ -155,42 +177,12 @@ class FragmentProyecciones : Fragment() {
         }
          */
 
-        ingresosViewModel.getProyectar(usuarioId).observe(viewLifecycleOwner) { proyectado ->
-            proyectado?.let {
 
-                val textViewProyectado = view?.findViewById<TextView>(R.id.textProyeciones)
-                val mensaje = "Ingresos proyectados para el siguiente mes : $${String.format("%.2f", it)}"
-                textViewProyectado?.text = mensaje
 
-            }
-        }
 
-        gastosViewModel.getCategoriasConMasGastos(usuarioId).observe(viewLifecycleOwner) { listaCategorias ->
-            if (!listaCategorias.isNullOrEmpty()) {
-                val categoriaMasGasto = listaCategorias.first() // Obtiene la categoría con el mayor gasto
-                mostrarRecomendacion(categoriaMasGasto.categoria, categoriaMasGasto.totalValor)
-            }
-        }
 
-        gastosViewModel.gastopromediodiario(usuarioId).observe(viewLifecycleOwner) { gastosPromedioDiario ->
-
-            gastosPromedioDiario?.let{
-                val textViewPromedioDiario = view?.findViewById<TextView>(R.id.textRecomendacion1)
-                val mensaje = "El promedio diario de tus gastos es de  : $${String.format("%.2f", it)}"
-                textViewPromedioDiario?.text = mensaje
-
-            }
-        }
 
          */
     }
 
-
-    fun mostrarRecomendacion(categoria: String, totalValor: Double) {
-
-        val textViewRecomendacion = view?.findViewById<TextView>(R.id.textRecomendacion)
-        val mensaje =  "Revisa tus gastos en $categoria, ya que suman $totalValor y es la categoria que más gasta"
-        textViewRecomendacion?.text = mensaje
-
-    }
 }

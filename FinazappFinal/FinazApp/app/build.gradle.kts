@@ -65,7 +65,7 @@ dependencies {
     implementation("com.github.lecho:hellocharts-library:1.5.8@aar")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.recyclerview:recyclerview:1.3.2")
-
+    implementation ("com.squareup.retrofit2:converter-scalars:2.9.0")
     // Reemplazar con la versión de lifecycle adecuada
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")

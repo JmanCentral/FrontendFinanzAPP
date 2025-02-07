@@ -2,6 +2,7 @@ package com.practica.finazapp.ViewModelsApiRest
 
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import com.practica.finazapp.RepositoriosApiRest.SpendRepository
 import androidx.lifecycle.LiveData
@@ -12,6 +13,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import androidx.lifecycle.viewModelScope
+import com.practica.finazapp.Entidades.CategoriaTotalDTO
 import kotlinx.coroutines.launch
 
     class SpendViewModel (application: Application) : AndroidViewModel(application)   {
@@ -86,6 +88,10 @@ import kotlinx.coroutines.launch
         // LiveData para el promedio diario de gastos
         private val _promedioDiarioLiveData = MutableLiveData<Double?>()
         val promedioDiarioLiveData: LiveData<Double?> = _promedioDiarioLiveData
+
+        // LiveData para el porcentaje de gastos sobre ingresos
+        private val _CategoriaMasAlta = MutableLiveData<List<CategoriaTotalDTO>?>()
+        val CategoriaMasAlta: LiveData<List<CategoriaTotalDTO>?> = _CategoriaMasAlta
 
         // LiveData para indicar si una operación ha sido completada
         private val _operacionCompletada = MutableLiveData<Boolean>()
@@ -309,6 +315,7 @@ import kotlinx.coroutines.launch
     fun obtenerGastoRecurrente(idUsuario: Long) {
         viewModelScope.launch {
             repository.obtenerGastoRecurrente(idUsuario) { gastoRecurrente, error ->
+                Log.d("GastoRecurrente", "Gasto recurrente: $gastoRecurrente")
                 if (error == null) {
                     _gastoRecurrenteLiveData.postValue(gastoRecurrente)
                 } else {
@@ -337,6 +344,19 @@ import kotlinx.coroutines.launch
             repository.obtenerPromedioDiario(idUsuario) { promedioDiario, error ->
                 if (error == null) {
                     _promedioDiarioLiveData.postValue(promedioDiario)
+                } else {
+                    _errorLiveData.postValue(error)
+                }
+            }
+        }
+    }
+
+    fun obtenerCategoriasConMasGastos(idUsuario: Long) {
+        viewModelScope.launch {
+            repository.obtenerCategoriasConMasGastos(idUsuario)
+            { categorias, error ->
+                if (error == null) {
+                    _CategoriaMasAlta.postValue(categorias)
                 } else {
                     _errorLiveData.postValue(error)
                 }

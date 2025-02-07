@@ -1,5 +1,6 @@
 package com.practica.finazapp.Utils
 
+import com.practica.finazapp.Entidades.CategoriaTotalDTO
 import com.practica.finazapp.Entidades.GastoDTO
 import retrofit2.Call
 import retrofit2.http.*
@@ -94,6 +95,11 @@ interface GastoService {
      fun obtenerPromedioDiario(
         @Path("id_usuario") idUsuario: Long
     ): Call<Double>
+
+     @GET("ObtenerCategoriasConMasGastos/{id_usuario}")
+     fun obtenerCategoriasConMasGastos(
+        @Path("id_usuario") idUsuario: Long
+    ): Call<List<CategoriaTotalDTO>>
 
     // Modificar un gasto
     @PUT("ModificarGastos/{id_gasto}")

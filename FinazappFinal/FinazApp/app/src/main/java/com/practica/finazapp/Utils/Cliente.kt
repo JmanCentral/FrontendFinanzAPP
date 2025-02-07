@@ -4,6 +4,7 @@ import android.content.Context
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.scalars.ScalarsConverterFactory
 
 object Cliente {
     fun getCliente(url: String, context: Context): Retrofit {
@@ -15,6 +16,7 @@ object Cliente {
             .baseUrl(url)
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(ScalarsConverterFactory.create()) // Maneja respuestas String
             .build()
     }
 }

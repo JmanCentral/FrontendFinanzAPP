@@ -1,6 +1,8 @@
 package com.practica.finazapp.RepositoriosApiRest
 
 import android.content.Context
+import android.util.Log
+import com.practica.finazapp.Entidades.CategoriaTotalDTO
 import com.practica.finazapp.Entidades.GastoDTO
 import com.practica.finazapp.Utils.Cliente
 import com.practica.finazapp.Utils.GastoService
@@ -195,11 +197,11 @@ class SpendRepository (context: Context)  {
             override fun onResponse(call: Call<String>, response: Response<String>) {
                 if (response.isSuccessful) {
                     callback(response.body(), null)
+                    Log.d("GastoRecurrente", "Gasto recurrente: ${response.body()}")
                 } else {
                     callback(null, "Error al obtener gasto recurrente: ${response.code()}")
                 }
             }
-
             override fun onFailure(call: Call<String>, t: Throwable) {
                 callback(null, "Fallo en la conexión: ${t.message}")
             }
@@ -221,6 +223,23 @@ class SpendRepository (context: Context)  {
             }
         })
     }
+
+    fun obtenerCategoriasConMasGastos(idUsuario: Long, callback: (List<CategoriaTotalDTO>?, String?) -> Unit) {
+        gastoService.obtenerCategoriasConMasGastos(idUsuario).enqueue(object : Callback<List<CategoriaTotalDTO>> {
+            override fun onResponse(call: Call<List<CategoriaTotalDTO>>, response: Response<List<CategoriaTotalDTO>>) {
+                if (response.isSuccessful) {
+                    callback(response.body(), null)
+                } else {
+                    callback(null, "Error al obtener categorías con más gastos: ${response.code()}")
+                }
+
+                }
+            override fun onFailure(call: Call<List<CategoriaTotalDTO>>, t: Throwable) {
+                callback(null, "Fallo en la conexión: ${t.message}")
+                }
+            })
+            }
+
 
     fun obtenerPromedioDiario(idUsuario: Long, callback: (Double?, String?) -> Unit) {
         gastoService.obtenerPromedioDiario(idUsuario).enqueue(object : Callback<Double> {

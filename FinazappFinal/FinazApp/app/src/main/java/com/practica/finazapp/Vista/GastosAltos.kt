@@ -1,11 +1,24 @@
+
 package com.practica.finazapp.Vista
 
-/*
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.practica.finazapp.ViewModelsApiRest.IncomeViewModel
+import com.practica.finazapp.ViewModelsApiRest.SharedViewModel
+import com.practica.finazapp.ViewModelsApiRest.SpendViewModel
+import com.practica.finazapp.databinding.FragmentGastosAltosBinding
+
 
 class GastosAltos : Fragment() {
 
     private var usuarioId: Long = -1
-    private lateinit var gastosViewModel: GastosViewModel
+    private lateinit var gastosViewModel: SpendViewModel
     private lateinit var adapter: GastoListaAdapter
     private lateinit var sharedViewModel: SharedViewModel
     private var _binding: FragmentGastosAltosBinding? = null
@@ -23,7 +36,6 @@ class GastosAltos : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Inicializar el RecyclerView
         recyclerView = binding.ListGastos
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
@@ -38,7 +50,7 @@ class GastosAltos : Fragment() {
         }
 
         // Inicializar el GastosViewModel
-        gastosViewModel = ViewModelProvider(this).get(GastosViewModel::class.java)
+        gastosViewModel = ViewModelProvider(this).get(SpendViewModel::class.java)
 
         binding.btnOrdenarAscendente.setOnClickListener {
             cargarGastosAscendente()
@@ -52,8 +64,9 @@ class GastosAltos : Fragment() {
     }
 
     private fun cargarGastosAscendente() {
-        // Observar los gastos del ViewModel y actualizar el adaptador
-        gastosViewModel.getGastosOrdenadosAsc(usuarioId).observe(viewLifecycleOwner) { gastos ->
+
+        gastosViewModel.listarGastosAscendentemente(usuarioId)
+        gastosViewModel.gastosAscendentesLiveData.observe(viewLifecycleOwner) { gastos ->
             if (gastos != null) {
                 adapter = GastoListaAdapter(gastos)
                 recyclerView.adapter = adapter
@@ -64,7 +77,8 @@ class GastosAltos : Fragment() {
 
     private fun cargarGastosDescendente() {
         // Observar los gastos del ViewModel y actualizar el adaptador
-        gastosViewModel.getGastosOrdenadosDesc(usuarioId).observe(viewLifecycleOwner) { gastos ->
+        gastosViewModel.listarGastosDescendentemente(usuarioId)
+        gastosViewModel.gastosDescendentesLiveData.observe(viewLifecycleOwner) { gastos ->
             if (gastos != null) {
                 adapter = GastoListaAdapter(gastos)
                 recyclerView.adapter = adapter
@@ -78,11 +92,8 @@ class GastosAltos : Fragment() {
     }
 
 
-        override fun onDestroyView() {
-            super.onDestroyView()
-            _binding = null
-        }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
-
-
- */
+}

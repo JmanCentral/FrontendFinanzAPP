@@ -1,11 +1,38 @@
 package com.practica.finazapp.Vista
 
-/*
+import android.annotation.SuppressLint
+import android.graphics.Color
+import android.os.Build
+import android.os.Bundle
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.annotation.RequiresApi
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import com.practica.finazapp.Entidades.GastoDTO
+import com.practica.finazapp.ViewModelsApiRest.SharedViewModel
+import com.practica.finazapp.ViewModelsApiRest.SpendViewModel
+import com.practica.finazapp.databinding.FragmentReporteBinding
+import lecho.lib.hellocharts.formatter.SimpleAxisValueFormatter
+import lecho.lib.hellocharts.model.Axis
+import lecho.lib.hellocharts.model.AxisValue
+import lecho.lib.hellocharts.model.Line
+import lecho.lib.hellocharts.model.LineChartData
+import lecho.lib.hellocharts.model.PointValue
+import lecho.lib.hellocharts.view.LineChartView
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.time.Month
+import java.time.format.DateTimeFormatter
+import java.time.temporal.TemporalAdjusters
+
 class Reporte : Fragment() {
     private var usuarioId: Long = -1
     private var _binding: FragmentReporteBinding? = null
     private lateinit var sharedViewModel: SharedViewModel
-    private lateinit var gastosViewModel: GastosViewModel
+    private lateinit var gastosViewModel: SpendViewModel
     private val binding get() = _binding!!
 
     override fun onCreateView(
@@ -26,7 +53,7 @@ class Reporte : Fragment() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        gastosViewModel = ViewModelProvider(this)[GastosViewModel::class.java]
+        gastosViewModel = ViewModelProvider(this)[SpendViewModel::class.java]
         sharedViewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
         sharedViewModel.idUsuario.observe(viewLifecycleOwner) { usuarioId ->
             Log.d("FragmentGastos", "id usuario: $usuarioId")
@@ -95,9 +122,16 @@ class Reporte : Fragment() {
                 val anio = fechaActual.year
                 descSem.setText("semana del $diaInf-$diaSup de $mes del $anio")
                 Log.d("FragmentReporte", "rango: $fechaInfFormateada a $fechaSupFormateada")
-                gastosViewModel.getGastosPorFechas(usuarioId, fechaInfFormateada, fechaSupFormateada).observe(viewLifecycleOwner){listaSem ->
-                    cargarGraficoLineasSem(lineChartReporte, convertirMapaALista(getDatosPorCategoria(listaSem)))
-                    Log.d("FragmentReporte", "lista gastos: $listaSem")
+
+                gastosViewModel.listarGastosPorFechas(usuarioId, fechaInfFormateada, fechaSupFormateada)
+                gastosViewModel.gastosPorFechasLiveData.observe(viewLifecycleOwner) { listaSem ->
+                    listaSem?.let {
+                        cargarGraficoLineasSem(
+                            lineChartReporte,
+                            convertirMapaALista(getDatosPorCategoria(listaSem))
+                        )
+                        Log.d("FragmentReporte", "lista gastos: $listaSem")
+                    }
                 }
             }
             "Mensual" -> {
@@ -113,10 +147,13 @@ class Reporte : Fragment() {
                 descSem.setText("$mes de $anio")
 
                 Log.d("FragmentReporte", "rango: $fechaInfFormateada a $fechaSupFormateada")
-                gastosViewModel.getGastosPorFechas(usuarioId, fechaInfFormateada, fechaSupFormateada).observe(viewLifecycleOwner){listaMes ->
+                gastosViewModel.listarGastosPorFechas(usuarioId, fechaInfFormateada, fechaSupFormateada)
+                gastosViewModel.gastosPorFechasLiveData.observe(viewLifecycleOwner){listaMes ->
+                    listaMes?.let {
                     cargarGraficoLineasMes(lineChartReporte, convertirMapaALista(getDatosPorCategoria(listaMes)))
                     Log.d("FragmentReporte", "lista gastos: $listaMes")
                 }
+                    }
             }
             "Anual" -> {
                 lineChartReporte = binding.graficoLineasAnual
@@ -129,9 +166,16 @@ class Reporte : Fragment() {
                 val anio = fechaActual.year
                 descSem.setText("$anio")
                 Log.d("FragmentReporte", "rango: $fechaInfFormateada a $fechaSupFormateada")
-                gastosViewModel.getGastosPorFechas(usuarioId, fechaInfFormateada, fechaSupFormateada).observe(viewLifecycleOwner){listaAn ->
-                    Log.d("FragmentReporte", "lista gastos: $listaAn")
-                    cargarGraficoLineasAn(lineChartReporte, convertirMapaALista(getDatosPorCategoria(listaAn)))
+
+                gastosViewModel.listarGastosPorFechas(usuarioId, fechaInfFormateada, fechaSupFormateada)
+                gastosViewModel.gastosPorFechasLiveData.observe(viewLifecycleOwner) { listaAn ->
+                    listaAn?.let {
+                        Log.d("FragmentReporte", "lista gastos: $listaAn")
+                        cargarGraficoLineasAn(
+                            lineChartReporte,
+                            convertirMapaALista(getDatosPorCategoria(listaAn))
+                        )
+                    }
                 }
             }
         }
@@ -166,7 +210,7 @@ class Reporte : Fragment() {
         }
         return listaDatosPorCategoria
     }
-    private fun getDatosPorCategoria(lista: List<Gasto>): Map<String, Map<String, Double>> {
+    private fun getDatosPorCategoria(lista: List<GastoDTO>): Map<String, Map<String, Double>> {
         val datosPorCategoria: MutableMap<String, MutableMap<String, Double>> = mutableMapOf()
 
         for (dato in lista) {
@@ -531,5 +575,3 @@ class Reporte : Fragment() {
         _binding = null
     }
 }
-
- */
