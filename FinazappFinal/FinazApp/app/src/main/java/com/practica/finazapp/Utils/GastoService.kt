@@ -20,6 +20,15 @@ interface GastoService {
         @Path("id_usuario") idUsuario: Long
     ): Call<Double>
 
+    // Obtener dinero disponible
+    @GET("ObtenerDineroDisponiblePorFechas/{id_usuario}/{fecha_inicial}/{fecha_final}")
+    fun obtenerDineroDisponiblePorFechas(
+        @Path("id_usuario") idUsuario: Long,
+        @Path("fecha_inicial") fechaInicial: String,
+        @Path("fecha_final") fechaFinal: String
+    ): Call<Double>
+
+
     // Obtener gastos por mes y categoría
     @GET("GastosMesCategoria/{id_usuario}/{categoria}")
      fun obtenerGastosMesCategoria(

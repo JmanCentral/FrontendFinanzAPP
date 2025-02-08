@@ -178,6 +178,7 @@ class Reporte : Fragment() {
                     }
                 }
             }
+
         }
     }
 
@@ -569,6 +570,8 @@ class Reporte : Fragment() {
         }
         return true
     }
+
+
 
     override fun onDestroyView() {
         super.onDestroyView()

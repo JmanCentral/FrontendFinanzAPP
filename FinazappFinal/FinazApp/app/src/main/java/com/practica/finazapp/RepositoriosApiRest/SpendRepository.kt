@@ -49,6 +49,21 @@ class SpendRepository (context: Context)  {
         })
     }
 
+    fun obtenerDineroDisponiblePorFechas(idUsuario: Long, fechaInicial: String, fechaFinal: String, callback: (Double?, String?) -> Unit) {
+        gastoService.obtenerDineroDisponiblePorFechas(idUsuario, fechaInicial, fechaFinal).enqueue(object : Callback<Double> {
+            override fun onResponse(call: Call<Double>, response: Response<Double>) {
+                if (response.isSuccessful) {
+                    callback(response.body(), null)
+                } else {
+                    callback(null, "Error al obtener gastos por fechas: ${response.code()}")
+                }
+            }
+            override fun onFailure(call: Call<Double>, t: Throwable) {
+                callback(null, "Fallo en la conexión: ${t.message}")
+            }
+        })
+    }
+
     fun obtenerGastosMesCategoria(idUsuario: Long, categoria: String, callback: (List<GastoDTO>?, String?) -> Unit) {
         gastoService.obtenerGastosMesCategoria(idUsuario, categoria).enqueue(object : Callback<List<GastoDTO>> {
             override fun onResponse(call: Call<List<GastoDTO>>, response: Response<List<GastoDTO>>) {

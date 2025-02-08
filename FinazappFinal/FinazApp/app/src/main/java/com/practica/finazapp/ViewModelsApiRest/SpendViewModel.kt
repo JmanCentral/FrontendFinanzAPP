@@ -26,6 +26,9 @@ import kotlinx.coroutines.launch
         private val _dineroDisponibleLiveData = MutableLiveData<Double?>()
         val dineroDisponibleLiveData: LiveData<Double?> = _dineroDisponibleLiveData
 
+        private val _dineroDisponibleporfechasLiveData = MutableLiveData<Double?>()
+        val dineroDisponibleporfechasLiveData: LiveData<Double?> = _dineroDisponibleporfechasLiveData
+
         // LiveData para la lista de gastos por mes y categoría
         private val _gastosMesCategoriaLiveData = MutableLiveData<List<GastoDTO>?>()
         val gastosMesCategoriaLiveData: LiveData<List<GastoDTO>?> = _gastosMesCategoriaLiveData
@@ -127,6 +130,18 @@ import kotlinx.coroutines.launch
 
         }
 
+        fun obtenerDineroDisponibleporfechas(idUsuario: Long , fechaInicial: String, fechaFinal: String) {
+            viewModelScope.launch {
+                repository.obtenerDineroDisponiblePorFechas(idUsuario, fechaInicial, fechaFinal) { gastos, error ->
+                    if (error == null) {
+                        _dineroDisponibleporfechasLiveData.postValue(gastos)
+                    } else {
+                        _errorLiveData.postValue(error)
+                    }
+                }
+            }
+        }
+
         // Función para obtener gastos por mes y categoría
         fun obtenerGastosMesCategoria(idUsuario: Long, categoria: String) {
 
@@ -222,7 +237,6 @@ import kotlinx.coroutines.launch
 
     // Función para obtener el valor general de gastos por mes
     fun obtenerValorGastosMes(idUsuario: Long) {
-
             repository.obtenerValorGastosMes(idUsuario) { valor, error ->
                 if (error == null) {
                     _valorGastosMesLiveData.postValue(valor)
