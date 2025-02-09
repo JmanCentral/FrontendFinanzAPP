@@ -11,8 +11,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -23,10 +23,10 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.practica.finazapp.Entidades.GastoDTO
+import com.practica.finazapp.Notificaciones.NotificationHelper
 import com.practica.finazapp.R
 import com.practica.finazapp.ViewModelsApiRest.AlertViewModel
 import com.practica.finazapp.ViewModelsApiRest.IncomeViewModel
@@ -66,6 +66,13 @@ class DashboardFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Obtener la referencia del ImageView correctamente
+        val miImagen = view.findViewById<ImageView>(R.id.campana)
+
+        miImagen?.setOnClickListener {
+            Recordatorios()
+        }
+
 
         // Registrar un OnBackPressedCallback
         val callback: OnBackPressedCallback = object : OnBackPressedCallback(true) {
@@ -104,8 +111,6 @@ class DashboardFragment : Fragment() {
                 } catch (e: Exception) {
                     Log.e("FragmentGastos", "Error al cargar datos: ${e.message}", e)
                 }
-
-
 
                 val bloqueTransporte = binding.bloqueTransporte
                 val bloqueGastosVarios = binding.bloqueGastosVarios
@@ -217,7 +222,6 @@ class DashboardFragment : Fragment() {
                                     )
 
                                     gastosViewModel.registrarGasto(usuarioId,nuevoGasto)
-                                    dialog.dismiss()
                                     verificarAlertasExcedidas()
                                 } catch (e: NumberFormatException) {
                                     // Manejar el caso en que la cantidad no sea un número válido
@@ -246,6 +250,8 @@ class DashboardFragment : Fragment() {
             }
         }
     }
+
+
 
     private fun verificarAlertasExcedidas() {
         Log.d("DashboardFragment", "Llamando al método verificarAlertasExcedidas...")
@@ -347,7 +353,7 @@ class DashboardFragment : Fragment() {
     private fun cargarDatos() {
 
         gastosViewModel.obtenerDineroDisponible(usuarioId)
-        gastosViewModel.dineroDisponibleLiveData.observeOnce(viewLifecycleOwner) { disp ->
+        gastosViewModel.dineroDisponibleLiveData.observe(viewLifecycleOwner) { disp ->
             val numberFormat = NumberFormat.getInstance()
             numberFormat.maximumFractionDigits = 2
             if (disp != null) {
@@ -360,7 +366,7 @@ class DashboardFragment : Fragment() {
         }
         gastosViewModel.obtenerValorGastosMesCategoria(usuarioId, "Gastos Hormiga")
         gastosViewModel.valorGastosMesCategoriaLiveData
-            .observeOnce(viewLifecycleOwner) { cantidad ->
+            .observe(viewLifecycleOwner) { cantidad ->
                 if (cantidad != null) {
                     val numberFormat = NumberFormat.getInstance()
                     numberFormat.maximumFractionDigits = 2
@@ -374,7 +380,7 @@ class DashboardFragment : Fragment() {
 
         gastosViewModel.obtenerValorGastosMesCategoria1(usuarioId, "Alimentos")
         gastosViewModel.valorGastosMesCategoriaLiveData1
-            .observeOnce(viewLifecycleOwner) { cantidad ->
+            .observe(viewLifecycleOwner) { cantidad ->
                 if (cantidad != null) {
                     val numberFormat = NumberFormat.getInstance()
                     numberFormat.maximumFractionDigits = 2
@@ -388,7 +394,7 @@ class DashboardFragment : Fragment() {
 
         gastosViewModel.obtenerValorGastosMesCategoria2(usuarioId, "Transporte")
         gastosViewModel.valorGastosMesCategoriaLiveData2
-            .observeOnce(viewLifecycleOwner) { cantidad ->
+            .observe(viewLifecycleOwner) { cantidad ->
                 if (cantidad != null) {
                     val numberFormat = NumberFormat.getInstance()
                     numberFormat.maximumFractionDigits = 2
@@ -402,7 +408,7 @@ class DashboardFragment : Fragment() {
 
         gastosViewModel.obtenerValorGastosMesCategoria3(usuarioId, "Servicios")
         gastosViewModel.valorGastosMesCategoriaLiveData3
-            .observeOnce(viewLifecycleOwner) { cantidad ->
+            .observe(viewLifecycleOwner) { cantidad ->
                 if (cantidad != null) {
                     val numberFormat = NumberFormat.getInstance()
                     numberFormat.maximumFractionDigits = 2
@@ -416,7 +422,7 @@ class DashboardFragment : Fragment() {
 
         gastosViewModel.obtenerValorGastosMesCategoria4(usuarioId, "Mercado")
         gastosViewModel.valorGastosMesCategoriaLiveData4
-            .observeOnce(viewLifecycleOwner) { cantidad ->
+            .observe(viewLifecycleOwner) { cantidad ->
                 if (cantidad != null) {
                     val numberFormat = NumberFormat.getInstance()
                     numberFormat.maximumFractionDigits = 2
@@ -602,6 +608,14 @@ class DashboardFragment : Fragment() {
         startActivity(intent)
     }
 
+    private fun Recordatorios() {
+
+        val intent = Intent(requireContext(), Recordatorios_Usuario::class.java).apply {
+            putExtra("usuarioId", usuarioId)
+        }
+        startActivity(intent)
+    }
+
 
 
     fun cargarBarra(cantidad: Double, barra: View) {
@@ -744,6 +758,8 @@ class DashboardFragment : Fragment() {
             }
         })
     }
+
+
 
 
 

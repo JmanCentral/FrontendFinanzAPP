@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        style="@style/TxtVerdeMedianoItalic"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Buscar Recordatorio"
+        android:textStyle="bold" />
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/Busca_recordatorio3"
+        style="@style/EstiloEditText"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:layout_margin="8dp"
+        android:background="@drawable/bg_btn_borde_amarillo"
+        android:hint="Nombre del recordatorio"
+        android:padding="4dp" />
+
+    <Button
+        android:id="@+id/button2"
+        style="@style/EstiloBordeVerde"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="8dp"
+        android:layout_marginTop="8dp"
+        android:background="#001A41"
+        android:text="Buscar Recordatorio"
+        android:textColor="@color/blanco"
+        android:textSize="20sp" />
+
+    <!-- TextView para la categoría límite -->
+
+    <!-- Spinner para la descripción -->
+
+</LinearLayout>

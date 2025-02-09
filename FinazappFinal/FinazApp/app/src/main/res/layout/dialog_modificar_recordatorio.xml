@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        style="@style/TxtVerdeMedianoItalic"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Modificar Recordatorio"
+        android:textStyle="bold" />
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/Busca_recordatorio1"
+        style="@style/EstiloEditText"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:layout_margin="8dp"
+        android:background="@drawable/bg_btn_borde_amarillo"
+        android:hint="Nombre del recordatorio"
+        android:padding="4dp" />
+
+    <!-- TextView para la categoría límite -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="4dp"
+        android:gravity="center"
+        android:text="Elige el tipo de recordatorio"
+        android:textColor="#001A41"
+        android:textSize="25sp"
+        android:textStyle="bold" />
+
+    <!-- Spinner para la descripción -->
+    <Spinner
+        android:id="@+id/spinnerDescripcion3"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:layout_margin="8dp"
+        android:background="@drawable/bg_btn_borde_amarillo"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="4dp"
+        android:gravity="center"
+        android:text="Elige cada cuanto va a sonar"
+        android:textColor="#001A41"
+        android:textSize="25sp"
+        android:textStyle="bold" />
+
+    <Spinner
+        android:id="@+id/spinnerDescripcion4"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:layout_margin="8dp"
+        android:background="@drawable/bg_btn_borde_amarillo"/>
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/editTextFecha"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:hint="Fecha"
+        android:focusable="false"
+        android:clickable="true"
+        android:padding="4dp"
+        style="@style/EstiloEditText"
+        android:background="@drawable/bg_btn_borde_amarillo"
+        android:layout_margin="8dp"/>
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/editTextRecordatorio1limite"
+        style="@style/EstiloEditText"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:layout_margin="8dp"
+        android:background="@drawable/bg_btn_borde_amarillo"
+        android:hint="Valor del Recordatorio"
+        android:inputType="numberDecimal"
+        android:padding="4dp" />
+
+    <TextView
+        android:id="@+id/txtRecordatorio2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/TxtVerdePequenoItalic"
+        android:text="el ingreso se contara a partir de la fecha especificada y se tendra en cuenta cada mes."/>
+
+    <Button
+        android:id="@+id/button"
+        style="@style/EstiloBordeVerde"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="8dp"
+        android:layout_marginTop="8dp"
+        android:background="#001A41"
+        android:text="Eliminar Recordatorio"
+        android:textColor="@color/blanco"
+        android:textSize="20sp" />
+
+</LinearLayout>

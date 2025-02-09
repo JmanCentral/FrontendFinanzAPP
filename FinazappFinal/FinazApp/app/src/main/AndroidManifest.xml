@@ -22,6 +22,9 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".Vista.Recordatorios_Usuario"
+            android:exported="true" />
+        <activity
             android:name=".Vista.ListaGastos"
             android:exported="false" />
         <activity

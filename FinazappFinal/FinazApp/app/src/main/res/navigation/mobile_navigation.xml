@@ -21,7 +21,7 @@
 
     <fragment
         android:id="@+id/nav_reporte"
-        android:name="com.practica.finazapp.Vista.Reporte"
+        android:name="com.practica.finazapp.Vista.Recordatorios"
         android:label="@string/reporte"
         tools:layout="@layout/fragment_reporte" >
     </fragment>

@@ -8,6 +8,7 @@ import com.practica.finazapp.RepositoriosApiRest.SpendRepository
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.distinctUntilChanged
 import com.practica.finazapp.Entidades.GastoDTO
 import retrofit2.Call
 import retrofit2.Callback
@@ -24,30 +25,30 @@ import kotlinx.coroutines.launch
 
         // LiveData para el dinero disponible
         private val _dineroDisponibleLiveData = MutableLiveData<Double?>()
-        val dineroDisponibleLiveData: LiveData<Double?> = _dineroDisponibleLiveData
+        val dineroDisponibleLiveData: LiveData<Double?> = _dineroDisponibleLiveData.distinctUntilChanged()
 
         private val _dineroDisponibleporfechasLiveData = MutableLiveData<Double?>()
         val dineroDisponibleporfechasLiveData: LiveData<Double?> = _dineroDisponibleporfechasLiveData
 
         // LiveData para la lista de gastos por mes y categoría
         private val _gastosMesCategoriaLiveData = MutableLiveData<List<GastoDTO>?>()
-        val gastosMesCategoriaLiveData: LiveData<List<GastoDTO>?> = _gastosMesCategoriaLiveData
+        val gastosMesCategoriaLiveData: LiveData<List<GastoDTO>?> = _gastosMesCategoriaLiveData.distinctUntilChanged()
 
         // LiveData para el valor general de gastos por mes y categoría
         private val _valorGastosMesCategoriaLiveData = MutableLiveData<Double?>()
-        val valorGastosMesCategoriaLiveData: LiveData<Double?> = _valorGastosMesCategoriaLiveData
+        val valorGastosMesCategoriaLiveData: LiveData<Double?> = _valorGastosMesCategoriaLiveData.distinctUntilChanged()
 
         private val _valorGastosMesCategoriaLiveData1 = MutableLiveData<Double?>()
-        val valorGastosMesCategoriaLiveData1: LiveData<Double?> = _valorGastosMesCategoriaLiveData1
+        val valorGastosMesCategoriaLiveData1: LiveData<Double?> = _valorGastosMesCategoriaLiveData1.distinctUntilChanged()
 
         private val _valorGastosMesCategoriaLiveData2 = MutableLiveData<Double?>()
-        val valorGastosMesCategoriaLiveData2: LiveData<Double?> = _valorGastosMesCategoriaLiveData2
+        val valorGastosMesCategoriaLiveData2: LiveData<Double?> = _valorGastosMesCategoriaLiveData2.distinctUntilChanged()
 
         private val _valorGastosMesCategoriaLiveData3 = MutableLiveData<Double?>()
-        val valorGastosMesCategoriaLiveData3: LiveData<Double?> = _valorGastosMesCategoriaLiveData3
+        val valorGastosMesCategoriaLiveData3: LiveData<Double?> = _valorGastosMesCategoriaLiveData3.distinctUntilChanged()
 
         private val _valorGastosMesCategoriaLiveData4 = MutableLiveData<Double?>()
-        val valorGastosMesCategoriaLiveData4: LiveData<Double?> = _valorGastosMesCategoriaLiveData4
+        val valorGastosMesCategoriaLiveData4: LiveData<Double?> = _valorGastosMesCategoriaLiveData4.distinctUntilChanged()
 
         private val _valorGastosMesCategoriaLiveData5 = MutableLiveData<Double?>()
         val valorGastosMesCategoriaLiveData5: LiveData<Double?> = _valorGastosMesCategoriaLiveData5

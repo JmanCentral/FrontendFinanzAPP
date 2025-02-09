@@ -476,6 +476,15 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 
+    <ImageView
+        android:id="@+id/campana"
+        android:layout_width="79dp"
+        android:layout_height="62dp"
+        android:layout_marginTop="10dp"
+        android:src="@drawable/campana"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/floatingActionButton"
         android:layout_width="wrap_content"

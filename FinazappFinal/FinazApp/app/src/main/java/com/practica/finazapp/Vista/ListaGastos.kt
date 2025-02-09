@@ -38,7 +38,20 @@ class ListaGastos : AppCompatActivity(), OnItemClickListener2 {
 
         gastosViewModel = ViewModelProvider(this)[SpendViewModel::class.java]
 
+        ObtenerGastos ()
+
+        gastosViewModel.operacionCompletada.observe(this) { completada ->
+            if (completada == true) {
+                ObtenerGastos() // Actualizar la UI
+            }
+        }
         // Obtener y mostrar gastos por categoría
+    }
+
+    private fun ObtenerGastos () {
+
+        usuarioId = intent.getLongExtra("usuarioId", -1)
+        val categoria = intent.getStringExtra("categoria") ?: ""
         gastosViewModel.obtenerGastosMesCategoria(usuarioId, categoria)
         gastosViewModel.gastosMesCategoriaLiveData.observe(this) { gastosCat ->
             if (gastosCat != null) {
@@ -49,6 +62,7 @@ class ListaGastos : AppCompatActivity(), OnItemClickListener2 {
                 Log.d("ListaGastos", "No hay gastos para la categoría: $categoria")
             }
         }
+
     }
 
 
@@ -102,7 +116,6 @@ class ListaGastos : AppCompatActivity(), OnItemClickListener2 {
                             fecha = fecha
                         )
                         gastosViewModel.modificarGasto(gasto.id_gasto, gastoActualizado)
-                        dialog.dismiss()
                     } catch (e: NumberFormatException) {
                         Toast.makeText(this, "La cantidad ingresada no es válida", Toast.LENGTH_SHORT).show()
                     }

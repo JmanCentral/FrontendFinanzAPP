@@ -1,4 +1,4 @@
-package com.practica.finazapp.Vista
+package com.practica.finazapp.Notificaciones
 
 // NotificationHelper.kt
 import android.annotation.SuppressLint
