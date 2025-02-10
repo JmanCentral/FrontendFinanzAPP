@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import com.practica.finazapp.Entidades.CategoriaTotalDTO
 import com.practica.finazapp.Entidades.GastoDTO
+import com.practica.finazapp.Entidades.ProyeccionDTO
 import com.practica.finazapp.Utils.Cliente
 import com.practica.finazapp.Utils.GastoService
 import com.practica.finazapp.Utils.UsuarioService
@@ -290,6 +291,58 @@ class SpendRepository (context: Context)  {
             }
         })
     }
+
+    fun obtenerGastosFrecuentes(idUsuario: Long, callback: (List<ProyeccionDTO>?, String?) -> Unit) {
+        gastoService.obtenerGastosFrecuentes(idUsuario).enqueue(object : Callback<List<ProyeccionDTO>> {
+            override fun onResponse(call: Call<List<ProyeccionDTO>>, response: Response<List<ProyeccionDTO>>) {
+                if (response.isSuccessful) {
+                    callback(response.body(), null)
+                } else {
+                    callback(null, "Error al obtener gastos frecuentes: ${response.code()}")
+                }
+            }
+            override fun onFailure(call: Call<List<ProyeccionDTO>>, t: Throwable) {
+                callback(null, "Fallo en la conexión: ${t.message}")
+            }
+        })
+    }
+
+    fun listarPorNombres(idUsuario: Long, nombre: String, categoria: String, callback: (List<GastoDTO>?, String?) -> Unit) {
+        gastoService.listarPorNombres(idUsuario, nombre, categoria).enqueue(object : Callback<List<GastoDTO>> {
+            override fun onResponse( call: Call<List<GastoDTO>>,response: Response<List<GastoDTO>>)
+            {
+                if (response.isSuccessful) {
+                    callback(response.body(), null)
+                } else {
+                    callback(null, "Error al obtener gastos por nombres: ${response.code()}")
+                }
+
+            }
+            override fun onFailure(call: Call<List<GastoDTO>>, t: Throwable) {
+                callback(null, "Fallo en la conexión: ${t.message}")
+            }
+        })
+    }
+
+    fun eliminarGastos(idUsuario: Long, categoria: String, callback: (Boolean, String?) -> Unit) {
+        gastoService.eliminarGastos(idUsuario, categoria).enqueue(object : Callback<Void> {
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                if (response.isSuccessful) {
+                    // Si la eliminación es exitosa, devuelve true
+                    callback(true, null)
+                } else {
+                    // Si hay un error, pasa un mensaje de error con el código de respuesta
+                    callback(false, "Error al eliminar los gastos: ${response.code()}")
+                }
+        }
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                // Si hay un fallo en la conexión, pasa el mensaje de error
+                callback(false, "Fallo en la conexión: ${t.message}")
+            }
+        })
+    }
+
+
 
     fun eliminarGasto(idGasto: Long, callback: (Boolean, String?) -> Unit) {
         gastoService.eliminarGasto(idGasto).enqueue(object : Callback<Void> {

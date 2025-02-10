@@ -584,6 +584,7 @@ class DashboardFragment : Fragment() {
         }
     }
 
+
     // Método para mostrar el mensaje de advertencia
     private fun mostrarAdvertencia(categoria: String, porcentaje: Double) {
         val builder = AlertDialog.Builder(requireContext())

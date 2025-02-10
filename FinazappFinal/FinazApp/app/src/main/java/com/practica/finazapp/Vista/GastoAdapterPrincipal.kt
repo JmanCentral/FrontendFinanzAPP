@@ -77,6 +77,4 @@ class GastoAdapterPrincipal(private val gastos: List<GastoDTO>) :
     }
 
 
-
-
 }

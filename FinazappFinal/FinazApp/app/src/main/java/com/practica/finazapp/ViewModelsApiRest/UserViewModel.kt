@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.distinctUntilChanged
 import com.practica.finazapp.Entidades.LoginDTO
 import com.practica.finazapp.Entidades.LoginResponseDTO
 import com.practica.finazapp.Entidades.UsuarioDTO
@@ -23,7 +24,7 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
     val loginResponse: LiveData<LoginResponseDTO?> = _loginResponse
 
     private val _errorLiveData = MutableLiveData<String?>()
-    val errorLiveData: LiveData<String?> = _errorLiveData
+    val errorLiveData: LiveData<String?> = _errorLiveData.distinctUntilChanged()
 
     fun registrarUsuario(usuario: UsuarioDTO) {
         userRepository.registrarUsuario(usuario) { usuarioResponse, error ->

@@ -2,6 +2,7 @@ package com.practica.finazapp.Utils
 
 import com.practica.finazapp.Entidades.CategoriaTotalDTO
 import com.practica.finazapp.Entidades.GastoDTO
+import com.practica.finazapp.Entidades.ProyeccionDTO
 import retrofit2.Call
 import retrofit2.http.*
 
@@ -116,6 +117,23 @@ interface GastoService {
         @Path("id_gasto") idGasto: Long,
         @Body gasto: GastoDTO
     ): Call<GastoDTO>
+
+    @GET("frecuentes/{usuarioId}")
+    fun obtenerGastosFrecuentes(@Path("usuarioId") usuarioId: Long): Call<List<ProyeccionDTO>>
+
+
+    @GET("ListarPorNombre/{id_usuario}/{nombre}/{categoria}")
+    fun listarPorNombres(
+        @Path("id_usuario") idUsuario: Long,
+        @Path("nombre") nombre: String,
+        @Path("categoria") categoria: String
+    ): Call<List<GastoDTO>>
+
+    @DELETE("EliminarTodosLosGastos/{id_usuario}/{categoria}")
+    fun eliminarGastos(
+        @Path("id_usuario") idUsuario: Long,
+        @Path("categoria") categoria: String
+    ): Call<Void>
 
     // Eliminar un gasto
     @DELETE("EliminarGastos/{id_gasto}")

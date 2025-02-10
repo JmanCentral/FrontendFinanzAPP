@@ -15,6 +15,7 @@ import retrofit2.Callback
 import retrofit2.Response
 import androidx.lifecycle.viewModelScope
 import com.practica.finazapp.Entidades.CategoriaTotalDTO
+import com.practica.finazapp.Entidades.ProyeccionDTO
 import kotlinx.coroutines.launch
 
     class SpendViewModel (application: Application) : AndroidViewModel(application)   {
@@ -27,8 +28,8 @@ import kotlinx.coroutines.launch
         private val _dineroDisponibleLiveData = MutableLiveData<Double?>()
         val dineroDisponibleLiveData: LiveData<Double?> = _dineroDisponibleLiveData.distinctUntilChanged()
 
-        private val _dineroDisponibleporfechasLiveData = MutableLiveData<Double?>()
-        val dineroDisponibleporfechasLiveData: LiveData<Double?> = _dineroDisponibleporfechasLiveData
+        private val _obtenerfrecuentestedegastos = MutableLiveData<List<ProyeccionDTO>?>()
+        val obtenerfrecuentestedegastos: LiveData<List<ProyeccionDTO>?> = _obtenerfrecuentestedegastos.distinctUntilChanged()
 
         // LiveData para la lista de gastos por mes y categoría
         private val _gastosMesCategoriaLiveData = MutableLiveData<List<GastoDTO>?>()
@@ -101,6 +102,10 @@ import kotlinx.coroutines.launch
         private val _operacionCompletada = MutableLiveData<Boolean>()
         val operacionCompletada: LiveData<Boolean> = _operacionCompletada
 
+        private val _listarhastospornombre = MutableLiveData<List<GastoDTO>?>()
+        val listarhastospornombre: LiveData<List<GastoDTO>?> = _listarhastospornombre
+
+
         // LiveData para manejar errores
         private val _errorLiveData = MutableLiveData<String?>()
         val errorLiveData: LiveData<String?> = _errorLiveData
@@ -131,14 +136,12 @@ import kotlinx.coroutines.launch
 
         }
 
-        fun obtenerDineroDisponibleporfechas(idUsuario: Long , fechaInicial: String, fechaFinal: String) {
-            viewModelScope.launch {
-                repository.obtenerDineroDisponiblePorFechas(idUsuario, fechaInicial, fechaFinal) { gastos, error ->
-                    if (error == null) {
-                        _dineroDisponibleporfechasLiveData.postValue(gastos)
-                    } else {
-                        _errorLiveData.postValue(error)
-                    }
+        fun obtenerFrecuentesTedeGastos(idUsuario: Long) {
+            repository.obtenerGastosFrecuentes(idUsuario) {frecuentes, error ->
+                if (error == null) {
+                    _obtenerfrecuentestedegastos.postValue(frecuentes)
+                } else {
+                    _errorLiveData.postValue(error)
                 }
             }
         }
@@ -378,6 +381,33 @@ import kotlinx.coroutines.launch
             }
         }
     }
+
+    fun listarGastosPorNombre(idUsuario: Long, nombre: String , categoria: String) {
+        viewModelScope.launch {
+            repository.listarPorNombres(idUsuario, nombre, categoria)
+            { gastos, error ->
+                if (error == null) {
+                    _listarhastospornombre.postValue(gastos)
+                } else {
+                    _errorLiveData.postValue(error)
+                    }
+            }
+        }
+    }
+
+    fun eliminarGastosPorNombre (idUsuario: Long, categoria: String) {
+        viewModelScope.launch {
+            repository.eliminarGastos(idUsuario, categoria)
+            { gastos, error ->
+                if (error == null) {
+                    _operacionCompletada.postValue(true)
+                } else {
+                    _errorLiveData.postValue(error)
+                    }
+            }
+        }
+    }
+
 
     // Función para modificar un gasto
     fun modificarGasto(idGasto: Long, gasto: GastoDTO) {

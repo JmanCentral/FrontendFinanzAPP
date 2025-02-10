@@ -1,13 +1,15 @@
 package com.practica.finazapp.Vista
 
 import android.annotation.SuppressLint
+import android.app.AlarmManager
 import android.app.DatePickerDialog
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.icu.util.Calendar
 import android.os.Bundle
 import android.util.Log
 import android.widget.ArrayAdapter
-import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Spinner
@@ -19,12 +21,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.TextInputEditText
-import com.practica.finazapp.Entidades.GastoDTO
 import com.practica.finazapp.Entidades.RecordatorioDTO
+import com.practica.finazapp.Notificaciones.AlarmaReceiver
 import com.practica.finazapp.R
 import com.practica.finazapp.ViewModelsApiRest.ReminderViewModel
 import com.practica.finazapp.ViewModelsApiRest.SharedViewModel
-import com.practica.finazapp.ui.Estilos.CustomSpinnerAdapter
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class Recordatorios_Usuario : AppCompatActivity() , RecordatorioListener {
 
@@ -48,10 +51,12 @@ class Recordatorios_Usuario : AppCompatActivity() , RecordatorioListener {
         usuarioId = intent.getLongExtra("usuarioId", -1)
 
         fetchRecordatorios()
+        Alarma ()
 
         recordatoriosViewModel.operacionCompletada.observe(this) { completada ->
             if (completada == true) {
                 fetchRecordatorios() // Actualizar la UI
+                Alarma ()
             }
         }
 
@@ -73,7 +78,7 @@ class Recordatorios_Usuario : AppCompatActivity() , RecordatorioListener {
             spinnerEstado.adapter = adapter
 
             // Configurar el Spinner con las opciones de días
-            val diasOpciones = listOf("3 dias", "7 dias", "15 dias", "1 mes", "3 meses", "6 meses")
+            val diasOpciones = listOf( "Cada 2 minutos", "Cada 3 minutos", "Cada 5 minutos")
             val adapterDias = ArrayAdapter(this, R.layout.item_spinner_dias, diasOpciones)
             adapterDias.setDropDownViewResource(R.layout.item_spinner_dias)
             spinnerDias.adapter = adapterDias
@@ -106,14 +111,10 @@ class Recordatorios_Usuario : AppCompatActivity() , RecordatorioListener {
                     val anio = parts[2]
                     val fecha = "${anio}-${mes}-${dia}"
 
-                    // Convertir el texto del Spinner a un número entero
                     val dias = when (diasSeleccionado) {
-                        "3 dias" -> 3
-                        "7 dias" -> 7
-                        "15 dias" -> 15
-                        "1 mes" -> 30
-                        "3 meses" -> 90
-                        "6 meses" -> 180
+                        "Cada 2 minutos" -> 120000
+                        "Cada 3 minutos" -> 180000
+                        "Cada 5 minutos" -> 300000
                         else -> 0  // En caso de error
                     }
 
@@ -121,10 +122,12 @@ class Recordatorios_Usuario : AppCompatActivity() , RecordatorioListener {
                         id_recordatorio = 0,
                         nombre = nombrerecordatorio,
                         estado = estado,
-                        dia = dias,  // Ahora es un número entero
+                        dia = dias,
                         valor = limiteStr.toDouble(),
                         fecha = fecha
                     )
+
+                    Log.d("NuevoRecordatorio", "Recordatorio creado: $dias")
 
                     recordatoriosViewModel.registrarRecordatorio(usuarioId, nuevoRecordatorio)
 
@@ -153,7 +156,60 @@ class Recordatorios_Usuario : AppCompatActivity() , RecordatorioListener {
             }
         }
     }
+
+    private fun Alarma () {
+
+        recordatoriosViewModel.listarRecordatorios(usuarioId)
+        recordatoriosViewModel.recordatoriosLiveData.observe(this) { recordatorios ->
+            recordatorios?.forEach { recordatorio ->
+                programarAlarma(this, recordatorio)
+            }
+        }
+
+    }
+
+    fun programarAlarma(context: Context, recordatorio: RecordatorioDTO) {
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(context, AlarmaReceiver::class.java).apply {
+            putExtra("nombre", recordatorio.nombre)
+            putExtra("valor", recordatorio.valor)
+        }
+
+        val pendingIntent = PendingIntent.getBroadcast(
+            context,
+            recordatorio.id_recordatorio.toInt(),
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        // Convertir la fecha del recordatorio a milisegundos
+        val formato = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val fechaFinal = formato.parse(recordatorio.fecha)?.time ?: return
+
+        val ahora = System.currentTimeMillis()
+
+        // Asegurar que el valor de 'dia' sea Long
+        val intervaloRepeticion = if (recordatorio.dia > 0) {
+            recordatorio.dia.toLong() * AlarmManager.INTERVAL_DAY
+        } else {
+            AlarmManager.INTERVAL_DAY
+        }
+
+        // Determinar cuándo debe ejecutarse la primera vez
+        val tiempoEjecucion = if (fechaFinal > ahora) fechaFinal else ahora + intervaloRepeticion
+
+        alarmManager.setRepeating(
+            AlarmManager.RTC_WAKEUP,
+            tiempoEjecucion,  // Ahora sí usamos la fecha corregida
+            intervaloRepeticion,  // Se repite correctamente
+            pendingIntent
+        )
+    }
+
+
     override fun onItemClick3(recordatorios: RecordatorioDTO) {
+
+        /*
         Log.d("onItemClick", "Recordatorio clickeado: ${recordatorios.nombre}")
 
         val dialogView = layoutInflater.inflate(R.layout.dialog_modificar_recordatorio, null)
@@ -261,7 +317,11 @@ class Recordatorios_Usuario : AppCompatActivity() , RecordatorioListener {
         }
 
         dialog.show()
+
+         */
     }
+
+
 
 
 

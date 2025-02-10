@@ -92,7 +92,7 @@ class FragmentAlertas : Fragment(), AlertasListener {
     @SuppressLint("MissingInflatedId")
     private fun mostrarDialogoNuevaAlerta() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_nueva_alerta, null)
-        val editTextNombreAlarma = dialogView.findViewById<TextInputEditText>(R.id.Busca_recordatorio)
+        val editTextNombreAlarma = dialogView.findViewById<TextInputEditText>(R.id.editTextNombreAlarma)
         val spinnerDescripcion = dialogView.findViewById<Spinner>(R.id.spinnerDescripcion)
         val editTextFecha = dialogView.findViewById<EditText>(R.id.editTextFecha)
         val editTextAlertalimite = dialogView.findViewById<EditText>(R.id.editTextAlertalimite)

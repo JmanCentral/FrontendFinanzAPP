@@ -116,9 +116,9 @@
             android:layout_marginTop="16dp"
             android:text="@string/ingresar"
             android:textSize="30sp"
-            app:layout_constraintTop_toBottomOf="@id/txtAdvertenciaLogin"
+            app:layout_constraintEnd_toEndOf="@id/wrapperinputContrasena"
             app:layout_constraintStart_toStartOf="@id/wrapperinputContrasena"
-            app:layout_constraintEnd_toEndOf="@id/wrapperinputContrasena" />
+            app:layout_constraintTop_toBottomOf="@id/txtAdvertenciaLogin" />
 
         <TextView
             android:id="@+id/btnRegistrarse"

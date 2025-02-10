@@ -231,7 +231,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:padding="16dp"
-                        android:text="Recomendacion 6"
+                        android:text="Clickea para observar tus gastos recurrentes!!!!!"
                         android:justificationMode="inter_word"
                         android:textColor="@android:color/black"
                         android:textSize="18sp" />

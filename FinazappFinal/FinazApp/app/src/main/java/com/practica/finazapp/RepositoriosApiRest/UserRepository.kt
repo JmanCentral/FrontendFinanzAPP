@@ -24,7 +24,7 @@ class UserRepository (context: Context) {
                 if (response.isSuccessful) {
                     callback(response.body(), null)
                 } else {
-                    callback(null, "Error al registrar usuario: ${response.code()}")
+                    callback(null, "Contraseña incorrecta")
                 }
             }
 
