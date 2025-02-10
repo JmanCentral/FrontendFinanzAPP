@@ -24,7 +24,8 @@ class UserRepository (context: Context) {
                 if (response.isSuccessful) {
                     callback(response.body(), null)
                 } else {
-                    callback(null, "Contraseña incorrecta")
+                    // 🔴 Manejar error 400 como si fuera un fallo
+                    onFailure(call, Throwable("Error en la solicitud: ${response.code()}"))
                 }
             }
 
@@ -42,7 +43,16 @@ class UserRepository (context: Context) {
                 if (response.isSuccessful) {
                     callback(response.body(), null)
                 } else {
-                    callback(null, "Error en el login: ${response.code()}")
+                    when (response.code()) {
+                        401, 403 -> callback(
+                            null,
+                            "Acceso denegado: Usuario o contraseña incorrectos"
+                        )  // ✅ Mensaje más preciso
+                        else -> callback(
+                            null,
+                            "Error inesperado: ${response.code()}"
+                        )  // ❗ Maneja otros errores
+                    }
                 }
             }
 

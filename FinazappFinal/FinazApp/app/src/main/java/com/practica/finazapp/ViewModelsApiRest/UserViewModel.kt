@@ -24,12 +24,18 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
     val loginResponse: LiveData<LoginResponseDTO?> = _loginResponse
 
     private val _errorLiveData = MutableLiveData<String?>()
-    val errorLiveData: LiveData<String?> = _errorLiveData.distinctUntilChanged()
+    val errorLiveData: LiveData<String?> = _errorLiveData
+
+    private val _errorLiveData1 = MutableLiveData<String?>()
+    val errorLiveData1: LiveData<String?> = _errorLiveData1
+
 
     fun registrarUsuario(usuario: UsuarioDTO) {
         userRepository.registrarUsuario(usuario) { usuarioResponse, error ->
-            _usuarioLiveData.postValue(usuarioResponse)
-            _errorLiveData.postValue(error)
+            if (error.isNullOrEmpty()) {  // ✅ Solo actualizar si no hay error
+                _usuarioLiveData.postValue(usuarioResponse)
+            }
+            _errorLiveData1.postValue(error)
         }
     }
 
@@ -37,11 +43,14 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
         userRepository.iniciarSesion(loginDTO.username, loginDTO.contrasena) { response, error ->
             if (response != null) {
                 _loginResponse.postValue(response)
+                _errorLiveData.postValue(null)
             } else {
                 _errorLiveData.postValue(error)
+                _loginResponse.postValue(null)
             }
         }
     }
+
 
     fun ObtenerUsuario(idUsuario: Long) {
         userRepository.ObtenerUsuario(idUsuario) { usuarioResponse, error ->

@@ -2,6 +2,7 @@ package com.practica.finazapp.Vista
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -24,6 +25,7 @@ class Registro : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_registro)
 
+        Log.d("Registro", "onCreate del Registro")
         usuarioViewModel = ViewModelProvider(this).get(UserViewModel::class.java)
 
         val btnVolver = findViewById<TextView>(R.id.btnVolver)
@@ -41,25 +43,25 @@ class Registro : AppCompatActivity() {
         mostrarDialogoApellidos()
 
         btnRegistro1.setOnClickListener {
-            val nombres = txtInputNombres.text.toString()
-            val apellidos = txtInputApellidos.text.toString()
-            val usuario = txtInputUsuario.text.toString()
+            val nombres = txtInputNombres.text.toString().trim()
+            val apellidos = txtInputApellidos.text.toString().trim()
+            val usuario = txtInputUsuario.text.toString().trim()
             val contrasena = txtInputContrasena2.text.toString()
             val confirmContrasena = txtInputConf.text.toString()
 
-            if (nombres.isEmpty() || apellidos.isEmpty() || usuario.isEmpty() || contrasena.isEmpty()) {
-                txtAdvertencia.text = getString(R.string.todos_los_campos_son_obligatorios)
-                return@setOnClickListener
-            }
-
-            if (contrasena != confirmContrasena) {
-                txtAdvertencia.text = getString(R.string.las_contrase_as_no_coinciden)
-                return@setOnClickListener
-            }
-
-            if (!regex.matches(contrasena)) {
-                txtAdvertencia.text = getString(R.string.requerimientos_cont)
-                return@setOnClickListener
+            when {
+                nombres.isEmpty() || apellidos.isEmpty() || usuario.isEmpty() || contrasena.isEmpty() || confirmContrasena.isEmpty() -> {
+                    txtAdvertencia.text = getString(R.string.todos_los_campos_son_obligatorios)
+                    return@setOnClickListener
+                }
+                contrasena != confirmContrasena -> {
+                    txtAdvertencia.text = getString(R.string.las_contrase_as_no_coinciden)
+                    return@setOnClickListener
+                }
+                !regex.matches(contrasena) -> {
+                    txtAdvertencia.text = getString(R.string.requerimientos_cont)
+                    return@setOnClickListener
+                }
             }
 
             val nuevoUsuario = UsuarioDTO(
@@ -74,23 +76,21 @@ class Registro : AppCompatActivity() {
             usuarioViewModel.registrarUsuario(nuevoUsuario)
         }
 
+        usuarioViewModel.errorLiveData1.observe(this) { error ->
+            if (!error.isNullOrEmpty()) {
+                mostrarDialogoError()
+            }
+        }
+
         usuarioViewModel.usuarioLiveData.observe(this) { usuario ->
-            if (usuario != null) {
-                // Registro exitoso, redirigir al dashboard
+            usuario?.let {
                 Toast.makeText(this, "Registro exitoso", Toast.LENGTH_LONG).show()
-
-
-                val intent = Intent(this, Login::class.java)
-                startActivity(intent)
+                startActivity(Intent(this, Login::class.java))
                 finish()
             }
         }
 
-        usuarioViewModel.errorLiveData.observe(this) { error ->
-            if (!error.isNullOrEmpty()) {
-                txtAdvertencia.text = error
-            }
-        }
+
 
         btnVolver.setOnClickListener {
             val intent = Intent(this, Login::class.java)
@@ -116,5 +116,16 @@ class Registro : AppCompatActivity() {
             .setPositiveButton("Entendido") { dialog, _ -> dialog.dismiss() }
             .create().show()
     }
+
+    private fun mostrarDialogoError(){
+        AlertDialog.Builder(this)
+            .setTitle("Error al registrarse")
+            .setIcon(R.drawable.problem)
+            .setMessage("El nombre de usuario ya existe. Porfavor intenta con otro nombre de usuario.")
+            .setPositiveButton("Entendido") { dialog, _ -> dialog.dismiss() }
+            .create().show()
+
+    }
+
 }
 

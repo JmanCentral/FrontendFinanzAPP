@@ -25,7 +25,7 @@ class AuthInterceptor(private val context: Context) : Interceptor {
         val response = chain.proceed(request.build())
 
         // Verificar si el token ha expirado (código 401 o 403)
-        if (response.code == 401 || response.code == 403) {
+        if (response.code == 401) {
             // Limpiar el token y redirigir al usuario a la pantalla de login
             limpiarTokenYRedirigirALogin()
         }

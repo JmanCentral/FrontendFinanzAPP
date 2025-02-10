@@ -3,8 +3,10 @@ package com.practica.finazapp.Vista
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.practica.finazapp.R
@@ -22,6 +24,7 @@ class Login : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
+        Log.d("Login", "onCreate del Login para problemas")
 
         sharedViewModel = ViewModelProvider(this)[SharedViewModel::class.java]
         userViewModel = ViewModelProvider(this).get(UserViewModel::class.java)
@@ -33,20 +36,20 @@ class Login : AppCompatActivity() {
         val txtContrasena = findViewById<TextInputEditText>(R.id.txtinputContrasena)
         val txtAdvertencia = findViewById<TextView>(R.id.txtAdvertenciaLogin)
 
-        // Observador para manejar la respuesta de login
         userViewModel.loginResponse.observe(this) { usuario ->
+            Log.d("Login", "Usuario recibido en el observador: $usuario") // 🕵️‍♂️ Verificar qué llega aquí
             if (usuario != null) {
-                // Guardar el token
                 guardarDatosUsuario(usuario.id, usuario.token)
-                // Navegar al Dashboard
                 val intent = Intent(this, Dashboard::class.java)
                 startActivity(intent)
+                finish()
             }
         }
 
+
         userViewModel.errorLiveData.observe(this) { error ->
             if (!error.isNullOrEmpty()) {
-                txtAdvertencia.text = error
+                mostrarDialogoError()
             }
         }
 
@@ -79,6 +82,16 @@ class Login : AppCompatActivity() {
             putString("TOKEN", token)  // Guardar el Token
             apply()
         }
+    }
+
+    private fun mostrarDialogoError(){
+        AlertDialog.Builder(this)
+            .setTitle("Error al iniciar sesión")
+            .setIcon(R.drawable.problem)
+            .setMessage("Credenciales incorrectas. Por favor, verifica tu nombre de usuario y contraseña e inténtalo de nuevo.")
+            .setPositiveButton("Entendido") { dialog, _ -> dialog.dismiss() }
+            .create().show()
+
     }
 
 }

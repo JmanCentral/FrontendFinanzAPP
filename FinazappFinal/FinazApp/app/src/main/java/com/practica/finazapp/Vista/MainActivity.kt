@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Base64
+import android.util.Log
 import android.widget.Button
 import androidx.activity.ComponentActivity
 import com.practica.finazapp.R
@@ -17,6 +18,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        Log.d("MainActivity", "onCreate")
 
         // Crear el canal de notificaciones
         crearCanalNotificacion(this)
@@ -27,6 +29,7 @@ class MainActivity : ComponentActivity() {
             // Redirigir a la Activity principal (Dashboard)
             startActivity(Intent(this, Dashboard::class.java))
         } else {
+            Log.d("MainActivity", "Token no encontrado")
             // Redirigir a la pantalla de inicio de sesión (Login)
             startActivity(Intent(this, Login::class.java))
         }
