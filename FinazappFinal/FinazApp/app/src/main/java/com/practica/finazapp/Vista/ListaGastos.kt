@@ -47,6 +47,12 @@ class ListaGastos : AppCompatActivity(), OnItemClickListener2 {
             }
         }
 
+        val btnActualizarLista = findViewById<ImageView>(R.id.update)
+
+        btnActualizarLista.setOnClickListener {
+            ObtenerGastos()
+        }
+
         val btnBuscarGasto = findViewById<ImageView>(R.id.busqueda)
         btnBuscarGasto.setOnClickListener { mostrarDialogoBuscarGasto() }
 

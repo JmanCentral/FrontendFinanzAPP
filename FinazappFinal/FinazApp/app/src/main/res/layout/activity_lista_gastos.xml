@@ -53,6 +53,18 @@
             android:clickable="true"
             android:focusable="true"
             app:srcCompat="@drawable/delete_24dp_bb271a_fill0_wght400_grad0_opsz24" />
+
+        <ImageView
+            android:id="@+id/update"
+            android:layout_width="0dp"
+            android:layout_height="57dp"
+            android:layout_weight="1"
+            android:adjustViewBounds="true"
+            android:clickable="true"
+            android:focusable="true"
+            app:srcCompat="@drawable/system_update_alt_24dp_78a75a_fill0_wght400_grad0_opsz24" />
+
+
     </LinearLayout>
 
     <!-- RecyclerView para la lista de gastos -->

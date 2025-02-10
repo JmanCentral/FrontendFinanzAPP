@@ -2,11 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Permisos necesarios sin duplicados -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <uses-permission
-        android:name="android.permission.POST_NOTIFICATIONS"
-        tools:ignore="WrongManifestParent" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -23,6 +21,13 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+
+        <!-- Registro del receiver -->
+
+        <receiver
+            android:name=".Notificaciones.RecordatorioReceiver"
+            android:enabled="true"/>
+
         <activity
             android:name=".Vista.Recurrente"
             android:exported="false" />
@@ -36,14 +41,8 @@
             android:name=".Vista.MainActivity3"
             android:exported="false" />
         <activity
-            android:name=".Vista.Categorias"
-            android:exported="true" />
-        <activity
             android:name=".Vista.GastosAltos"
             android:exported="false" />
-        <activity
-            android:name=".Vista.MainActivity2"
-            android:exported="true" />
         <activity
             android:name=".Vista.Dashboard"
             android:exported="true"
@@ -63,7 +62,6 @@
             android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

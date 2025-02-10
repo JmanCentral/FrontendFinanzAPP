@@ -3,8 +3,10 @@ package com.practica.finazapp.Vista
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.text.InputType
 import android.util.Log
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -35,6 +37,23 @@ class Login : AppCompatActivity() {
         val txtUsuario = findViewById<TextInputEditText>(R.id.txtinputUsuario)
         val txtContrasena = findViewById<TextInputEditText>(R.id.txtinputContrasena)
         val txtAdvertencia = findViewById<TextView>(R.id.txtAdvertenciaLogin)
+        val btnMostrarOcultar = findViewById<ImageView>(R.id.btnMostrarOcultar)
+        var isPasswordVisible = false
+
+        btnMostrarOcultar.setOnClickListener {
+            isPasswordVisible = !isPasswordVisible
+
+            if (isPasswordVisible) {
+                txtContrasena.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                btnMostrarOcultar.setImageResource(R.drawable.invisible) // Cambia al icono de ojo abierto
+            } else {
+                txtContrasena.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+                btnMostrarOcultar.setImageResource(R.drawable.invisible) // Cambia al icono de ojo cerrado
+            }
+
+            txtContrasena.setSelection(txtContrasena.text?.length ?: 0) // Mantiene el cursor en su posición
+        }
+
 
         userViewModel.loginResponse.observe(this) { usuario ->
             Log.d("Login", "Usuario recibido en el observador: $usuario") // 🕵️‍♂️ Verificar qué llega aquí

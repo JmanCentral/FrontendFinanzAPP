@@ -7,6 +7,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.icu.util.Calendar
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.ArrayAdapter
@@ -22,11 +23,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.TextInputEditText
 import com.practica.finazapp.Entidades.RecordatorioDTO
-import com.practica.finazapp.Notificaciones.AlarmaReceiver
+import com.practica.finazapp.Notificaciones.RecordatorioReceiver
 import com.practica.finazapp.R
 import com.practica.finazapp.ViewModelsApiRest.ReminderViewModel
 import com.practica.finazapp.ViewModelsApiRest.SharedViewModel
 import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
 class Recordatorios_Usuario : AppCompatActivity() , RecordatorioListener {
@@ -51,12 +53,10 @@ class Recordatorios_Usuario : AppCompatActivity() , RecordatorioListener {
         usuarioId = intent.getLongExtra("usuarioId", -1)
 
         fetchRecordatorios()
-        Alarma ()
 
         recordatoriosViewModel.operacionCompletada.observe(this) { completada ->
             if (completada == true) {
                 fetchRecordatorios() // Actualizar la UI
-                Alarma ()
             }
         }
 
@@ -64,39 +64,66 @@ class Recordatorios_Usuario : AppCompatActivity() , RecordatorioListener {
 
 
         btnNuevoRecordatorio.setOnClickListener {
-            val dialogView = layoutInflater.inflate(R.layout.dialog_nuevo_recordatorio, null)
-            val editTextNombre = dialogView.findViewById<TextInputEditText>(R.id.Busca_recordatorio)
-            val spinnerEstado = dialogView.findViewById<Spinner>(R.id.spinnerDescripcion1)
-            val spinnerDias = dialogView.findViewById<Spinner>(R.id.spinnerDescripcion2)
-            val editTextFecha = dialogView.findViewById<EditText>(R.id.editTextFecha1)
-            val editTextCantidad = dialogView.findViewById<TextInputEditText>(R.id.editTextRecordatoriolimite)
+            Log.d("Recordatorio", "Botón Nuevo Recordatorio presionado")
 
-            // Configurar el Spinner con las opciones de estados
+            // Inflar el layout del diálogo
+            val dialogView = layoutInflater.inflate(R.layout.dialog_nuevo_recordatorio, null)
+            Log.d("Recordatorio", "Layout del diálogo inflado correctamente")
+
+            // Obtener referencias de los elementos del diálogo
+            val editTextNombre = dialogView.findViewById<TextInputEditText>(R.id.Busca_recordatorio)
+            Log.d("Recordatorio", "Referencia a editTextNombre obtenida")
+            val spinnerEstado = dialogView.findViewById<Spinner>(R.id.spinnerDescripcion1)
+            Log.d("Recordatorio", "Referencia a spinnerEstado obtenida")
+            val spinnerDias = dialogView.findViewById<Spinner>(R.id.spinnerDescripcion2)
+            Log.d("Recordatorio", "Referencia a spinnerDias obtenida")
+            val editTextFecha = dialogView.findViewById<EditText>(R.id.editTextFecha1)
+            Log.d("Recordatorio", "Referencia a editTextFecha obtenida")
+            val editTextCantidad =
+                dialogView.findViewById<TextInputEditText>(R.id.editTextRecordatoriolimite)
+            Log.d("Recordatorio", "Referencia a editTextCantidad obtenida")
+
+            // Configurar el Spinner de estados
             val estados = listOf("Activo", "Pagado", "Vencido")
             val adapter = ArrayAdapter(this, R.layout.item_spinner_recordatorios, estados)
             adapter.setDropDownViewResource(R.layout.item_spinner_recordatorios)
             spinnerEstado.adapter = adapter
+            Log.d("Recordatorio", "Spinner de estados configurado con: $estados")
 
-            // Configurar el Spinner con las opciones de días
-            val diasOpciones = listOf( "Cada 2 minutos", "Cada 3 minutos", "Cada 5 minutos")
+            // Configurar el Spinner de días
+            val diasOpciones = listOf("Cada 2 minutos", "Cada 3 minutos", "Cada 5 minutos")
             val adapterDias = ArrayAdapter(this, R.layout.item_spinner_dias, diasOpciones)
             adapterDias.setDropDownViewResource(R.layout.item_spinner_dias)
             spinnerDias.adapter = adapterDias
+            Log.d("Recordatorio", "Spinner de días configurado con: $diasOpciones")
 
+            // Configurar el selector de fecha
             editTextFecha.setOnClickListener {
+                Log.d("Recordatorio", "Campo de fecha presionado, mostrando DatePicker")
                 showDatePickerDialog(editTextFecha)
             }
 
+            // Construir el diálogo
             val dialog = AlertDialog.Builder(this)
                 .setView(dialogView)
                 .setPositiveButton("Guardar") { _, _ ->
+                    Log.d("Recordatorio", "Botón Guardar del diálogo presionado")
+                    // Recoger los valores ingresados
                     val nombrerecordatorio = editTextNombre.text.toString().trim()
                     val estado = spinnerEstado.selectedItem.toString().trim()
                     val diasSeleccionado = spinnerDias.selectedItem.toString().trim()
                     val fechaOriginal = editTextFecha.text.toString().trim()
                     val limiteStr = editTextCantidad.text.toString().trim()
 
+                    Log.d(
+                        "Recordatorio",
+                        "Valores ingresados - Nombre: '$nombrerecordatorio', Estado: '$estado', " +
+                                "Días: '$diasSeleccionado', Fecha: '$fechaOriginal', Límite: '$limiteStr'"
+                    )
+
+                    // Validar que no haya campos vacíos
                     if (nombrerecordatorio.isBlank() || fechaOriginal.isBlank() || limiteStr.isBlank()) {
+                        Log.e("Recordatorio", "Error: Se encontraron campos vacíos")
                         Toast.makeText(
                             this,
                             "Por favor, llene todos los campos",
@@ -105,106 +132,161 @@ class Recordatorios_Usuario : AppCompatActivity() , RecordatorioListener {
                         return@setPositiveButton
                     }
 
+                    // Validar el formato de la fecha
                     val parts = fechaOriginal.split("/")
+                    if (parts.size < 3) {
+                        Log.e("Recordatorio", "Formato de fecha incorrecto: $fechaOriginal")
+                        Toast.makeText(this, "Formato de fecha incorrecto", Toast.LENGTH_SHORT)
+                            .show()
+                        return@setPositiveButton
+                    }
                     val dia = parts[0].padStart(2, '0')
                     val mes = parts[1].padStart(2, '0')
                     val anio = parts[2]
                     val fecha = "${anio}-${mes}-${dia}"
+                    Log.d("Recordatorio", "Fecha formateada: $fecha")
 
+                    // Convertir la opción de días a milisegundos
                     val dias = when (diasSeleccionado) {
-                        "Cada 2 minutos" -> 120000
-                        "Cada 3 minutos" -> 180000
-                        "Cada 5 minutos" -> 300000
-                        else -> 0  // En caso de error
+                        "Cada 2 minutos" -> 2 * 60 * 1000L  // 2 minutos en milisegundos
+                        "Cada 3 minutos" -> 3 * 60 * 1000L  // 3 minutos en milisegundos
+                        "Cada 5 minutos" -> 5 * 60 * 1000L  // 5 minutos en milisegundos
+                        else -> {
+                            Log.e("Recordatorio", "Opción de días no reconocida: $diasSeleccionado")
+                            0L
+                        }
                     }
 
+
+                    // Convertir el límite a Double, manejando posibles errores
+                    val valorDouble = try {
+                        limiteStr.toDouble().also {
+                            Log.d("Recordatorio", "Límite convertido a Double: $it")
+                        }
+                    } catch (e: NumberFormatException) {
+                        Log.e("Recordatorio", "Error al convertir límite a Double: $limiteStr", e)
+                        Toast.makeText(this, "Límite inválido", Toast.LENGTH_SHORT).show()
+                        return@setPositiveButton
+                    }
+
+                    // Crear el objeto RecordatorioDTO
                     val nuevoRecordatorio = RecordatorioDTO(
                         id_recordatorio = 0,
                         nombre = nombrerecordatorio,
                         estado = estado,
-                        dia = dias,
-                        valor = limiteStr.toDouble(),
+                        dias_recordatorio = dias,
+                        valor = valorDouble,
                         fecha = fecha
                     )
+                    Log.d("Recordatorio", "RecordatorioDTO creado: $nuevoRecordatorio")
 
-                    Log.d("NuevoRecordatorio", "Recordatorio creado: $dias")
-
+                    // Registrar el recordatorio mediante el ViewModel
                     recordatoriosViewModel.registrarRecordatorio(usuarioId, nuevoRecordatorio)
-
+                    Log.d("Recordatorio", "Recordatorio enviado al ViewModel para su registro")
                 }
                 .setNegativeButton("Cancelar") { dialog, _ ->
+                    Log.d(
+                        "Recordatorio",
+                        "Botón Cancelar del diálogo presionado, se cierra el diálogo"
+                    )
                     dialog.dismiss()
                 }
                 .create()
 
+            // Mostrar el diálogo
             dialog.show()
+            Log.d("Recordatorio", "Diálogo mostrado en pantalla")
         }
-
     }
 
     private fun fetchRecordatorios() {
-
         usuarioId = intent.getLongExtra("usuarioId", -1)
+        Log.d("Recordatorios", "Usuario ID recibido: $usuarioId")
+
         recordatoriosViewModel.listarRecordatorios(usuarioId)
+        Log.d("Recordatorios", "Llamado a listarRecordatorios()")
+
         recordatoriosViewModel.recordatoriosLiveData.observe(this) { recordatorioslist ->
             if (recordatorioslist != null) {
+                Log.d("Recordatorios", "Lista de recordatorios recibida: ${recordatorioslist.size} elementos")
+
                 adapter = RecordatorioAdapter(recordatorioslist)
-                adapter.setOnItemClickListener3(this) // Pasamos la Activity como listener
+                adapter.setOnItemClickListener3(this)
                 recyclerView.adapter = adapter
+
+                // Programar alarmas para cada recordatorio
+                for (recordatorio in recordatorioslist) {
+                    Log.d("Recordatorios", "Programando alarma para: ${recordatorio.nombre}")
+                    programarAlarma(recordatorio)
+                }
             } else {
+                Log.w("Recordatorios", "No se encontraron recordatorios")
                 Toast.makeText(this, "No se encontraron recordatorios", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    private fun Alarma () {
-
-        recordatoriosViewModel.listarRecordatorios(usuarioId)
-        recordatoriosViewModel.recordatoriosLiveData.observe(this) { recordatorios ->
-            recordatorios?.forEach { recordatorio ->
-                programarAlarma(this, recordatorio)
-            }
-        }
-
-    }
-
-    fun programarAlarma(context: Context, recordatorio: RecordatorioDTO) {
-        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(context, AlarmaReceiver::class.java).apply {
+    @SuppressLint("ScheduleExactAlarm")
+    private fun programarAlarma(recordatorio: RecordatorioDTO) {
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(this, RecordatorioReceiver::class.java).apply {
             putExtra("nombre", recordatorio.nombre)
-            putExtra("valor", recordatorio.valor)
+            putExtra("intervalo", recordatorio.dias_recordatorio) // Guardar intervalo en Intent
         }
 
         val pendingIntent = PendingIntent.getBroadcast(
-            context,
-            recordatorio.id_recordatorio.toInt(),
+            this,
+            recordatorio.id_recordatorio.toInt(), // ID único para cada recordatorio
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        // Convertir la fecha del recordatorio a milisegundos
-        val formato = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        val fechaFinal = formato.parse(recordatorio.fecha)?.time ?: return
-
-        val ahora = System.currentTimeMillis()
-
-        // Asegurar que el valor de 'dia' sea Long
-        val intervaloRepeticion = if (recordatorio.dia > 0) {
-            recordatorio.dia.toLong() * AlarmManager.INTERVAL_DAY
-        } else {
-            AlarmManager.INTERVAL_DAY
+        // Intentar parsear la fecha en diferentes formatos
+        val formatosFecha = listOf("yyyy-MM-dd", "dd/MM/yyyy")
+        var fecha: Long? = null
+        for (formato in formatosFecha) {
+            try {
+                fecha = SimpleDateFormat(formato, Locale.getDefault()).parse(recordatorio.fecha)?.time
+                if (fecha != null) break // Salir del loop si se parsea correctamente
+            } catch (e: Exception) {
+                Log.e("Recordatorios", "Error al parsear la fecha con formato $formato para ${recordatorio.nombre}: ${e.message}")
+            }
         }
 
-        // Determinar cuándo debe ejecutarse la primera vez
-        val tiempoEjecucion = if (fechaFinal > ahora) fechaFinal else ahora + intervaloRepeticion
+        if (fecha == null) {
+            Log.e("Recordatorios", "No se pudo parsear la fecha para ${recordatorio.nombre}, alarma no programada.")
+            return
+        }
 
-        alarmManager.setRepeating(
-            AlarmManager.RTC_WAKEUP,
-            tiempoEjecucion,  // Ahora sí usamos la fecha corregida
-            intervaloRepeticion,  // Se repite correctamente
-            pendingIntent
-        )
+        // Asegurar que el intervalo es válido (en milisegundos)
+        val intervalo = recordatorio.dias_recordatorio
+        if (intervalo <= 0) {
+            Log.e("Recordatorios", "Intervalo de repetición inválido ($intervalo ms). La alarma no se programará.")
+            return
+        }
+
+        // Configurar la alarma según la versión de Android
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            alarmManager.setExactAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP,
+                fecha,
+                pendingIntent
+            )
+            Log.d("Recordatorios", "Alarma programada con setExactAndAllowWhileIdle para ${recordatorio.nombre} a las ${Date(fecha)}")
+        } else {
+            alarmManager.setRepeating(
+                AlarmManager.RTC_WAKEUP,
+                fecha,
+                intervalo,
+                pendingIntent
+            )
+            Log.d("Recordatorios", "Alarma programada con setRepeating para ${recordatorio.nombre} a las ${Date(fecha)} cada ${intervalo / 1000} segundos")
+        }
     }
+
+
+
+
 
 
     override fun onItemClick3(recordatorios: RecordatorioDTO) {
