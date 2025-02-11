@@ -13,15 +13,8 @@
     </fragment>
 
     <fragment
-        android:id="@+id/nav_perfil"
-        android:name="com.practica.finazapp.Vista.Perfil"
-        android:label="@string/perfil"
-        tools:layout="@layout/fragment_perfil">
-    </fragment>
-
-    <fragment
         android:id="@+id/nav_reporte"
-        android:name="com.practica.finazapp.Vista.Recordatorios"
+        android:name="com.practica.finazapp.Vista.Reporte"
         android:label="@string/reporte"
         tools:layout="@layout/fragment_reporte" >
     </fragment>

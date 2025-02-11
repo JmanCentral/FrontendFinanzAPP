@@ -220,7 +220,6 @@ class Recordatorios_Usuario : AppCompatActivity() , RecordatorioListener {
                     programarAlarma(recordatorio)
                 }
             } else {
-                Log.w("Recordatorios", "No se encontraron recordatorios")
                 Toast.makeText(this, "No se encontraron recordatorios", Toast.LENGTH_SHORT).show()
             }
         }
