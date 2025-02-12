@@ -57,7 +57,7 @@ class ListaGastos : AppCompatActivity(), OnItemClickListener2 {
         btnBuscarGasto.setOnClickListener { mostrarDialogoBuscarGasto() }
 
         val btnEliminarGasto = findViewById<ImageView>(R.id.serch)
-        btnEliminarGasto.setOnClickListener { eliminarGastoPorIdusuarioAndCategoria() }
+        btnEliminarGasto.setOnClickListener { AdvertenciaGastos() }
     }
 
     private fun ObtenerGastos() {
@@ -74,6 +74,7 @@ class ListaGastos : AppCompatActivity(), OnItemClickListener2 {
 
                 recyclerView.visibility = View.VISIBLE
                 imgNoGastos.visibility = View.GONE
+                txtNoGastos.visibility = View.GONE
             } else {
                 recyclerView.visibility = View.GONE
                 imgNoGastos.visibility = View.VISIBLE
@@ -104,8 +105,12 @@ class ListaGastos : AppCompatActivity(), OnItemClickListener2 {
                         adapter = GastoAdapterPrincipal(gastos)
                         adapter.setOnItemClickListener2(this)
                         recyclerView.adapter = adapter
+                        recyclerView.visibility = View.VISIBLE
+                        imgNoGastos.visibility = View.GONE
                     } else {
-                        Toast.makeText(this, "No se encontraron gastos", Toast.LENGTH_SHORT).show()
+                        recyclerView.visibility = View.GONE
+                        imgNoGastos.visibility = View.VISIBLE
+                        txtNoGastos.visibility = View.VISIBLE
                     }
                 }
             } else {
@@ -117,6 +122,23 @@ class ListaGastos : AppCompatActivity(), OnItemClickListener2 {
         dialog.show()
     }
 
+    private fun AdvertenciaGastos() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Confirmación")
+        builder.setMessage("¿Estás seguro de que deseas eliminar todos los Gastos de esta categoría? Esta acción no se puede deshacer.")
+
+        builder.setPositiveButton("Sí") { _, _ ->
+            eliminarGastoPorIdusuarioAndCategoria()
+        }
+
+        builder.setNegativeButton("No") { dialog, _ ->
+            dialog.dismiss() // Cierra el diálogo sin hacer nada
+        }
+
+        val dialog = builder.create()
+        dialog.show()
+    }
+
     private fun eliminarGastoPorIdusuarioAndCategoria() {
         val categoria = intent.getStringExtra("categoria") ?: ""
 
@@ -124,7 +146,6 @@ class ListaGastos : AppCompatActivity(), OnItemClickListener2 {
             Toast.makeText(this, "Error: usuario no identificado", Toast.LENGTH_SHORT).show()
             return
         }
-
         gastosViewModel.eliminarGastosPorNombre(usuarioId, categoria)
         gastosViewModel.operacionCompletada.removeObservers(this) // Evita múltiples observaciones
         gastosViewModel.operacionCompletada.observe(this) { completada ->
@@ -161,10 +182,18 @@ class ListaGastos : AppCompatActivity(), OnItemClickListener2 {
             .setPositiveButton("Guardar") { _, _ ->
                 val categoria = spinnerCategoria.selectedItem.toString()
                 val cantidad = editTextCantidad.text.toString().toDoubleOrNull()
-                val fecha = editTextFecha.text.toString().replace("/", "-")
+                val fechaOriginal = editTextFecha.text.toString()
                 val descripcion = editTextDescripcion.text.toString()
 
-                if (cantidad != null && categoria.isNotBlank() && fecha.isNotBlank() && descripcion.isNotBlank()) {
+                if (cantidad != null && categoria.isNotBlank() && fechaOriginal.isNotBlank() && descripcion.isNotBlank()) {
+
+                    // Realizar la conversión de fecha y guardar el nuevo gasto
+                    val parts = fechaOriginal.split("/")
+                    val dia = parts[0].padStart(2, '0')
+                    val mes = parts[1].padStart(2, '0')
+                    val anio = parts[2]
+                    val fecha = "${anio}-${mes}-${dia}"
+
                     val gastoActualizado = gasto.copy(
                         categoria = categoria,
                         valor = cantidad,

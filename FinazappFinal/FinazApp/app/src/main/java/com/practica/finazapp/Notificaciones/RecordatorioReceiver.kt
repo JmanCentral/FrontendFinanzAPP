@@ -23,7 +23,7 @@ class RecordatorioReceiver : BroadcastReceiver() {
         val valor = intent.getStringExtra("valor") ?: "un pago"
         val intervalo = intent.getLongExtra("intervalo", 0L) // Intervalo en milisegundos
 
-        val mensaje = "No se te olvide pagar $valor en $nombre"
+        val mensaje = "No se te olvide pagar $valor a $nombre"
 
         // Crear la notificación
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

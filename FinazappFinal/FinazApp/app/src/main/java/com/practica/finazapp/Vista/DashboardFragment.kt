@@ -66,6 +66,7 @@ class DashboardFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
         // Obtener la referencia del ImageView correctamente
         val miImagen = view.findViewById<ImageView>(R.id.campana)
 

@@ -51,6 +51,12 @@ interface IngresoService {
         @Path("id_usuario") idUsuario: Long
     ): Call<Double>
 
+    // Obtener proyección de ingresos
+    @GET("AhorroMensual/{id_usuario}")
+    fun obtenerAhorroPotencial(
+        @Path("id_usuario") idUsuario: Long
+    ): Call<Double>
+
     // Modificar un ingreso
     @PUT("modificar/{id_ingreso}")
     fun modificarIngreso(

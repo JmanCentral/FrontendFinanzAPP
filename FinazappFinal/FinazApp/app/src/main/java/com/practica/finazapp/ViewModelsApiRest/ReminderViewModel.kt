@@ -13,8 +13,8 @@ class ReminderViewModel (application: Application) : AndroidViewModel(applicatio
         ReminderRepository(getApplication<Application>().applicationContext)
     }
 
-    private val _recordatorioLiveData = MutableLiveData<RecordatorioDTO?>()
-    val recordatorioLiveData: LiveData<RecordatorioDTO?> = _recordatorioLiveData
+    private val _recordatorioLiveData = MutableLiveData<List<RecordatorioDTO>?>()
+    val recordatorioLiveData: LiveData<List<RecordatorioDTO>?> = _recordatorioLiveData
 
     private val _recordatoriosLiveData = MutableLiveData<List<RecordatorioDTO>?>()
     val recordatoriosLiveData: LiveData<List<RecordatorioDTO>?> = _recordatoriosLiveData
@@ -28,7 +28,10 @@ class ReminderViewModel (application: Application) : AndroidViewModel(applicatio
 
     // ✅ Registrar un nuevo recordatorio
     fun registrarRecordatorio(idUsuario: Long, recordatorioDTO: RecordatorioDTO) {
-        recordatorioRepository.registrarRecordatorio(idUsuario, recordatorioDTO) { recordatorio, error ->
+        recordatorioRepository.registrarRecordatorio(
+            idUsuario,
+            recordatorioDTO
+        ) { recordatorio, error ->
             if (recordatorio != null) {
                 _operacionCompletada.postValue(true)
             }
@@ -46,7 +49,10 @@ class ReminderViewModel (application: Application) : AndroidViewModel(applicatio
 
     // ✅ Modificar un recordatorio
     fun modificarRecordatorio(idRecordatorio: Long, recordatorioDTO: RecordatorioDTO) {
-        recordatorioRepository.modificarRecordatorio(idRecordatorio, recordatorioDTO) { recordatorio, error ->
+        recordatorioRepository.modificarRecordatorio(
+            idRecordatorio,
+            recordatorioDTO
+        ) { recordatorio, error ->
             if (recordatorio != null) {
                 _operacionCompletada.postValue(true)
             } else {
@@ -56,7 +62,7 @@ class ReminderViewModel (application: Application) : AndroidViewModel(applicatio
     }
 
     // ✅ Eliminar un recordatorio
-    fun eliminarRecordatorio(idRecordatorio: Long) {
+    fun eliminarRecordatorios(idRecordatorio: Long) {
         recordatorioRepository.eliminarRecordatorio(idRecordatorio) { success, error ->
             if (success) {
                 _operacionCompletada.postValue(true)
@@ -67,17 +73,23 @@ class ReminderViewModel (application: Application) : AndroidViewModel(applicatio
     }
 
     // ✅ Eliminar todos los recordatorios
-    fun eliminarTodos() {
-        recordatorioRepository.eliminarTodos { response, error ->
-            _errorLiveData.postValue(error)
-        }
-    }
+    fun eliminarTodos(idUsuario: Long) {
+        recordatorioRepository.eliminarRecordatorios(idUsuario) { success, error ->
+            if (success != null) {
+                _operacionCompletada.postValue(true)
+            } else {
+                _errorLiveData.postValue(error)
+            }
 
-    // ✅ Buscar un recordatorio por nombre
-    fun buscarPorNombre(nombre: String) {
-        recordatorioRepository.buscarPorNombre(nombre) { recordatorio, error ->
-            _recordatorioLiveData.postValue(recordatorio)
-            _errorLiveData.postValue(error)
         }
     }
+        fun buscarPorNombre(nombre: String) {
+            recordatorioRepository.buscarPorNombre(nombre) { recordatorio, error ->
+                if (recordatorio != null) {
+                    _recordatorioLiveData.postValue(recordatorio)
+                } else {
+                    _errorLiveData.postValue(error)
+                }
+            }
+        }
 }

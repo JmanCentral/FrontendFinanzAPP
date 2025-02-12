@@ -13,7 +13,7 @@ import retrofit2.Response
 class IncomeRepository(context: Context) {
 
     private val ingresoService: IngresoService by lazy {
-        Cliente.getCliente("https://backendfinazapp-1.onrender.com/Finanzapp/Ingresos/", context)
+        Cliente.getCliente("http://192.168.10.6:8862/Finanzapp/Ingresos/", context)
             .create(IngresoService::class.java)
     }
 
@@ -61,6 +61,22 @@ class IncomeRepository(context: Context) {
                 val errorMsg = "Fallo en la conexión: ${t.message}"
                 Log.e("IngresoRepository", errorMsg, t)
                 callback(null, errorMsg)
+            }
+        })
+    }
+
+    fun obtenerAhorroPotencial (idUsuario: Long, callback: (Double?, String?) -> Unit) {
+        ingresoService.obtenerAhorroPotencial(idUsuario).enqueue(object : Callback<Double> {
+            override fun onResponse(call: Call<Double>, response: Response<Double>) {
+                if (response.isSuccessful) {
+                    callback(response.body(), null)
+                } else {
+                    callback(null, "Error al obtener el ahorro potencial: ${response.code()}")
+                }
+
+                }
+            override fun onFailure(call: Call<Double>, t: Throwable) {
+                callback(null, "Fallo en la conexión: ${t.message}")
             }
         })
     }

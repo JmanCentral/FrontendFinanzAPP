@@ -83,7 +83,7 @@
         android:id="@+id/img_no_gastos"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/descendiente"
+        android:src="@drawable/nogastos"
         android:visibility="gone"
         android:contentDescription="No hay gastos"
         app:layout_constraintTop_toTopOf="parent"

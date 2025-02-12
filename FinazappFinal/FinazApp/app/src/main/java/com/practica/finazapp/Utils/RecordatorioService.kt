@@ -29,9 +29,9 @@ interface RecordatorioService {
     @DELETE("EliminarRecordatorios/{id_recordatorio}")
     fun eliminarRecordatorio(@Path("id_recordatorio") idRecordatorio: Long): Call<Void>
 
-    @DELETE("eliminartodos")
-    fun eliminarTodos(): Call<String>
+    @DELETE("eliminartodos/{id_usuario}")
+    fun eliminarTodos(@Path("id_usuario") idUsuario: Long): Call <Void>
 
     @GET("BuscarPorNombre/{nombre}")
-    fun buscarPorNombre(@Path("nombre") nombre: String): Call<RecordatorioDTO>
+    fun buscarPorNombre(@Path("nombre") nombre: String): Call<List<RecordatorioDTO>>
 }

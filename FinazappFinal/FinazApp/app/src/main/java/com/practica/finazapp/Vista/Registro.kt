@@ -1,9 +1,12 @@
 package com.practica.finazapp.Vista
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.text.InputType
 import android.util.Log
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import com.google.android.material.textfield.TextInputEditText
@@ -21,6 +24,7 @@ class Registro : AppCompatActivity() {
     private lateinit var usuarioViewModel: UserViewModel
     private lateinit var sharedViewModel: SharedViewModel
 
+    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_registro)
@@ -36,6 +40,42 @@ class Registro : AppCompatActivity() {
         val txtInputUsuario = findViewById<TextInputEditText>(R.id.txtinputUsuario)
         val btnRegistro1 = findViewById<Button>(R.id.btnRegistro)
         val txtAdvertencia = findViewById<TextView>(R.id.Advertencia)
+
+        val btnMostrarOcultar = findViewById<ImageView>(R.id.btnMostrarOcultar1)
+        var isPasswordVisible = false
+
+        val btnMostrarOcultar1= findViewById<ImageView>(R.id.btnMostrarOcultar2)
+        var isPasswordVisible1 = false
+
+        btnMostrarOcultar.setOnClickListener {
+            isPasswordVisible = !isPasswordVisible
+
+            if (isPasswordVisible) {
+                txtInputContrasena2.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                btnMostrarOcultar.setImageResource(R.drawable.ojoabierto) // Cambia al icono de ojo abierto
+            } else {
+                txtInputContrasena2.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+                btnMostrarOcultar.setImageResource(R.drawable.invisible) // Cambia al icono de ojo cerrado
+            }
+
+            txtInputContrasena2.setSelection(txtInputContrasena2.text?.length ?: 0) // Mantiene el cursor en su posición
+        }
+
+        btnMostrarOcultar1.setOnClickListener {
+            isPasswordVisible1 = !isPasswordVisible1
+
+            if (isPasswordVisible1) {
+                txtInputConf.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+                btnMostrarOcultar1.setImageResource(R.drawable.ojoabierto) // Cambia al icono de ojo abierto
+            } else {
+                txtInputConf.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+                btnMostrarOcultar1.setImageResource(R.drawable.invisible) // Cambia al icono de ojo cerrado
+            }
+
+            txtInputConf .setSelection(txtInputConf .text?.length ?: 0) // Mantiene el cursor en su posición
+        }
+
+
 
         val regex = Regex("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?]).{8,}\$")
 

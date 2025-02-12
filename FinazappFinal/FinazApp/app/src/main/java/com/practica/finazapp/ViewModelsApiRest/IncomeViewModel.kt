@@ -32,6 +32,9 @@ class IncomeViewModel (application: Application) : AndroidViewModel(application)
     private val _proyeccionIngresosLiveData = MutableLiveData<Double?>()
     val proyeccionIngresosLiveData: LiveData<Double?> = _proyeccionIngresosLiveData
 
+    private val _AhorroMensualLiveData = MutableLiveData<Double?>()
+    val AhorroMensualLiveData: LiveData<Double?> = _AhorroMensualLiveData
+
     private val _errorLiveData = MutableLiveData<String?>()
     val errorLiveData: LiveData<String?> = _errorLiveData
 
@@ -67,6 +70,17 @@ class IncomeViewModel (application: Application) : AndroidViewModel(application)
         repository.listarIngresosMensuales(idUsuario) { ingresos, error ->
             if (error == null) {
                 _ingresosMensualesLiveData.postValue(ingresos)
+            } else {
+                _errorLiveData.postValue(error)
+            }
+        }
+    }
+
+    fun obtenerAhorroMensual(idUsuario: Long) {
+        repository.obtenerAhorroPotencial(idUsuario) { ahorroMensual, error ->
+            if (error == null) {
+                _AhorroMensualLiveData.postValue(ahorroMensual)
+                Log.d("IncomeViewModel", "Ahorro mensual obtenido: $ahorroMensual")
             } else {
                 _errorLiveData.postValue(error)
             }

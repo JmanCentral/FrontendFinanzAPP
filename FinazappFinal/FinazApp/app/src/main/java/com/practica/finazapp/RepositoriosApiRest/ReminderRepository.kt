@@ -11,7 +11,7 @@ import retrofit2.Response
 class ReminderRepository (context: Context) {
 
     private val recordatorioService: RecordatorioService by lazy {
-        Cliente.getCliente("https://backendfinazapp-1.onrender.com/Finanzapp/Recordatorios/", context)
+        Cliente.getCliente("http://192.168.10.6:8862/Finanzapp/Recordatorios/", context)
             .create(RecordatorioService::class.java)
     }
 
@@ -88,39 +88,39 @@ class ReminderRepository (context: Context) {
     }
 
     // ✅ Eliminar todos los recordatorios
-    fun eliminarTodos(callback: (String?, String?) -> Unit) {
-        recordatorioService.eliminarTodos()
-            .enqueue(object : Callback<String> {
-                override fun onResponse(call: Call<String>, response: Response<String>) {
-                    if (response.isSuccessful) {
-                        callback(response.body(), null)
-                    } else {
-                        callback(null, "Error al eliminar todos los recordatorios: ${response.code()}")
-                    }
+    fun eliminarRecordatorios(idUsuario: Long, callback: (Boolean, String?) -> Unit) {
+        recordatorioService.eliminarTodos(idUsuario).enqueue(object : Callback<Void> {
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                if (response.isSuccessful) {
+                    // Si la eliminación es exitosa, devuelve true
+                    callback(true, null)
+                } else {
+                    // Si hay un error, pasa un mensaje de error con el código de respuesta
+                    callback(false, "Error al eliminar los recordatorios: ${response.code()}")
                 }
-
-                override fun onFailure(call: Call<String>, t: Throwable) {
-                    callback(null, "Fallo en la conexión: ${t.message}")
-                }
-            })
+            }
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                // Si hay un fallo en la conexión, pasa el mensaje de error
+                callback(false, "Fallo en la conexión: ${t.message}")
+            }
+        })
     }
 
     // ✅ Buscar un recordatorio por nombre
-    fun buscarPorNombre(nombre: String, callback: (RecordatorioDTO?, String?) -> Unit) {
-        recordatorioService.buscarPorNombre(nombre)
-            .enqueue(object : Callback<RecordatorioDTO> {
-                override fun onResponse(call: Call<RecordatorioDTO>, response: Response<RecordatorioDTO>) {
-                    if (response.isSuccessful) {
-                        callback(response.body(), null)
-                    } else {
-                        callback(null, "Error al buscar recordatorio: ${response.code()}")
-                    }
+    fun buscarPorNombre(nombre: String, callback: (List<RecordatorioDTO>?, String?) -> Unit) {
+        recordatorioService.buscarPorNombre(nombre).enqueue(object : Callback<List<RecordatorioDTO>> {
+            override fun onResponse(call: Call<List<RecordatorioDTO>>, response: Response<List<RecordatorioDTO>>) {
+                if (response.isSuccessful) {
+                    callback(response.body(), null)
+                } else {
+                    callback(null, "Error al buscar recordatorio: ${response.code()}")
                 }
+            }
 
-                override fun onFailure(call: Call<RecordatorioDTO>, t: Throwable) {
-                    callback(null, "Fallo en la conexión: ${t.message}")
-                }
-            })
+            override fun onFailure(call: Call<List<RecordatorioDTO>>, t: Throwable) {
+                callback(null, "Fallo en la conexión: ${t.message}")
+            }
+        })
     }
 
 }

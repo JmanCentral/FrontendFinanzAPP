@@ -124,18 +124,20 @@ class FragmentProyecciones : Fragment() {
 
             }
 
-            gastosViewModel.obtenerGastoRecurrente(usuarioId)
-            gastosViewModel.gastoRecurrenteLiveData.observe(viewLifecycleOwner) { descripcionRecurrente ->
-                descripcionRecurrente?.let {
-                    Log.d("descripcionRecurrente", "recurrente: $descripcionRecurrente")
-                    // Encuentra el TextView para mostrar el resultado
-                    val textViewGastosRecurrentes = view?.findViewById<TextView>(R.id.textpromedio)
-                    val mensaje =
-                        "Tienes un gasto recurrente en : $descripcionRecurrente revisa si es esencial ese gasto"
+        ingresosViewModel.obtenerAhorroMensual(usuarioId)
+        ingresosViewModel.AhorroMensualLiveData.observe(viewLifecycleOwner) { descripcionRecurrente ->
+            descripcionRecurrente?.let {
+                Log.d("descripcionRecurrente", "recurrente: $descripcionRecurrente")
+                // Encuentra el TextView para mostrar el resultado
+                val textViewGastosRecurrentes = view?.findViewById<TextView>(R.id.textpromedio)
+                val mensaje =
+                    "Tu posible ahorro mensual es  : $${String.format("%.2f", it)}"
 
-                    textViewGastosRecurrentes?.text = mensaje
-                }
+                textViewGastosRecurrentes?.text = mensaje
             }
+        }
+
+
             gastosViewModel.obtenerPorcentajeGastos(usuarioId)
             gastosViewModel.porcentajeGastosLiveData
                 .observe(viewLifecycleOwner) { porcentaje ->

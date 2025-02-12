@@ -31,10 +31,11 @@ class RecordatorioAdapter (private val recordatorios: List<RecordatorioDTO>) :
         val numberFormat = NumberFormat.getInstance()
         numberFormat.maximumFractionDigits = 2
 
+
         holder.nameTextView.text = currentRecordatorio.nombre
         holder.valorTextView.text = "${numberFormat.format(currentRecordatorio.valor)}$"
         holder.estado.text = currentRecordatorio.estado
-        holder.dias.text = "${numberFormat.format(currentRecordatorio.dias_recordatorio)}$"
+        holder.dias.text = "Recordatorio programado cada ${numberFormat.format(currentRecordatorio.dias_recordatorio * 1440)} minutos"
         holder.fecha.text = currentRecordatorio.fecha
 
 

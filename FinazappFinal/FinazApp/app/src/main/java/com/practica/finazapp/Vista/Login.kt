@@ -45,7 +45,7 @@ class Login : AppCompatActivity() {
 
             if (isPasswordVisible) {
                 txtContrasena.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
-                btnMostrarOcultar.setImageResource(R.drawable.invisible) // Cambia al icono de ojo abierto
+                btnMostrarOcultar.setImageResource(R.drawable.ojoabierto) // Cambia al icono de ojo abierto
             } else {
                 txtContrasena.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
                 btnMostrarOcultar.setImageResource(R.drawable.invisible) // Cambia al icono de ojo cerrado

@@ -28,7 +28,7 @@
                 android:background="@drawable/circulo"
                 android:contentDescription="@string/desc_usuario"
                 android:scaleType="fitCenter"
-                android:src="@drawable/user1" /> <!-- Establece un fondo circular -->
+                android:src="@mipmap/principal" /> <!-- Establece un fondo circular -->
         </FrameLayout>
 
         <TextView

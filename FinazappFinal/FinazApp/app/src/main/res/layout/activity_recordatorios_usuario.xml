@@ -43,7 +43,7 @@
             app:srcCompat="@drawable/note_add_24dp_75fb4c_fill0_wght700_grad0_opsz24" />
 
         <ImageView
-            android:id="@+id/imageView3"
+            android:id="@+id/BuscarPornombre"
             android:layout_width="0dp"
             android:layout_height="57dp"
             android:layout_weight="1"
@@ -53,7 +53,7 @@
             app:srcCompat="@drawable/busqueda" />
 
         <ImageView
-            android:id="@+id/imageView5"
+            android:id="@+id/eliminarRecordatorios"
             android:layout_width="0dp"
             android:layout_height="57dp"
             android:layout_weight="1"
@@ -61,6 +61,17 @@
             android:clickable="true"
             android:focusable="true"
             app:srcCompat="@drawable/delete" />
+
+        <ImageView
+            android:id="@+id/ActualizarRecordatorios"
+            android:layout_width="0dp"
+            android:layout_height="57dp"
+            android:layout_weight="1"
+            android:adjustViewBounds="true"
+            android:clickable="true"
+            android:focusable="true"
+            app:srcCompat="@drawable/update_24dp_78a75a_fill0_wght400_grad0_opsz24" />
+
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -74,5 +85,33 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout"
         app:layout_constraintVertical_bias="1.0" />
+
+    <!-- Imagen cuando no hay gastos -->
+    <ImageView
+        android:id="@+id/img_no_gastos1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/mujer"
+        android:visibility="gone"
+        android:contentDescription="No hay gastos"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+
+
+    <!-- Texto cuando no hay gastos -->
+    <TextView
+        android:id="@+id/txt_no_gastos2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="No hay gastos registrados"
+        android:textColor="@android:color/darker_gray"
+        android:textSize="18sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/img_no_gastos1" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
