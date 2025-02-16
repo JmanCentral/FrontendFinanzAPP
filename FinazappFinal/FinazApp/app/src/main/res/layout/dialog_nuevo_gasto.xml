@@ -50,9 +50,10 @@
         android:layout_margin="8dp"/>
 
     <TextView
-        android:id="@+id/txtAdvertencia"
+        android:id="@+id/txtAdvertencia1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        style="@style/TxtVerdePequenoItalic"/>
+        style="@style/TxtVerdePequenoItalic"
+        android:text="El gasto ingresado se registrará a partir de la fecha especificada y se descontará del ingreso total"/>
 
 </LinearLayout>

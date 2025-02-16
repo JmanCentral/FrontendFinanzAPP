@@ -66,5 +66,12 @@
         android:background="@drawable/bg_btn_borde_amarillo"
         android:layout_margin="8dp"/>
 
+    <TextView
+        android:id="@+id/txtAlerta"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/TxtVerdePequenoItalic"
+        android:text="La alerta la puedes configurar para que te notifique en la app cuando te has pasado de un presupuesto limite en cada categoria."/>
+
 </LinearLayout>
 

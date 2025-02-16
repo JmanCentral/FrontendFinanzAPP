@@ -21,6 +21,9 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -43,6 +46,7 @@ class Recordatorios_Usuario : AppCompatActivity() , RecordatorioListener {
     private lateinit var adapter: RecordatorioAdapter
     private lateinit var imgNoGastos1: ImageView
     private lateinit var txtNoGastos1: TextView
+    private var recordatoriosAnteriores: List<RecordatorioDTO> = emptyList()
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,7 +68,7 @@ class Recordatorios_Usuario : AppCompatActivity() , RecordatorioListener {
 
         recordatoriosViewModel.operacionCompletada.observe(this) { completada ->
             if (completada == true) {
-                fetchRecordatorios() // Actualizar la UI
+                fetchRecordatorios()
             }
         }
 
@@ -106,7 +110,7 @@ class Recordatorios_Usuario : AppCompatActivity() , RecordatorioListener {
             Log.d("Recordatorio", "Referencia a editTextCantidad obtenida")
 
             // Configurar el Spinner de estados
-            val estados = listOf("Activo", "Pagado", "Vencido")
+            val estados = listOf("Activo")
             val adapter = ArrayAdapter(this, R.layout.item_spinner_recordatorios, estados)
             adapter.setDropDownViewResource(R.layout.item_spinner_recordatorios)
             spinnerEstado.adapter = adapter
@@ -225,7 +229,7 @@ class Recordatorios_Usuario : AppCompatActivity() , RecordatorioListener {
         builder.setMessage("¿Estás seguro de que deseas eliminar todos los recordatorios? Esta acción no se puede deshacer.")
 
         builder.setPositiveButton("Sí") { _, _ ->
-            EliminarTodosLosRecordatorios()
+            eliminarTodosLosRecordatorios()
         }
 
         builder.setNegativeButton("No") { dialog, _ ->
@@ -237,22 +241,22 @@ class Recordatorios_Usuario : AppCompatActivity() , RecordatorioListener {
     }
 
 
-    private fun EliminarTodosLosRecordatorios() {
-
+    private fun eliminarTodosLosRecordatorios() {
         if (usuarioId == -1L) {
             Toast.makeText(this, "Error: usuario no identificado", Toast.LENGTH_SHORT).show()
             return
         }
 
-        recordatoriosViewModel.eliminarTodos(usuarioId)
-        recordatoriosViewModel.operacionCompletada.removeObservers(this)
-        recordatoriosViewModel.operacionCompletada.observe(this) { completada ->
-            if (completada == true) {
-                fetchRecordatorios() // Actualizar la UI
+            recordatoriosViewModel.eliminarTodos(usuarioId)
+            recordatoriosViewModel.operacionCompletada.observe(this) { completada ->
+                if (completada == true) {
+                    Log.d("Recordatorios", "Todos los recordatorios eliminados correctamente.")
+                    fetchRecordatorios() // Actualizar la UI después de eliminar
+                }
             }
-        }
 
     }
+
 
     private fun BuscarPorNombre() {
 
@@ -277,6 +281,7 @@ class Recordatorios_Usuario : AppCompatActivity() , RecordatorioListener {
                         recyclerView.adapter = adapter
                         recyclerView.visibility = View.VISIBLE
                         imgNoGastos1.visibility = View.GONE
+                        txtNoGastos1.visibility = View.GONE
                     } else {
                         recyclerView.visibility = View.GONE
                         imgNoGastos1.visibility = View.VISIBLE
@@ -293,6 +298,17 @@ class Recordatorios_Usuario : AppCompatActivity() , RecordatorioListener {
 
     }
 
+    private fun isAlarmaProgramada(recordatorio: RecordatorioDTO): Boolean {
+        val intent = Intent(this, RecordatorioReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(
+            this,
+            recordatorio.id_recordatorio.toInt(),
+            intent,
+            PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
+        )
+        return pendingIntent != null
+    }
+
     private fun fetchRecordatorios() {
         usuarioId = intent.getLongExtra("usuarioId", -1)
         Log.d("Recordatorios", "Usuario ID recibido: $usuarioId")
@@ -301,214 +317,114 @@ class Recordatorios_Usuario : AppCompatActivity() , RecordatorioListener {
         Log.d("Recordatorios", "Llamado a listarRecordatorios()")
 
         recordatoriosViewModel.recordatoriosLiveData.observe(this) { recordatorioslist ->
-            if (recordatorioslist != null) {
-                Log.d("Recordatorios", "Lista de recordatorios recibida: ${recordatorioslist.size} elementos")
+            Log.d("Recordatorios", "Lista de recordatorios recibida: ${recordatorioslist?.size ?: 0} elementos")
 
+            // Cancelar alarmas obsoletas
+            recordatoriosAnteriores.filter { it !in (recordatorioslist ?: emptyList()) }.forEach { cancelarAlarma(it) }
+
+            if (!recordatorioslist.isNullOrEmpty()) {
                 adapter = RecordatorioAdapter(recordatorioslist)
                 adapter.setOnItemClickListener3(this)
                 recyclerView.adapter = adapter
                 recyclerView.visibility = View.VISIBLE
                 imgNoGastos1.visibility = View.GONE
+                txtNoGastos1.visibility = View.GONE
 
-                // Programar alarmas para cada recordatorio
-                for (recordatorio in recordatorioslist) {
-                    if(recordatorio.estado.equals("Pagado", ignoreCase = true)){
-                        cancelarAlarma(recordatorio)
-                        Log.d("Recordatorios", "La alarma para ${recordatorio.nombre} se canceló porque su estado es Pagado")
-                    } else {
-                        Log.d("Recordatorios", "Programando alarma para: ${recordatorio.nombre}")
-                        programarAlarma(recordatorio)
+                // Reprogramar alarmas necesarias
+                recordatorioslist.forEach { recordatorio ->
+                    if (!isAlarmaProgramada(recordatorio)) {
+                        reprogramarAlarma(recordatorio)
                     }
                 }
+
+                recordatoriosAnteriores = recordatorioslist
             } else {
                 recyclerView.visibility = View.GONE
                 imgNoGastos1.visibility = View.VISIBLE
                 txtNoGastos1.visibility = View.VISIBLE
+                recordatoriosAnteriores = emptyList()
             }
         }
     }
-
-
 
     @SuppressLint("ScheduleExactAlarm")
-    private fun programarAlarma(recordatorio: RecordatorioDTO) {
-        Log.d("Recordatorios", "Programando alarma para: ${recordatorio.nombre}")
-
+    private fun reprogramarAlarma(recordatorio: RecordatorioDTO) {
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(this, RecordatorioReceiver::class.java).apply {
+            putExtra("id_recordatorio", recordatorio.id_recordatorio.toInt())
             putExtra("nombre", recordatorio.nombre)
             putExtra("valor", recordatorio.valor.toString())
-            putExtra("intervalo", recordatorio.dias_recordatorio) // Guardar intervalo en Intent
-        }
-
-        val pendingIntent = PendingIntent.getBroadcast(
-            this,
-            recordatorio.id_recordatorio.toInt(), // ID único para cada recordatorio
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
-        // Intentar parsear la fecha en diferentes formatos
-        val formatosFecha = listOf("yyyy-MM-dd", "dd/MM/yyyy")
-        var fecha: Long? = null
-        for (formato in formatosFecha) {
-            try {
-                fecha = SimpleDateFormat(formato, Locale.getDefault()).parse(recordatorio.fecha)?.time
-                if (fecha != null) break // Salir del loop si se parsea correctamente
-            } catch (e: Exception) {
-                Log.e("Recordatorios", "Error al parsear la fecha con formato $formato para ${recordatorio.nombre}: ${e.message}")
-            }
-        }
-
-        if (fecha == null) {
-            Log.e("Recordatorios", "No se pudo parsear la fecha para ${recordatorio.nombre}, alarma no programada.")
-            return
-        }
-
-        // Asegurar que el intervalo es válido (en milisegundos)
-        val intervalo = recordatorio.dias_recordatorio
-        if (intervalo <= 0) {
-            Log.e("Recordatorios", "Intervalo de repetición inválido ($intervalo ms). La alarma no se programará.")
-            return
-        }
-
-        // Configurar la alarma según la versión de Android
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            alarmManager.setExactAndAllowWhileIdle(
-                AlarmManager.RTC_WAKEUP,
-                fecha,
-                pendingIntent
-            )
-            Log.d("Recordatorios", "Alarma programada con setExactAndAllowWhileIdle para ${recordatorio.nombre} a las ${Date(fecha)}")
-        } else {
-            alarmManager.setRepeating(
-                AlarmManager.RTC_WAKEUP,
-                fecha,
-                intervalo,
-                pendingIntent
-            )
-            Log.d("Recordatorios", "Alarma programada con setRepeating para ${recordatorio.nombre} a las ${Date(fecha)} cada ${intervalo / 1000} segundos")
-        }
-    }
-
-    private fun cancelarAlarma(recordatorio: RecordatorioDTO) {
-        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(this, RecordatorioReceiver::class.java).apply {
-            putExtra("nombre", recordatorio.nombre)
             putExtra("intervalo", recordatorio.dias_recordatorio)
         }
 
         val pendingIntent = PendingIntent.getBroadcast(
             this,
-            recordatorio.id_recordatorio.toInt(), // Debe ser el mismo ID único
+            recordatorio.id_recordatorio.toInt(),
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val siguienteAlarma = System.currentTimeMillis() + recordatorio.dias_recordatorio
+
+        alarmManager.setExactAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP,
+            siguienteAlarma,
+            pendingIntent
+        )
+
+        Log.d("Recordatorios", "Alarma reprogramada para ${recordatorio.nombre} en ${Date(siguienteAlarma)}")
+    }
+
+    private fun cancelarAlarma(recordatorio: RecordatorioDTO) {
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(this, RecordatorioReceiver::class.java).apply {
+            putExtra("id_recordatorio", recordatorio.id_recordatorio.toInt())
+        }
+
+        val pendingIntent = PendingIntent.getBroadcast(
+            this,
+            recordatorio.id_recordatorio.toInt(),
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
         alarmManager.cancel(pendingIntent)
         pendingIntent.cancel()
+
+        val prefs = getSharedPreferences("RecordatoriosPrefs", Context.MODE_PRIVATE)
+        prefs.edit().putBoolean("alarma_cancelada_${recordatorio.id_recordatorio}", true).apply()
+
         Log.d("Recordatorios", "Alarma cancelada para: ${recordatorio.nombre}")
     }
 
 
-
-
+    @SuppressLint("SuspiciousIndentation")
     override fun onItemClick3(recordatorios: RecordatorioDTO) {
         Log.d("onItemClick", "Recordatorio clickeado: ${recordatorios.nombre}")
 
         val dialogView = layoutInflater.inflate(R.layout.dialog_modificar_recordatorio, null)
-        val editTextNombre = dialogView.findViewById<TextInputEditText>(R.id.Busca_recordatorio1)
         val spinnerEstado = dialogView.findViewById<Spinner>(R.id.spinnerDescripcion3)
-        val spinnerDias = dialogView.findViewById<Spinner>(R.id.spinnerDescripcion4)
-        val editTextFecha = dialogView.findViewById<EditText>(R.id.editTextFecha)
-        val editTextCantidad = dialogView.findViewById<TextInputEditText>(R.id.editTextRecordatorio1limite)
-        val btnEliminar = dialogView.findViewById<Button>(R.id.button) // Asegurar que sea el ID correcto en el layout
+        val btnEliminar = dialogView.findViewById<Button>(R.id.button) // Botón eliminar
 
-        // Llenar los campos con la información actual del recordatorio
-        editTextNombre.setText(recordatorios.nombre)
-        editTextCantidad.setText(recordatorios.valor.toString())
-
-        // Convertir la fecha de "yyyy-MM-dd" a "dd/MM/yyyy"
-        val parts = recordatorios.fecha.split("-")
-        val fechaFormateada = "${parts[2]}/${parts[1]}/${parts[0]}"
-        editTextFecha.setText(fechaFormateada)
-
-        // Configurar el Spinner de estado con la opción actual
-        val estados = listOf("Activo", "Pagado", "Vencido")
+        val estados = listOf("Pagado", "Vencido")
         val adapterEstado = ArrayAdapter(this, R.layout.item_spinner_recordatorios, estados)
         adapterEstado.setDropDownViewResource(R.layout.item_spinner_recordatorios)
         spinnerEstado.adapter = adapterEstado
         spinnerEstado.setSelection(estados.indexOf(recordatorios.estado))
 
-        // Configurar el Spinner de días
-        val diasOpciones = listOf("Cada 2 minutos", "Cada 3 minutos", "Cada 5 minutos")
-        val diasValores = listOf(2 * 60 * 1000L , 3 * 60 * 1000L, 5 * 60 * 1000L)
-        val adapterDias = ArrayAdapter(this, R.layout.item_spinner_dias, diasOpciones)
-        adapterDias.setDropDownViewResource(R.layout.item_spinner_dias)
-        spinnerDias.adapter = adapterDias
-
-        val diasIndex = diasValores.indexOf(recordatorios.dias_recordatorio)
-        if (diasIndex != -1) spinnerDias.setSelection(diasIndex)
-
-        editTextFecha.setOnClickListener {
-            showDatePickerDialog(editTextFecha)
-        }
-
         val dialog = AlertDialog.Builder(this)
             .setView(dialogView)
             .setPositiveButton("Guardar") { _, _ ->
-                val nombreNuevo = editTextNombre.text.toString().trim()
+                val prefs = getSharedPreferences("RecordatoriosPrefs", Context.MODE_PRIVATE)
+                prefs.edit().putBoolean("alarma_cancelada_${recordatorios.id_recordatorio}", true).apply()
+
                 val estadoNuevo = spinnerEstado.selectedItem.toString().trim()
-                val diasSeleccionado = spinnerDias.selectedItem.toString().trim()
-                val fechaOriginal = editTextFecha.text.toString().trim()
-                val limiteStr = editTextCantidad.text.toString().trim()
-
-                if (nombreNuevo.isBlank() || fechaOriginal.isBlank() || limiteStr.isBlank()) {
-                    Toast.makeText(
-                        this,
-                        "Por favor, llene todos los campos",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    return@setPositiveButton
-                }
-
-                // Convertir la fecha de "dd/MM/yyyy" a "yyyy-MM-dd"
-                val partes = fechaOriginal.split("/")
-                val dia = partes[0].padStart(2, '0')
-                val mes = partes[1].padStart(2, '0')
-                val anio = partes[2]
-                val fechaNueva = "${anio}-${mes}-${dia}"
-
-                // Convertir el texto del Spinner a un número entero
-                val dias = when (diasSeleccionado) {
-                    "Cada 2 minutos" -> 2 * 60 * 1000L  // 2 minutos en milisegundos
-                    "Cada 3 minutos" -> 3 * 60 * 1000L  // 3 minutos en milisegundos
-                    "Cada 5 minutos" -> 5 * 60 * 1000L  // 5 minutos en milisegundos
-                    else -> {
-                        Log.e("Recordatorio", "Opción de días no reconocida: $diasSeleccionado")
-                        0L
-                    }
-                }
-
-                val recordatorioActualizado = RecordatorioDTO(
-                    id_recordatorio = recordatorios.id_recordatorio,
-                    nombre = nombreNuevo,
-                    estado = estadoNuevo,
-                    dias_recordatorio = dias,
-                    valor = limiteStr.toDouble(),
-                    fecha = fechaNueva
-                )
-
-                cancelarAlarma(recordatorios)
+                val recordatorioActualizado = recordatorios.copy(estado = estadoNuevo)
 
                 recordatoriosViewModel.modificarRecordatorio(recordatorios.id_recordatorio, recordatorioActualizado)
-
-                programarAlarma(recordatorioActualizado)
-
+                reprogramarAlarma(recordatorioActualizado)
             }
-            .setNegativeButton("Cancelar") { dialog, _ ->
-                dialog.dismiss()
-            }
+            .setNegativeButton("Cancelar") { dialog, _ -> dialog.dismiss() }
             .create()
 
         btnEliminar.setOnClickListener {
@@ -518,8 +434,8 @@ class Recordatorios_Usuario : AppCompatActivity() , RecordatorioListener {
         }
 
         dialog.show()
-
     }
+
 
     private fun showDatePickerDialog(editTextFecha: EditText) {
         // Obtener la fecha actual
@@ -541,6 +457,15 @@ class Recordatorios_Usuario : AppCompatActivity() , RecordatorioListener {
         )
 
         datePickerDialog.show()
+    }
+
+    fun <T> LiveData<T>.observeOnce(lifecycleOwner: LifecycleOwner, observer: Observer<T>) {
+        observe(lifecycleOwner, object : Observer<T> {
+            override fun onChanged(value: T) {
+                removeObserver(this) // Elimina el observador después de la primera actualización
+                observer.onChanged(value)
+            }
+        })
     }
 
 

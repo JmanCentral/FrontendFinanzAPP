@@ -57,6 +57,13 @@
         android:background="@drawable/bg_btn_borde_amarillo"
         android:layout_margin="8dp"/>
 
+    <TextView
+        android:id="@+id/txtRecordatorio2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/TxtVerdePequenoItalic"
+        android:text="Puedes modificar el gasto para cambiarlo de categoria o cambiar su precio , fecha y descripción ."/>
+
     <Button
         android:layout_marginTop="8dp"
         android:id="@+id/btnEliminarGasto"
@@ -66,6 +73,8 @@
         android:layout_marginHorizontal="8dp"
         android:text="@string/eliminar_gasto1"
         android:textSize="20sp"/>
+
+
 
 
 </LinearLayout>

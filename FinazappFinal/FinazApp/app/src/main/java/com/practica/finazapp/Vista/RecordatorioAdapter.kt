@@ -35,7 +35,7 @@ class RecordatorioAdapter (private val recordatorios: List<RecordatorioDTO>) :
         holder.nameTextView.text = currentRecordatorio.nombre
         holder.valorTextView.text = "${numberFormat.format(currentRecordatorio.valor)}$"
         holder.estado.text = currentRecordatorio.estado
-        holder.dias.text = "Recordatorio programado cada ${numberFormat.format(currentRecordatorio.dias_recordatorio * 1440)} minutos"
+        holder.dias.text = "Recordatorio programado cada ${numberFormat.format(currentRecordatorio.dias_recordatorio / 60000)} minutos"
         holder.fecha.text = currentRecordatorio.fecha
 
 
