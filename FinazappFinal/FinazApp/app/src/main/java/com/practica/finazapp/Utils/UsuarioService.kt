@@ -19,4 +19,5 @@ interface UsuarioService {
 
     @GET("ObtenerUsuario/{id_usuario}")
     fun ObtenerUsuario(@Path("id_usuario") idUsuario: Long): Call<UsuarioDTO>
+
 }

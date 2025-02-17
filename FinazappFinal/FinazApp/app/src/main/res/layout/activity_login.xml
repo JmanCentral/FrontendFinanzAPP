@@ -148,5 +148,20 @@
             android:focusable="true"
             android:background="?attr/selectableItemBackground"/>
 
+        <TextView
+            android:id="@+id/btnRecuperar"
+            style="@style/TxtVerdePequenoItalic"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"
+            android:gravity="center"
+            android:text="¿Olvidaste tu contraseña?"
+            app:layout_constraintTop_toBottomOf ="@id/btnRegistrarse"
+            app:layout_constraintStart_toStartOf="parent"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground"/>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

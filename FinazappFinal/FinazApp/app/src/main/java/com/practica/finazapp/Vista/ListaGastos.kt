@@ -2,6 +2,7 @@ package com.practica.finazapp.Vista
 
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.*
@@ -48,6 +49,7 @@ class ListaGastos : AppCompatActivity(), OnItemClickListener2 {
         }
 
         val btnActualizarLista = findViewById<ImageView>(R.id.update)
+        val btndevolver = findViewById<ImageView>(R.id.devolverse)
 
         btnActualizarLista.setOnClickListener {
             ObtenerGastos()
@@ -58,6 +60,14 @@ class ListaGastos : AppCompatActivity(), OnItemClickListener2 {
 
         val btnEliminarGasto = findViewById<ImageView>(R.id.serch)
         btnEliminarGasto.setOnClickListener { AdvertenciaGastos() }
+
+
+        btndevolver.setOnClickListener {
+            val intent = Intent(this, Dashboard::class.java)
+            startActivity(intent)
+            finish()
+        }
+
     }
 
     private fun ObtenerGastos() {

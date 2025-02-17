@@ -11,7 +11,7 @@ import retrofit2.Response
 class ReminderRepository (context: Context) {
 
     private val recordatorioService: RecordatorioService by lazy {
-        Cliente.getCliente("http://192.168.10.6:8862/Finanzapp/Recordatorios/", context)
+        Cliente.getCliente("http://192.168.10.3:8862/Finanzapp/Recordatorios/", context)
             .create(RecordatorioService::class.java)
     }
 

@@ -42,6 +42,8 @@ class Dashboard : AppCompatActivity() {
         binding = ActivityDashboardBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val navigateToGraphics = intent.getBooleanExtra("navigate_to_graphics", false)
+
         setSupportActionBar(binding.appBarDashboard.toolbar)
 
         val drawerLayout: DrawerLayout = binding.drawerLayout
@@ -52,9 +54,13 @@ class Dashboard : AppCompatActivity() {
         val navController = navHostFragment.navController
         // Definir los destinos de nivel superior del menú de hamburguesa
         appBarConfiguration = AppBarConfiguration(setOf(
-            R.id.nav_dashboard, R.id.nav_perfil, R.id.nav_ingresos, R.id.nav_reporte
+            R.id.nav_dashboard, R.id.nav_perfil, R.id.nav_ingresos, R.id.nav_reporte , R.id.fragmentCategorias, R.id.graficos_Avanzados, R.id.gastosAltos, R.id.fragmentAlertas, R.id.fragmentProyecciones
         ), drawerLayout
         )
+
+        if (navigateToGraphics) {
+            navController.navigate(R.id.graficos_Avanzados)
+        }
 
         val sharedPref = this.getSharedPreferences("MiApp", Context.MODE_PRIVATE)
         val usuarioId: Long = sharedPref.getLong("USUARIO_ID", -1)

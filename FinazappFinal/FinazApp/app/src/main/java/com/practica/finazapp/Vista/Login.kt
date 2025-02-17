@@ -1,5 +1,6 @@
 package com.practica.finazapp.Vista
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -8,6 +9,7 @@ import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
@@ -15,13 +17,17 @@ import com.practica.finazapp.R
 import com.practica.finazapp.ViewModelsApiRest.SharedViewModel
 import com.practica.finazapp.ViewModelsApiRest.UserViewModel
 import com.google.android.material.textfield.TextInputEditText
+import com.practica.finazapp.Entidades.EmailRequest
 import com.practica.finazapp.Entidades.LoginDTO
+import com.practica.finazapp.ViewModelsApiRest.PasswordViewModel
 
 class Login : AppCompatActivity() {
 
     private lateinit var sharedViewModel: SharedViewModel
     private lateinit var userViewModel: UserViewModel
+    private lateinit var passwordViewModel: PasswordViewModel
 
+    @SuppressLint("WrongViewCast", "MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
@@ -30,6 +36,7 @@ class Login : AppCompatActivity() {
 
         sharedViewModel = ViewModelProvider(this)[SharedViewModel::class.java]
         userViewModel = ViewModelProvider(this).get(UserViewModel::class.java)
+        passwordViewModel = ViewModelProvider(this).get(PasswordViewModel::class.java)
 
 
         val btnIngresar = findViewById<Button>(R.id.btnIngresar)
@@ -39,6 +46,12 @@ class Login : AppCompatActivity() {
         val txtAdvertencia = findViewById<TextView>(R.id.txtAdvertenciaLogin)
         val btnMostrarOcultar = findViewById<ImageView>(R.id.btnMostrarOcultar)
         var isPasswordVisible = false
+
+        val btnrecuperacion = findViewById<TextView>(R.id.btnRecuperar)
+
+        btnrecuperacion.setOnClickListener{
+            recuperarcontra()
+        }
 
         btnMostrarOcultar.setOnClickListener {
             isPasswordVisible = !isPasswordVisible
@@ -71,6 +84,11 @@ class Login : AppCompatActivity() {
                 mostrarDialogoError()
             }
         }
+
+        passwordViewModel.errorLiveData.observe(this) { error ->
+            if (!error.isNullOrEmpty()) {
+                mostrarDialogoError1()
+            }}
 
         btnIngresar.setOnClickListener {
             val usuarioInput = txtUsuario.text.toString()
@@ -113,4 +131,39 @@ class Login : AppCompatActivity() {
 
     }
 
+    private fun mostrarDialogoError1(){
+        AlertDialog.Builder(this)
+            .setTitle("Error al recuperarcontraseña")
+            .setIcon(R.drawable.problem)
+            .setMessage("Correo electrónico incorrecto")
+            .setPositiveButton("Entendido") { dialog, _ -> dialog.dismiss() }
+            .create().show()
+
+    }
+
+    private fun recuperarcontra() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_recuperar_password, null)
+        val editTextCorreo = dialogView.findViewById<TextInputEditText>(R.id.Busca_correo)
+        val btnRecuperar = dialogView.findViewById<Button>(R.id.buttonPassword)
+
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setNegativeButton("Cancelar") { dialog, _ -> dialog.dismiss() }
+            .create()
+
+        dialog.show()
+
+        btnRecuperar.setOnClickListener {
+            val correo = editTextCorreo.text.toString().trim()
+
+            if (correo.isEmpty()) {
+                Toast.makeText(this, "Ingrese un correo", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val emailRequest = EmailRequest(email = correo)
+
+            passwordViewModel.recuperarpassword(emailRequest)
+        }
+    }
 }

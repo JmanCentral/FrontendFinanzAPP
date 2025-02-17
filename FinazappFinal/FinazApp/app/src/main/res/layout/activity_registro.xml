@@ -142,6 +142,41 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
+            android:id="@+id/txtCorreo"
+            style="@style/TxtNegroMedianoItalic"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginStart="40dp"
+            android:layout_marginEnd="8dp"
+            android:text="Correo"
+            app:layout_constraintTop_toBottomOf ="@id/wrapperinputUsuario"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/wrapperinputCorreo"
+            style="@style/EstiloBordeAmarillo"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="50dp"
+            app:layout_constraintTop_toBottomOf="@id/txtCorreo"
+            app:layout_constraintStart_toStartOf="@id/txtCorreo"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:boxBackgroundMode="none">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/txtinputCorreo"
+                style="@style/EstiloEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textEmailAddress"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+        <TextView
             android:id="@+id/txtContrasena2"
             style="@style/TxtNegroMedianoItalic"
             android:layout_width="match_parent"
@@ -151,7 +186,7 @@
             android:layout_marginStart="40dp"
             android:layout_marginEnd="8dp"
             android:text="@string/contrasena1"
-            app:layout_constraintTop_toBottomOf ="@id/wrapperinputUsuario"
+            app:layout_constraintTop_toBottomOf ="@id/wrapperinputCorreo"
             app:layout_constraintStart_toStartOf="parent"/>
 
         <com.google.android.material.textfield.TextInputLayout

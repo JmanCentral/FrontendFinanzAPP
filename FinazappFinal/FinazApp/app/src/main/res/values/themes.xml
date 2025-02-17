@@ -198,6 +198,17 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <!-- Tema para el Splash Screen -->
+    <style name="Theme.App.Starting" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Color de fondo del Splash Screen -->
+        <item name="android:windowBackground">@drawable/splash_background</item>
+        <!-- Duración de la animación del ícono (opcional) -->
+        <item name="windowSplashScreenAnimationDuration">100</item>
+        <!-- Tema que se aplicará después del Splash Screen -->
+        <item name="postSplashScreenTheme">@style/AppTheme</item>
+    </style>
+
+
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.NavigationViewTextStyle" parent="TextAppearance.AppCompat">

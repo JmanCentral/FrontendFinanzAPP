@@ -309,71 +309,71 @@ class Recordatorios_Usuario : AppCompatActivity() , RecordatorioListener {
         return pendingIntent != null
     }
 
-    private fun fetchRecordatorios() {
-        usuarioId = intent.getLongExtra("usuarioId", -1)
-        Log.d("Recordatorios", "Usuario ID recibido: $usuarioId")
+        private fun fetchRecordatorios() {
+            usuarioId = intent.getLongExtra("usuarioId", -1)
+            Log.d("Recordatorios", "Usuario ID recibido: $usuarioId")
 
-        recordatoriosViewModel.listarRecordatorios(usuarioId)
-        Log.d("Recordatorios", "Llamado a listarRecordatorios()")
+            recordatoriosViewModel.listarRecordatorios(usuarioId)
+            Log.d("Recordatorios", "Llamado a listarRecordatorios()")
 
-        recordatoriosViewModel.recordatoriosLiveData.observe(this) { recordatorioslist ->
-            Log.d("Recordatorios", "Lista de recordatorios recibida: ${recordatorioslist?.size ?: 0} elementos")
+            recordatoriosViewModel.recordatoriosLiveData.observe(this) { recordatorioslist ->
+                Log.d("Recordatorios", "Lista de recordatorios recibida: ${recordatorioslist?.size ?: 0} elementos")
 
-            // Cancelar alarmas obsoletas
-            recordatoriosAnteriores.filter { it !in (recordatorioslist ?: emptyList()) }.forEach { cancelarAlarma(it) }
+                // Cancelar alarmas obsoletas
+                recordatoriosAnteriores.filter { it !in (recordatorioslist ?: emptyList()) }.forEach { cancelarAlarma(it) }
 
-            if (!recordatorioslist.isNullOrEmpty()) {
-                adapter = RecordatorioAdapter(recordatorioslist)
-                adapter.setOnItemClickListener3(this)
-                recyclerView.adapter = adapter
-                recyclerView.visibility = View.VISIBLE
-                imgNoGastos1.visibility = View.GONE
-                txtNoGastos1.visibility = View.GONE
+                if (!recordatorioslist.isNullOrEmpty()) {
+                    adapter = RecordatorioAdapter(recordatorioslist)
+                    adapter.setOnItemClickListener3(this)
+                    recyclerView.adapter = adapter
+                    recyclerView.visibility = View.VISIBLE
+                    imgNoGastos1.visibility = View.GONE
+                    txtNoGastos1.visibility = View.GONE
 
-                // Reprogramar alarmas necesarias
-                recordatorioslist.forEach { recordatorio ->
-                    if (!isAlarmaProgramada(recordatorio)) {
-                        reprogramarAlarma(recordatorio)
+                    // Reprogramar alarmas necesarias
+                    recordatorioslist.forEach { recordatorio ->
+                        if (!isAlarmaProgramada(recordatorio)) {
+                            reprogramarAlarma(recordatorio)
+                        }
                     }
-                }
 
-                recordatoriosAnteriores = recordatorioslist
-            } else {
-                recyclerView.visibility = View.GONE
-                imgNoGastos1.visibility = View.VISIBLE
-                txtNoGastos1.visibility = View.VISIBLE
-                recordatoriosAnteriores = emptyList()
+                    recordatoriosAnteriores = recordatorioslist
+                } else {
+                    recyclerView.visibility = View.GONE
+                    imgNoGastos1.visibility = View.VISIBLE
+                    txtNoGastos1.visibility = View.VISIBLE
+                    recordatoriosAnteriores = emptyList()
+                }
             }
         }
-    }
 
-    @SuppressLint("ScheduleExactAlarm")
-    private fun reprogramarAlarma(recordatorio: RecordatorioDTO) {
-        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val intent = Intent(this, RecordatorioReceiver::class.java).apply {
-            putExtra("id_recordatorio", recordatorio.id_recordatorio.toInt())
-            putExtra("nombre", recordatorio.nombre)
-            putExtra("valor", recordatorio.valor.toString())
-            putExtra("intervalo", recordatorio.dias_recordatorio)
+        @SuppressLint("ScheduleExactAlarm")
+        private fun reprogramarAlarma(recordatorio: RecordatorioDTO) {
+            val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            val intent = Intent(this, RecordatorioReceiver::class.java).apply {
+                putExtra("id_recordatorio", recordatorio.id_recordatorio.toInt())
+                putExtra("nombre", recordatorio.nombre)
+                putExtra("valor", recordatorio.valor.toString())
+                putExtra("intervalo", recordatorio.dias_recordatorio)
+            }
+
+            val pendingIntent = PendingIntent.getBroadcast(
+                this,
+                recordatorio.id_recordatorio.toInt(),
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+
+            val siguienteAlarma = System.currentTimeMillis() + recordatorio.dias_recordatorio
+
+            alarmManager.setExactAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP,
+                siguienteAlarma,
+                pendingIntent
+            )
+
+            Log.d("Recordatorios", "Alarma reprogramada para ${recordatorio.nombre} en ${Date(siguienteAlarma)}")
         }
-
-        val pendingIntent = PendingIntent.getBroadcast(
-            this,
-            recordatorio.id_recordatorio.toInt(),
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
-        val siguienteAlarma = System.currentTimeMillis() + recordatorio.dias_recordatorio
-
-        alarmManager.setExactAndAllowWhileIdle(
-            AlarmManager.RTC_WAKEUP,
-            siguienteAlarma,
-            pendingIntent
-        )
-
-        Log.d("Recordatorios", "Alarma reprogramada para ${recordatorio.nombre} en ${Date(siguienteAlarma)}")
-    }
 
     private fun cancelarAlarma(recordatorio: RecordatorioDTO) {
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager

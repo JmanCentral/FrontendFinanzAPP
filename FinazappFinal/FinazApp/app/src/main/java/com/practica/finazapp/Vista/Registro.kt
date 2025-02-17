@@ -40,6 +40,7 @@ class Registro : AppCompatActivity() {
         val txtInputUsuario = findViewById<TextInputEditText>(R.id.txtinputUsuario)
         val btnRegistro1 = findViewById<Button>(R.id.btnRegistro)
         val txtAdvertencia = findViewById<TextView>(R.id.Advertencia)
+        val txtCorreo = findViewById<TextInputEditText>(R.id.txtinputCorreo)
 
         val btnMostrarOcultar = findViewById<ImageView>(R.id.btnMostrarOcultar1)
         var isPasswordVisible = false
@@ -81,6 +82,7 @@ class Registro : AppCompatActivity() {
 
         mostrarDialogoNombres()
         mostrarDialogoApellidos()
+        mostrarDialogoCorreo()
 
         btnRegistro1.setOnClickListener {
             val nombres = txtInputNombres.text.toString().trim()
@@ -88,9 +90,10 @@ class Registro : AppCompatActivity() {
             val usuario = txtInputUsuario.text.toString().trim()
             val contrasena = txtInputContrasena2.text.toString()
             val confirmContrasena = txtInputConf.text.toString()
+            val email = txtCorreo.text.toString().trim()
 
             when {
-                nombres.isEmpty() || apellidos.isEmpty() || usuario.isEmpty() || contrasena.isEmpty() || confirmContrasena.isEmpty() -> {
+                nombres.isEmpty() || apellidos.isEmpty() || usuario.isEmpty() || contrasena.isEmpty() || confirmContrasena.isEmpty() || email.isEmpty()  -> {
                     txtAdvertencia.text = getString(R.string.todos_los_campos_son_obligatorios)
                     return@setOnClickListener
                 }
@@ -107,6 +110,7 @@ class Registro : AppCompatActivity() {
             val nuevoUsuario = UsuarioDTO(
                 id_usuario = 0,
                 username = usuario,
+                email = email,
                 contrasena = contrasena,
                 nombre = nombres,
                 apellido = apellidos,
@@ -153,6 +157,14 @@ class Registro : AppCompatActivity() {
         AlertDialog.Builder(this)
             .setTitle("Uso de los Apellidos")
             .setMessage("Tus apellidos serán usados de forma segura en la aplicación únicamente para fines de personalización y gestión de tu cuenta.")
+            .setPositiveButton("Entendido") { dialog, _ -> dialog.dismiss() }
+            .create().show()
+    }
+
+    private fun mostrarDialogoCorreo() {
+        AlertDialog.Builder(this)
+            .setTitle("Uso de los Apellidos")
+            .setMessage("El correo será utilizado únicamente para la recuperación de contraseña. Asegúrese de ingresarlo correctamente.")
             .setPositiveButton("Entendido") { dialog, _ -> dialog.dismiss() }
             .create().show()
     }

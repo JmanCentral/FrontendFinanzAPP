@@ -1,506 +1,225 @@
 package com.practica.finazapp.Vista
+
 import android.annotation.SuppressLint
-import android.graphics.Color
+import android.app.DatePickerDialog
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.EditText
+import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.github.mikephil.charting.charts.LineChart
-import com.github.mikephil.charting.components.XAxis
-import com.practica.finazapp.databinding.FragmentGraficosAvanzadosBinding
-import com.github.mikephil.charting.data.Entry
-import com.github.mikephil.charting.data.LineData
-import com.github.mikephil.charting.data.LineDataSet
-import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
-import com.github.mikephil.charting.formatter.ValueFormatter
-import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
-import com.github.mikephil.charting.utils.ColorTemplate
-import com.practica.finazapp.Entidades.GastoDTO
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.finanzapp.viewmodels.AlcanciaViewModel
+import com.google.android.material.textfield.TextInputEditText
+import com.practica.finazapp.Entidades.AlcanciaDTO
+import com.practica.finazapp.R
 import com.practica.finazapp.ViewModelsApiRest.SharedViewModel
-import com.practica.finazapp.ViewModelsApiRest.SpendViewModel
-import lecho.lib.hellocharts.view.LineChartView
-import java.text.SimpleDateFormat
-import java.time.DayOfWeek
-import java.time.LocalDate
-import java.time.Month
-import java.time.format.DateTimeFormatter
-import java.time.temporal.TemporalAdjusters
+import com.practica.finazapp.databinding.FragmentGraficosAvanzadosBinding
+import java.util.Calendar
 
 
-
-class Graficos_Avanzados : Fragment() {
+class Graficos_Avanzados : Fragment(), AlcanciaListener {
 
     private var usuarioId: Long = -1
     private var _binding: FragmentGraficosAvanzadosBinding? = null
-    private lateinit var sharedViewModel: SharedViewModel
-    private lateinit var gastosViewModel: SpendViewModel
     private val binding get() = _binding!!
+    private lateinit var sharedViewModel: SharedViewModel
+    private lateinit var alcanciaViewModel: AlcanciaViewModel
+    private lateinit var alcanciaAdapter: AlcanciaAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        // Inflar el diseño del fragmento utilizando el enlace de datos generado
         _binding = FragmentGraficosAvanzadosBinding.inflate(inflater, container, false)
-        val root: View = binding.root
-        // Recuperar el ID del usuario del argumento
-        usuarioId = arguments?.getLong("usuario_id", -1) ?: -1
-
-        // Devolver la vista raíz del diseño inflado
-        return root
+        return binding.root
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        gastosViewModel = ViewModelProvider(this)[SpendViewModel::class.java]
-        sharedViewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
-        sharedViewModel.idUsuario.observe(viewLifecycleOwner) { usuarioId ->
-            Log.d("FragmentGastos", "id usuario: $usuarioId")
-            usuarioId?.let {
-                this.usuarioId = it
-                Log.d("FragmentReporte", "id usuario: $usuarioId")
-                val adelanteSem = binding.btonAdelanteSem
-                val atrasSem = binding.btonAtrasSem
-                val adelanteMes = binding.btonAdelanteMes
-                val atrasMes = binding.btonAtrasMes
-                val adelanteAn= binding.btonAdelanteAn
-                val atrasAn = binding.btonAtrasAn
-                var fechaActual = LocalDate.now()
-                Log.d("FragmentReporte", "fecha de referencia: $fechaActual")
-                listOf<String>("disponible", "Gastos hormiga", "Alimentos", "Transporte", "Servicios", "Mercado")
 
-                adelanteSem.setOnClickListener {
-                    fechaActual = fechaActual.plusWeeks(1)
-                    actualizarGrafico(fechaActual, "Semanal")
-                }
-                atrasSem.setOnClickListener {
-                    fechaActual = fechaActual.minusWeeks(1)
-                    actualizarGrafico(fechaActual, "Semanal")
-                }
-                adelanteMes.setOnClickListener {
-                    fechaActual = fechaActual.plusMonths(1)
-                    actualizarGrafico(fechaActual, "Mensual")
-                }
-                atrasMes.setOnClickListener {
-                    fechaActual = fechaActual.minusMonths(1)
-                    actualizarGrafico(fechaActual, "Mensual")
-                }
-                adelanteAn.setOnClickListener {
-                    fechaActual = fechaActual.plusYears(1)
-                    actualizarGrafico(fechaActual, "Anual")
-                }
-                atrasAn.setOnClickListener {
-                    fechaActual = fechaActual.minusYears(1)
-                    actualizarGrafico(fechaActual, "Anual")
-                }
-                actualizarGrafico(fechaActual,"Semanal")
-                actualizarGrafico(fechaActual, "Mensual")
-                actualizarGrafico(fechaActual, "Anual")
+        sharedViewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
+        alcanciaViewModel = ViewModelProvider(this).get(AlcanciaViewModel::class.java)
+
+        // Configurar RecyclerView
+        binding.recyclerViewAlcancias.layoutManager = LinearLayoutManager(requireContext())
+        alcanciaAdapter = AlcanciaAdapter(emptyList()) // Inicializar con lista vacía
+        binding.recyclerViewAlcancias.adapter = alcanciaAdapter
+
+        Log.d("Alcancia", "onViewCreated() llamado")
+        // Observar el ID de usuario y cargar alcancías
+        sharedViewModel.idUsuario.observe(viewLifecycleOwner) { id ->
+            Log.d("Alcancia", "Usuario ID observado: $id")
+            usuarioId = id
+            obtenerAlcancias(id)
+            binding.RegistrarAlcancia.setOnClickListener {
+                registrar(id)
             }
-
         }
+
+        binding.BuscarAlcancia.setOnClickListener {
+            BuscarPorCodigo()
+        }
+
     }
 
-    @SuppressLint("SetTextI18n")
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun actualizarGrafico(fechaActual: LocalDate, tiempo: String){
-        Log.d("FragmentReporte", "fecha de referencia: $fechaActual, tiempo: $tiempo")
-        lateinit var lineChartReporte: LineChart
-        when (tiempo){
-            "Semanal" ->{
-                lineChartReporte = binding.graficoLineasSemanal
-                val fechaInf = periodoDeTiempo(tiempo, fechaActual).first
-                val fechaSup = periodoDeTiempo(tiempo, fechaActual).second
-                val formato1 = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-                val fechaInfFormateada  = fechaInf.toString().format(formato1)
-                val fechaSupFormateada = fechaSup.toString().format(formato1)
-                val descSem = binding.descSem
-                val diaInf = fechaInf.dayOfMonth
-                val diaSup = fechaSup.dayOfMonth
-                val mes = extraerMes(fechaSup)
-                val anio = fechaActual.year
-                descSem.setText("semana del $diaInf-$diaSup de $mes del $anio")
-                Log.d("FragmentReporte", "rango: $fechaInfFormateada a $fechaSupFormateada")
+    private fun BuscarPorCodigo() {
+        // Inflar la vista del diálogo
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_buscar_alcancia, null)
+        val editTextNombre = dialogView.findViewById<EditText>(R.id.Busca_alcancia)
+        val buttonalcancia = dialogView.findViewById<Button>(R.id.buttonalcancia)
 
-                gastosViewModel.listarGastosPorFechas(usuarioId, fechaInfFormateada, fechaSupFormateada)
-                gastosViewModel.gastosPorFechasLiveData.observe(viewLifecycleOwner) { listaSem ->
-                    listaSem?.let {
-                        cargarGraficoLineasSem(
-                            lineChartReporte,
-                            convertirMapaALista(getDatosPorCategoria(listaSem))
-                        )
-                        Log.d("FragmentReporte", "lista gastos: $listaSem")
+        // Crear el diálogo
+        val dialog = AlertDialog.Builder(requireContext())
+            .setTitle("Buscar Alcancía")
+            .setView(dialogView)
+            .create()
+
+        // Configurar el listener del botón
+        buttonalcancia.setOnClickListener {
+            val nombre = editTextNombre.text.toString().trim()
+            if (nombre.isNotBlank()) {
+                // Buscar la alcancía por código
+                alcanciaViewModel.buscarAlcanciaPorCodigo(nombre)
+                alcanciaViewModel.alcanciacodigoLiveData.observe(viewLifecycleOwner) { alcancias ->
+                    if (!alcancias.isNullOrEmpty()) {
+                        // Configurar el adaptador si se encuentran alcancías
+                        alcanciaAdapter = AlcanciaAdapter(alcancias)
+                        alcanciaAdapter.setOnItemClickListener(this)
+                        binding.recyclerViewAlcancias.adapter = alcanciaAdapter
+                        binding.recyclerViewAlcancias.visibility = View.VISIBLE
+                        binding.ivListaVacia.visibility = View.GONE
+                    } else {
+                        // Mostrar mensaje de lista vacía si no se encuentran alcancías
+                        binding.recyclerViewAlcancias.visibility = View.GONE
+                        binding.ivListaVacia.visibility = View.VISIBLE
                     }
                 }
-            }
-            "Mensual" -> {
-                lineChartReporte = binding.graficoLineasMensual
-                val fechaInf = periodoDeTiempo(tiempo, fechaActual).first
-                val fechaSup = periodoDeTiempo(tiempo, fechaActual).second
-                val formato = DateTimeFormatter.ofPattern("yyyy-mm-dd")
-                val fechaInfFormateada  = fechaInf.toString().format(formato)
-                val fechaSupFormateada = fechaSup.toString().format(formato)
-                val descSem = binding.descMes
-                val mes = extraerMes(fechaActual)
-                val anio = fechaActual.year
-                descSem.setText("$mes de $anio")
-
-                Log.d("FragmentReporte", "rango: $fechaInfFormateada a $fechaSupFormateada")
-                gastosViewModel.listarGastosPorFechas(usuarioId, fechaInfFormateada, fechaSupFormateada)
-                gastosViewModel.gastosPorFechasLiveData.observe(viewLifecycleOwner){listaMes ->
-                    listaMes?.let {
-                        cargarGraficoLineasMes(lineChartReporte, convertirMapaALista(getDatosPorCategoria(listaMes)))
-                        Log.d("FragmentReporte", "lista gastos: $listaMes")
-                    }
-                }
-            }
-            "Anual" -> {
-                lineChartReporte = binding.graficoLineasAnual
-                val fechaInf = periodoDeTiempo(tiempo, fechaActual).first.toString()
-                val fechaSup = periodoDeTiempo(tiempo, fechaActual).second.toString()
-                val formato = DateTimeFormatter.ofPattern("yyyy-mm-dd")
-                val fechaInfFormateada  = fechaInf.format(formato)
-                val fechaSupFormateada = fechaSup.format(formato)
-                val descSem = binding.descAn
-                val anio = fechaActual.year
-                descSem.setText("$anio")
-                Log.d("FragmentReporte", "rango: $fechaInfFormateada a $fechaSupFormateada")
-
-                gastosViewModel.listarGastosPorFechas(usuarioId, fechaInfFormateada, fechaSupFormateada)
-                gastosViewModel.gastosPorFechasLiveData.observe(viewLifecycleOwner) { listaAn ->
-                    listaAn?.let {
-                        Log.d("FragmentReporte", "lista gastos: $listaAn")
-                        cargarGraficoLineasAn(
-                            lineChartReporte,
-                            convertirMapaALista(getDatosPorCategoria(listaAn))
-                        )
-                    }
-                }
-            }
-
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun extraerMes(fecha: LocalDate): String{
-        val mes = when(fecha.month){
-            Month.JANUARY -> "Enero"
-            Month.FEBRUARY -> "Febrero"
-            Month.MARCH -> "Marzo"
-            Month.APRIL -> "Abril"
-            Month.MAY -> "Mayo"
-            Month.JUNE -> "Junio"
-            Month.JULY -> "Julio"
-            Month.AUGUST -> "Agosto"
-            Month.SEPTEMBER -> "Septiembre"
-            Month.OCTOBER -> "Octubre"
-            Month.NOVEMBER -> "Noviembre"
-            Month.DECEMBER -> "Diciembre"
-            null -> "null"
-        }
-        return mes
-    }
-
-    private fun convertirMapaALista(datosPorCategoria: Map<String, Map<String, Double>>): Map<String, List<Pair<String, Double>>> {
-        val listaDatosPorCategoria = mutableMapOf<String, List<Pair<String,Double>>>()
-
-        for ((categoria, datos) in datosPorCategoria) {
-            val listaDatos = datos.toList()
-            listaDatosPorCategoria.put(categoria, listaDatos)
-        }
-        return listaDatosPorCategoria
-    }
-    private fun getDatosPorCategoria(lista: List<GastoDTO>): Map<String, Map<String, Double>> {
-        val datosPorCategoria: MutableMap<String, MutableMap<String, Double>> = mutableMapOf()
-
-        for (dato in lista) {
-            val categoria = dato.categoria
-            val fecha = dato.fecha
-            val valor = dato.valor
-
-            // Si la categoría no existe en el mapa, crear una nueva entrada
-            if (!datosPorCategoria.containsKey(categoria)) {
-                datosPorCategoria[categoria] = mutableMapOf(fecha to valor)
             } else {
-                // Si la categoría existe, verificar si la fecha ya existe
-                if (datosPorCategoria[categoria]?.containsKey(fecha) == true) {
-                    // Si la fecha ya existe, sumar el valor al valor existente
-                    val valorExistente = datosPorCategoria[categoria]?.get(fecha) ?: 0.0
-                    datosPorCategoria[categoria]?.put(fecha, valorExistente + valor)
+                // Mostrar mensaje de error si el campo está vacío
+                Toast.makeText(requireContext(), "Ingrese un código válido", Toast.LENGTH_SHORT).show()
+            }
+            dialog.dismiss()
+        }
+
+        // Mostrar el diálogo
+        dialog.show()
+    }
+
+    private fun obtenerAlcancias(usuarioId: Long) {
+        alcanciaViewModel.obtenerAlcanciasPorUser(usuarioId)
+        alcanciaViewModel.alcanciasPorUserLiveData.observe(viewLifecycleOwner) { alcancias ->
+            if (!alcancias.isNullOrEmpty()) {
+                alcanciaAdapter = AlcanciaAdapter(alcancias)
+                alcanciaAdapter.setOnItemClickListener(this)
+                binding.recyclerViewAlcancias.adapter = alcanciaAdapter
+                binding.recyclerViewAlcancias.visibility = View.VISIBLE
+                binding.ivListaVacia.visibility = View.GONE
+            } else {
+                binding.recyclerViewAlcancias.visibility = View.GONE
+                binding.ivListaVacia.visibility = View.VISIBLE
+            }
+        }
+    }
+
+
+    override fun onItemClick5(alcancia: AlcanciaDTO) {
+        // Crear un Intent para iniciar la Activity de depósitos
+        val intent = Intent(requireContext(), Depositos::class.java).apply {
+            Log.d("Alcancia", "ID de la alcancía seleccionada: ${alcancia.idAlcancia}, Usuario ID: $usuarioId")
+            putExtra("idAlcancia", alcancia.idAlcancia) // Pasar el idAlcancia como extra
+            putExtra("usuarioId", usuarioId) // Pasar el usuarioId como extra
+        }
+        startActivity(intent) // Iniciar la Activity
+    }
+
+
+
+
+    @SuppressLint("MissingInflatedId")
+    private fun registrar(usuarioId: Long) {
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_nueva_alcancia, null)
+        val editTextFechaCreacion = dialogView.findViewById<EditText>(R.id.editTextFechaCreacion)
+
+        val dialog = AlertDialog.Builder(requireContext())
+            .setTitle("Registrar Alcancía")
+            .setView(dialogView)
+            .setPositiveButton("Guardar") { _, _ ->
+                val nombreAlcancia = dialogView.findViewById<TextInputEditText>(R.id.editTextNombreAlcancia).text.toString()
+                val meta = dialogView.findViewById<TextInputEditText>(R.id.editTextMeta).text.toString().toDoubleOrNull() ?: 0.0
+                val saldoActual = dialogView.findViewById<TextInputEditText>(R.id.editTextSaldoActual).text.toString().toDoubleOrNull() ?: 0.0
+                val codigo = dialogView.findViewById<TextInputEditText>(R.id.editTextCodigo).text.toString()
+                val fechaCreacion = editTextFechaCreacion.text.toString()
+
+
+
+                if (nombreAlcancia.isNotEmpty() && codigo.isNotEmpty() && fechaCreacion.isNotEmpty()) {
+
+                    val parts = fechaCreacion.split("/")
+                    val dia = parts[0].padStart(2, '0')
+                    val mes = parts[1].padStart(2, '0')
+                    val anio = parts[2]
+                    val fechaoriginal = "${anio}-${mes}-${dia}"
+
+                    val alcanciaDTO = AlcanciaDTO(
+                        idAlcancia = 0,
+                        nombre_alcancia = nombreAlcancia,
+                        meta = meta,
+                        saldoActual = saldoActual,
+                        codigo = codigo,
+                        fechaCreacion = fechaoriginal
+                    )
+
+                    alcanciaViewModel.registrarAlcancia(alcanciaDTO, usuarioId)
+                    Toast.makeText(requireContext(), "Alcancía registrada correctamente", Toast.LENGTH_SHORT).show()
                 } else {
-                    // Si la fecha no existe, agregar una nueva entrada
-                    datosPorCategoria[categoria]?.put(fecha, valor)
+                    Toast.makeText(requireContext(), "Por favor, complete todos los campos", Toast.LENGTH_SHORT).show()
                 }
             }
+            .setNegativeButton("Cancelar") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .create()
+
+        // Configurar el selector de fecha cuando el usuario haga clic en el campo de fecha
+        editTextFechaCreacion.setOnClickListener {
+            showDatePickerDialog(editTextFechaCreacion)
         }
 
-        return datosPorCategoria
+        dialog.show()
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun periodoDeTiempo(tiempo: String, fechaActual: LocalDate): Pair<LocalDate, LocalDate> {
-        return when (tiempo) {
-            "Semanal" -> {
-                val inicioSemana = fechaActual.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
-                val finSemana = fechaActual.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY))
-                Pair(inicioSemana, finSemana)
-            }
-            "Mensual" -> {
-                val inicioMes = fechaActual.with(TemporalAdjusters.firstDayOfMonth())
-                val finMes = fechaActual.with(TemporalAdjusters.lastDayOfMonth())
-                Pair(inicioMes, finMes)
-            }
-            "Anual" -> {
-                val inicioAnio = fechaActual.with(TemporalAdjusters.firstDayOfYear())
-                val finAnio = fechaActual.with(TemporalAdjusters.lastDayOfYear())
-                Pair(inicioAnio, finAnio)
-            }
-            else -> throw IllegalArgumentException("Tipo de rango de fechas no válido")
-        }
-    }
+    private fun showDatePickerDialog(editTextFecha: EditText) {
+        val calendar = Calendar.getInstance()
+        val year = calendar.get(Calendar.YEAR)
+        val month = calendar.get(Calendar.MONTH)
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun cargarGraficoLineasSem(chartView: LineChart, datosPorCategoria: Map<String, List<Pair<String, Double>>>) {
-        val lineDataSetList = mutableListOf<LineDataSet>()
-
-        for ((categoria, datos) in datosPorCategoria) {
-            val entries = datos.map { (fecha, valor) ->
-                Entry(diaSemana(fecha), (valor / 1000).toFloat())
-            }
-
-            val dataSet = LineDataSet(entries, categoria).apply {
-                color = getColorCategoria(categoria)
-                valueTextSize = 10f
-                lineWidth = 2f
-                setDrawCircles(true)
-                circleRadius = 4f
-                setDrawValues(false)
-                setDrawFilled(true)
-                mode = LineDataSet.Mode.CUBIC_BEZIER // Líneas suaves
-            }
-            lineDataSetList.add(dataSet)
-        }
-
-        val lineData = LineData(lineDataSetList as List<ILineDataSet>?)
-        chartView.data = lineData
-
-        // Configurar el eje X
-        chartView.xAxis.apply {
-            position = XAxis.XAxisPosition.BOTTOM
-            setDrawGridLines(false)
-            granularity = 1f
-            valueFormatter = object : ValueFormatter() {
-                override fun getFormattedValue(value: Float): String {
-                    return when (value.toInt()) {
-                        1 -> "Lun"
-                        2 -> "Mar"
-                        3 -> "Mier"
-                        4 -> "Jue"
-                        5 -> "Vier"
-                        6 -> "Sab"
-                        7 -> "Dom"
-                        else -> "?"
-                    }
-                }
-            }
-        }
-
-        // Configurar el eje Y
-        chartView.axisLeft.apply {
-            setDrawGridLines(true)
-            axisMinimum = 0f
-        }
-        chartView.axisRight.isEnabled = false
-        chartView.description.isEnabled = false
-        chartView.invalidate() // Refrescar el gráfico
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun diaSemana(fecha: String): Float {
-        val diaSem = LocalDate.parse(fecha).dayOfWeek.value
-        Log.d("FragmentReporte", "fecha: $fecha, dia de la semana: $diaSem")
-        return diaSem.toFloat()
-    }
-
-
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun cargarGraficoLineasMes(chartView: LineChart, datosPorCategoria: Map<String, List<Pair<String, Double>>>) {
-        val lineDataSetList = mutableListOf<LineDataSet>()
-
-        for ((categoria, datos) in datosPorCategoria) {
-            val entries = organizar(datos).map { (fecha, valor) ->
-                Entry(diaMes(fecha), (valor / 1000).toFloat())
-            }
-
-            val dataSet = LineDataSet(entries, categoria).apply {
-                color = getColorCategoria(categoria)
-                valueTextSize = 10f
-                lineWidth = 2f
-                setDrawCircles(true)
-                circleRadius = 4f
-                setDrawValues(false)
-                setDrawFilled(true)
-                mode = LineDataSet.Mode.CUBIC_BEZIER // Líneas suaves
-            }
-            lineDataSetList.add(dataSet)
-        }
-
-        val lineData = LineData(lineDataSetList as List<ILineDataSet>?)
-        chartView.data = lineData
-
-        // Configurar el eje X
-        chartView.xAxis.apply {
-            position = XAxis.XAxisPosition.BOTTOM
-            setDrawGridLines(false)
-            granularity = 1f
-            valueFormatter = object : ValueFormatter() {
-                override fun getFormattedValue(value: Float): String {
-                    return value.toInt().toString()
-                }
-            }
-        }
-
-        // Configurar el eje Y
-        chartView.axisLeft.apply {
-            setDrawGridLines(true)
-            axisMinimum = 0f
-        }
-        chartView.axisRight.isEnabled = false
-        chartView.description.isEnabled = false
-        chartView.invalidate() // Refrescar el gráfico
-    }
-
-    fun diaMes(fecha: String): Float {
-        val partes = fecha.split("-")
-        val dia = partes[2]
-        return dia.toFloat()
-    }
-
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun cargarGraficoLineasAn(chartView: LineChart, datosPorCategoria: Map<String, List<Pair<String, Double>>>) {
-        val lineDataSetList = mutableListOf<LineDataSet>()
-
-        for ((categoria, datos) in datosPorCategoria) {
-            val entries = generarPuntosAn(organizar(datos))
-            val lineDataSet = LineDataSet(entries, categoria).apply {
-                color = getColorCategoria(categoria)
-                valueTextSize = 10f
-                setCircleColor(getColorCategoria(categoria))
-                circleRadius = 3f
-                lineWidth = 2f
-                setDrawValues(false)
-            }
-            lineDataSetList.add(lineDataSet)
-        }
-
-        val lineData = LineData(lineDataSetList as List<ILineDataSet>?)
-        chartView.data = lineData
-        chartView.description.isEnabled = false
-        chartView.xAxis.apply {
-            position = XAxis.XAxisPosition.BOTTOM
-            granularity = 30f
-            valueFormatter = IndexAxisValueFormatter(arrayOf("Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"))
-        }
-        chartView.axisLeft.apply {
-            setDrawGridLines(true)
-            axisMinimum = 0f
-        }
-        chartView.axisRight.isEnabled = false
-        chartView.invalidate()
-
-        val noData = binding.noDataAn
-        if (chartView.data.entryCount == 0) {
-            noData.visibility = View.VISIBLE
-            chartView.visibility = View.INVISIBLE
-        } else {
-            noData.visibility = View.GONE
-            chartView.visibility = View.VISIBLE
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun generarPuntosAn(datos: List<Pair<String, Double>>): List<Entry> {
-        return datos.map { (fecha, valor) ->
-            Entry(diaAnio(fecha), (valor / 1000).toFloat())
-        }
-    }
-
-    fun diaAnio(fecha: String): Float {
-        val partes = fecha.split("-")
-        val meses = partes[1].toInt()
-        val dias = partes[2].toInt()
-        var diaDelAnio = dias + when (meses) {
-            2 -> 31
-            3 -> 59
-            4 -> 90
-            5 -> 120
-            6 -> 151
-            7 -> 181
-            8 -> 212
-            9 -> 243
-            10 -> 273
-            11 -> 304
-            12 -> 334
-            else -> 0
-        }
-        return diaDelAnio.toFloat()
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun organizar(lista: List<Pair<String, Double>>): List<Pair<String, Double>> {
-        return lista.sortedBy { LocalDate.parse(it.first, DateTimeFormatter.ofPattern("yyyy-MM-dd")) }
-    }
-
-    fun getColorCategoria(categoria: String): Int {
-        val categoriasColores = mapOf(
-            "disponible" to Color.parseColor("#87EE2B"),
-            "Gastos Hormiga" to Color.parseColor("#F66B6B"),
-            "Alimentos" to Color.parseColor("#FF66C1"),
-            "Transporte" to Color.parseColor("#339AF0"),
-            "Servicios" to Color.parseColor("#EEB62B"),
-            "Mercado" to Color.parseColor("#FD8435")
+        val datePickerDialog = DatePickerDialog(
+            requireContext(),
+            { _, selectedYear, selectedMonth, selectedDay ->
+                val formattedDate = "${selectedDay.toString().padStart(2, '0')}/${(selectedMonth + 1).toString().padStart(2, '0')}/$selectedYear"
+                editTextFecha.setText(formattedDate)
+            },
+            year, month, day
         )
-        return categoriasColores[categoria] ?: Color.BLACK
-    }
 
-    fun isChartEmpty(lineChartView: LineChartView): Boolean {
-        val lineChartData = lineChartView.lineChartData
-        if (lineChartData != null) {
-            val lines = lineChartData.lines
-            if (lines != null && lines.isNotEmpty()) {
-                if(lines.size > 1) {
-                    for (line in lines) {
-                        if (line.values.size > 1) {
-                            return false
-                        }
-                    }
-                }
-            }
-        }
-        return true
+        datePickerDialog.show()
     }
-
 
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
-
-
 }
-
-
-
-
-
-

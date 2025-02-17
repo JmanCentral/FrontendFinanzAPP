@@ -1,11 +1,14 @@
 package com.practica.finazapp.Vista
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.icu.util.Calendar
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -16,8 +19,10 @@ import android.widget.ImageView
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
@@ -90,6 +95,8 @@ class DashboardFragment : Fragment() {
 
 
         notificationHelper = NotificationHelper(requireContext())
+
+        solicitarPermisoNotificaciones()
 
         // Inicializar SharedPreferences
         sharedPreferences = requireContext().getSharedPreferences("notificaciones", Context.MODE_PRIVATE)
@@ -251,6 +258,25 @@ class DashboardFragment : Fragment() {
             }
         }
     }
+
+    private val requestPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if (isGranted) {
+                Toast.makeText(requireContext(), "Permiso concedido", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(requireContext(), "Permiso denegado", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+    private fun solicitarPermisoNotificaciones() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED) {
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+    }
+
 
 
 

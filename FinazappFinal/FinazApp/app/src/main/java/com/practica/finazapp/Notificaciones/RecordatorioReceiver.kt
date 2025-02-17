@@ -46,7 +46,7 @@ class RecordatorioReceiver : BroadcastReceiver() {
         }
 
         val builder = NotificationCompat.Builder(context, channelId)
-            .setSmallIcon(R.drawable.ic_notification)
+            .setSmallIcon(R.mipmap.principal)
             .setContentTitle("Recordatorio de Pago")
             .setContentText(mensaje)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
