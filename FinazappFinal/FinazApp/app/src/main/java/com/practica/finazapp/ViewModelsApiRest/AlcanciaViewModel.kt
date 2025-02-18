@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.finanzapp.repositories.AlcanciaRepository
 import com.practica.finazapp.Entidades.AlcanciaDTO
+import java.io.File
 
 class AlcanciaViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -26,12 +27,22 @@ class AlcanciaViewModel(application: Application) : AndroidViewModel(application
     val alcanciasPorUserLiveData: LiveData<List<AlcanciaDTO>?> = _alcanciasPorUserLiveData
 
     // Registrar alcancía
-    fun registrarAlcancia(alcancia: AlcanciaDTO, idUsuario: Long) {
-        alcanciaRepository.registrarAlcancia(alcancia, idUsuario) { alcanciaResponse, error ->
+
+    fun registrarAlcancia(
+        idUsuario: Long,
+        nombre: String,
+        meta: Double,
+        saldoActual: Double,
+        codigo: String,
+        fecha: String,
+        imagen: File
+    ) {
+        alcanciaRepository.registrarAlcancia(idUsuario, nombre, meta, saldoActual, codigo, fecha, imagen) { alcanciaResponse, error ->
             if (alcanciaResponse != null) {
                 _alcanciaLiveData.postValue(alcanciaResponse)
+            } else {
+                _errorLiveData.postValue(error)
             }
-            _errorLiveData.postValue(error)
         }
     }
 

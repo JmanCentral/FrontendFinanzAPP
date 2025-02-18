@@ -4,9 +4,14 @@ import android.content.Context
 import com.practica.finazapp.Entidades.AlcanciaDTO
 import com.practica.finazapp.Utils.AlcanciaService
 import com.practica.finazapp.Utils.Cliente
+import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.File
 
 class AlcanciaRepository(context: Context) {
 
@@ -15,22 +20,46 @@ class AlcanciaRepository(context: Context) {
             .create(AlcanciaService::class.java)
     }
 
-    // Registrar una nueva alcancía
-    fun registrarAlcancia(alcancia: AlcanciaDTO, idUsuario: Long, callback: (AlcanciaDTO?, String?) -> Unit) {
-        alcanciaService.crearAlcancia(idUsuario, alcancia).enqueue(object : Callback<AlcanciaDTO> {
-            override fun onResponse(call: Call<AlcanciaDTO>, response: Response<AlcanciaDTO>) {
-                if (response.isSuccessful) {
-                    callback(response.body(), null)
-                } else {
-                    callback(null, "Error al registrar alcancía: ${response.code()}")
-                }
-            }
 
-            override fun onFailure(call: Call<AlcanciaDTO>, t: Throwable) {
-                callback(null, "Fallo en la conexión: ${t.message}")
-            }
-        })
-    }
+        fun registrarAlcancia(
+            idUsuario: Long,
+            nombre: String,
+            meta: Double,
+            saldoActual: Double,
+            codigo: String,
+            fecha: String,
+            imagen: File,
+            callback: (AlcanciaDTO?, String?) -> Unit
+        ) {
+            // Crear RequestBody para cada campo
+            val nombreBody = RequestBody.create("text/plain".toMediaType(), nombre)
+            val metaBody = RequestBody.create("text/plain".toMediaType(), meta.toString())
+            val saldoBody = RequestBody.create("text/plain".toMediaType(), saldoActual.toString())
+            val codigoBody = RequestBody.create("text/plain".toMediaType(), codigo)
+            val fechaBody = RequestBody.create("text/plain".toMediaType(), fecha)
+
+            // Crear MultipartBody.Part para la imagen
+            val requestFile = RequestBody.create("image/*".toMediaType(), imagen)
+            val imagenPart = MultipartBody.Part.createFormData("imagen", imagen.name, requestFile)
+
+            // Llamada al servicio
+            alcanciaService.registrarAlcancia(
+                idUsuario, nombreBody, metaBody, saldoBody, codigoBody, fechaBody, imagenPart
+            ).enqueue(object : Callback<AlcanciaDTO> {
+                override fun onResponse(call: Call<AlcanciaDTO>, response: Response<AlcanciaDTO>) {
+                    if (response.isSuccessful) {
+                        callback(response.body(), null)
+                    } else {
+                        callback(null, "Error al registrar alcancía: ${response.code()}")
+                    }
+                }
+
+                override fun onFailure(call: Call<AlcanciaDTO>, t: Throwable) {
+                    callback(null, "Fallo en la conexión: ${t.message}")
+                }
+            })
+        }
+
 
     // Buscar alcancía por código
     fun buscarPorCodigo(codigo: String, callback: (List<AlcanciaDTO>?, String?) -> Unit) {
