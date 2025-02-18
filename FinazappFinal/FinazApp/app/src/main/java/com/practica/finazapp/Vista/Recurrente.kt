@@ -26,7 +26,6 @@ class Recurrente : AppCompatActivity()  {
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContentView(R.layout.activity_recurrente)
 
         sharedViewModel = ViewModelProvider(this).get(SharedViewModel::class.java)
