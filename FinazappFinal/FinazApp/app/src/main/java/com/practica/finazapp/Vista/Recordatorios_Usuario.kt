@@ -51,7 +51,6 @@ class Recordatorios_Usuario : AppCompatActivity() , RecordatorioListener {
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContentView(R.layout.activity_recordatorios_usuario)
 
         sharedViewModel = ViewModelProvider(this).get(SharedViewModel::class.java)
@@ -76,6 +75,7 @@ class Recordatorios_Usuario : AppCompatActivity() , RecordatorioListener {
         val btnEliminarRecordatorio = findViewById<ImageView>(R.id.eliminarRecordatorios)
         val btnActualizarListaporNombre = findViewById<ImageView>(R.id.BuscarPornombre)
         val btnActualizarLista = findViewById<ImageView>(R.id.ActualizarRecordatorios)
+        val btndevolver = findViewById<ImageView>(R.id.devolverse)
 
         btnEliminarRecordatorio.setOnClickListener {
             Advertencia()
@@ -87,6 +87,12 @@ class Recordatorios_Usuario : AppCompatActivity() , RecordatorioListener {
 
         btnActualizarLista.setOnClickListener {
             fetchRecordatorios()
+        }
+
+        btndevolver.setOnClickListener {
+            val intent = Intent(this, Dashboard::class.java)
+            startActivity(intent)
+            finish()
         }
 
         btnNuevoRecordatorio.setOnClickListener {
@@ -347,8 +353,10 @@ class Recordatorios_Usuario : AppCompatActivity() , RecordatorioListener {
             }
         }
 
-        @SuppressLint("ScheduleExactAlarm")
-        private fun reprogramarAlarma(recordatorio: RecordatorioDTO) {
+    @SuppressLint("ScheduleExactAlarm")
+    private fun reprogramarAlarma(recordatorio: RecordatorioDTO) {
+        // Verificar si el estado del recordatorio es "Activo"
+        if (recordatorio.estado == "Activo") {
             val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
             val intent = Intent(this, RecordatorioReceiver::class.java).apply {
                 putExtra("id_recordatorio", recordatorio.id_recordatorio.toInt())
@@ -373,7 +381,10 @@ class Recordatorios_Usuario : AppCompatActivity() , RecordatorioListener {
             )
 
             Log.d("Recordatorios", "Alarma reprogramada para ${recordatorio.nombre} en ${Date(siguienteAlarma)}")
+        } else {
+            Log.d("Recordatorios", "La alarma no se reprogramará porque el estado del recordatorio no es 'Activo'.")
         }
+    }
 
     private fun cancelarAlarma(recordatorio: RecordatorioDTO) {
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager

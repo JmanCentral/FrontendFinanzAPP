@@ -25,11 +25,14 @@ class AlcanciaViewModel(application: Application) : AndroidViewModel(application
     private val _alcanciasPorUserLiveData = MutableLiveData<List<AlcanciaDTO>?>()
     val alcanciasPorUserLiveData: LiveData<List<AlcanciaDTO>?> = _alcanciasPorUserLiveData
 
+    private val _operacionCoMPLETADALiveData = MutableLiveData<Boolean>()
+    val operacionCompletadaLiveData: LiveData<Boolean> = _operacionCoMPLETADALiveData
+
     // Registrar alcancía
     fun registrarAlcancia(alcancia: AlcanciaDTO, idUsuario: Long) {
         alcanciaRepository.registrarAlcancia(alcancia, idUsuario) { alcanciaResponse, error ->
             if (alcanciaResponse != null) {
-                _alcanciaLiveData.postValue(alcanciaResponse)
+                _operacionCoMPLETADALiveData.postValue(true)
             }
             _errorLiveData.postValue(error)
         }

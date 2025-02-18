@@ -20,7 +20,9 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
-
+        <activity
+            android:name=".Vista.Alcancias_Compartidas"
+            android:exported="false" />
         <!-- SplashActivity (actividad principal) -->
         <activity
             android:name=".Vista.SplashActivity"
@@ -28,11 +30,10 @@
             android:theme="@style/Theme.App.Starting">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <!-- Otras actividades -->
+        </activity> <!-- Otras actividades -->
         <activity
             android:name=".Vista.Depositos"
             android:exported="true" />
@@ -66,12 +67,11 @@
             android:theme="@style/AppTheme" />
         <activity
             android:name=".Vista.MainActivity"
-            android:exported="true" />
-
-        <!-- BroadcastReceiver -->
+            android:exported="true" /> <!-- BroadcastReceiver -->
         <receiver
             android:name=".Notificaciones.RecordatorioReceiver"
             android:enabled="true"
-            android:exported="true" /> <!-- Asegúrate de definir si debe ser exportado o no -->
+            android:exported="true" />
     </application>
+
 </manifest>

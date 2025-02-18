@@ -71,6 +71,11 @@ class Graficos_Avanzados : Fragment(), AlcanciaListener {
             BuscarPorCodigo()
         }
 
+        alcanciaViewModel.operacionCompletadaLiveData.observe(viewLifecycleOwner) { completada ->
+            if (completada == true) {
+                obtenerAlcancias(usuarioId)  // Usa usuarioId directamente
+            }
+        }
     }
 
     private fun BuscarPorCodigo() {
@@ -87,24 +92,14 @@ class Graficos_Avanzados : Fragment(), AlcanciaListener {
 
         // Configurar el listener del botón
         buttonalcancia.setOnClickListener {
-            val nombre = editTextNombre.text.toString().trim()
-            if (nombre.isNotBlank()) {
-                // Buscar la alcancía por código
-                alcanciaViewModel.buscarAlcanciaPorCodigo(nombre)
-                alcanciaViewModel.alcanciacodigoLiveData.observe(viewLifecycleOwner) { alcancias ->
-                    if (!alcancias.isNullOrEmpty()) {
-                        // Configurar el adaptador si se encuentran alcancías
-                        alcanciaAdapter = AlcanciaAdapter(alcancias)
-                        alcanciaAdapter.setOnItemClickListener(this)
-                        binding.recyclerViewAlcancias.adapter = alcanciaAdapter
-                        binding.recyclerViewAlcancias.visibility = View.VISIBLE
-                        binding.ivListaVacia.visibility = View.GONE
-                    } else {
-                        // Mostrar mensaje de lista vacía si no se encuentran alcancías
-                        binding.recyclerViewAlcancias.visibility = View.GONE
-                        binding.ivListaVacia.visibility = View.VISIBLE
-                    }
+            val codigo = editTextNombre.text.toString().trim()
+            if (codigo.isNotBlank()) {
+                // Redirigir a la nueva Activity
+                val intent = Intent(requireContext(), Alcancias_Compartidas::class.java).apply {
+                    putExtra("codigo", codigo)
+                    putExtra("usuarioId", usuarioId)
                 }
+                startActivity(intent)
             } else {
                 // Mostrar mensaje de error si el campo está vacío
                 Toast.makeText(requireContext(), "Ingrese un código válido", Toast.LENGTH_SHORT).show()
