@@ -71,6 +71,10 @@ class Graficos_Avanzados : Fragment(), AlcanciaListener {
             BuscarPorCodigo()
         }
 
+        binding.ivListaVacia.setOnClickListener {
+            registrar(usuarioId)
+        }
+
         alcanciaViewModel.operacionCompletadaLiveData.observe(viewLifecycleOwner) { completada ->
             if (completada == true) {
                 obtenerAlcancias(usuarioId)  // Usa usuarioId directamente

@@ -73,4 +73,25 @@
         style="@style/TxtVerdePequenoItalic"
         android:text="La alcancía se registrará con los datos proporcionados."/>
 
+    <!-- Contenedor para centrar la imagen -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <ImageView
+            android:id="@+id/imageViewAlcancia"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ahorro" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/buttonSeleccionarImagen"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Seleccionar imagen" />
+
 </LinearLayout>

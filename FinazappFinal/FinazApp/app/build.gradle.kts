@@ -1,5 +1,6 @@
 plugins {
     id("com.android.application")
+    id("com.google.gms.google-services")
     id("org.jetbrains.kotlin.android")
     id("androidx.room")
     kotlin("kapt")
@@ -73,6 +74,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
     implementation("androidx.activity:activity:1.9.2")
     implementation("androidx.work:work-runtime-ktx:2.9.1")
+    implementation ("com.google.firebase:firebase-storage:20.2.0")
 
     val room_version = "2.6.1"
     implementation("androidx.room:room-runtime:$room_version")
