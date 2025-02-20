@@ -46,4 +46,21 @@ class DepositoRepository(context: Context) {
             }
         })
     }
+
+    fun obtenerDepositosPorNoti(idAlcancia: Long, callback: (List<String>?, String?) -> Unit) {
+        depositoService.obtenerDepositosPorNoti(idAlcancia).enqueue(object : Callback<List<String>> {
+            override fun onResponse(call: Call<List<String>>, response: Response<List<String>>) {
+                if (response.isSuccessful) {
+                    val depositos = response.body()
+                    val depositosString = depositos?.map { it.toString() }
+                    callback(depositosString, null)
+                } else {
+                    callback(null, "Error al obtener depósitos: ${response.code()}")
+                }
+            }
+            override fun onFailure(call: Call<List<String>>, t: Throwable) {
+                callback(null, "Fallo en la conexión: ${t.message}")
+                }
+            })
+    }
 }

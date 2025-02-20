@@ -14,8 +14,8 @@ class DepositoViewModel(application: Application) : AndroidViewModel(application
         DepositoRepository(getApplication<Application>().applicationContext)
     }
 
-    private val _depositoResponse = MutableLiveData<DepositoDTO?>()
-    val depositoResponse: LiveData<DepositoDTO?> get() = _depositoResponse
+    private val _depositoResponse = MutableLiveData<List<String>?>()
+    val depositoResponse: LiveData<List<String>?> get() = _depositoResponse
 
     private val _depositosList = MutableLiveData<List<DepositoDTO>?>()
     val depositosList: LiveData<List<DepositoDTO>?> get() = _depositosList
@@ -27,12 +27,15 @@ class DepositoViewModel(application: Application) : AndroidViewModel(application
     val operacionCompletada: LiveData<Boolean> = _operacionCompletada
 
     fun registrarDeposito(depositoDTO: DepositoDTO, idUsuario: Long, idAlcancia: Long) {
-        depositoRepository.registrarDeposito(depositoDTO, idUsuario, idAlcancia) { response, error ->
+        depositoRepository.registrarDeposito(
+            depositoDTO,
+            idUsuario,
+            idAlcancia
+        ) { response, error ->
             if (response != null) {
                 _operacionCompletada.postValue(true)
             } else {
                 _errorLiveData.postValue(error)
-                _depositoResponse.postValue(null)
             }
         }
     }
@@ -47,5 +50,16 @@ class DepositoViewModel(application: Application) : AndroidViewModel(application
                 _depositosList.postValue(null)
             }
         }
+    }
+
+    fun obtenerDepositosPorNoti(idAlcancia: Long) {
+        depositoRepository.obtenerDepositosPorNoti(idAlcancia) { response, error ->
+            if (response != null) {
+                _depositoResponse.postValue(response)
+            } else {
+                _errorLiveData.postValue(error)
+            }
+        }
+
     }
 }

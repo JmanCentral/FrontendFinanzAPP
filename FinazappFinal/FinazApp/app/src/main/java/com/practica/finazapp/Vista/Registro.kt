@@ -17,17 +17,30 @@ import com.practica.finazapp.Entidades.UsuarioDTO
 import com.practica.finazapp.R
 import com.practica.finazapp.ViewModelsApiRest.SharedViewModel
 import com.practica.finazapp.ViewModelsApiRest.UserViewModel
+import com.google.firebase.messaging.FirebaseMessaging
 
 
 class Registro : AppCompatActivity() {
 
     private lateinit var usuarioViewModel: UserViewModel
     private lateinit var sharedViewModel: SharedViewModel
+    private var firebaseToken: String? = null
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_registro)
+
+        // Obtener el token de Firebase
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                firebaseToken = task.result
+                Log.d("FirebaseToken", "Token: $firebaseToken")
+            } else {
+                Log.e("FirebaseToken", "Error obteniendo el token", task.exception)
+            }
+        }
+
 
         Log.d("Registro", "onCreate del Registro")
         usuarioViewModel = ViewModelProvider(this).get(UserViewModel::class.java)
@@ -114,6 +127,7 @@ class Registro : AppCompatActivity() {
                 contrasena = contrasena,
                 nombre = nombres,
                 apellido = apellidos,
+                token = firebaseToken ?: "",
                 roles = setOf("USER")
             )
 

@@ -18,4 +18,7 @@ interface DepositoService {
 
     @GET("ObtenerDepositos/{id_alcancia}")
     fun obtenerDepositos(@Path("id_alcancia") idAlcancia: Long): Call<List<DepositoDTO>>
+
+    @GET("BuscarAlcanciasPorUsuarios/{id_alcancia}")
+    fun obtenerDepositosPorNoti(@Path("id_alcancia") idAlcancia: Long): Call<List<String>>
 }

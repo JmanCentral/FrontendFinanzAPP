@@ -8,6 +8,7 @@ data class UsuarioDTO (
     var nombre: String,
     var email: String,
     var apellido: String,
+    var token: String,
     val roles: Set<String>
 
 )
