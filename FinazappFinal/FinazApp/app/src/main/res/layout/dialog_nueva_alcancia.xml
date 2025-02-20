@@ -31,14 +31,15 @@
     <!-- Campo para el saldo actual de la alcancía -->
     <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/editTextSaldoActual"
+        style="@style/EstiloEditText"
         android:layout_width="match_parent"
         android:layout_height="45dp"
-        android:hint="Saldo actual"
+        android:layout_margin="8dp"
+        android:background="@drawable/bg_btn_borde_amarillo"
+        android:hint="Saldo Actual en 0 al crearla"
         android:inputType="numberDecimal"
         android:padding="4dp"
-        style="@style/EstiloEditText"
-        android:background="@drawable/bg_btn_borde_amarillo"
-        android:layout_margin="8dp"/>
+        android:enabled="false" />
 
     <!-- Campo para el código de la alcancía -->
     <com.google.android.material.textfield.TextInputEditText

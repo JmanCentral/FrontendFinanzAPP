@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
@@ -31,7 +32,7 @@ class Depositos : AppCompatActivity(), DepositoListener {
     private lateinit var sharedViewModel: SharedViewModel
     private val depositoViewModel: DepositoViewModel by viewModels()
     private lateinit var depositoAdapter: DepositoAdapter
-    private var idAlcancia: Long = -1L // Variable para almacenar el idAlcancia
+    private var idAlcancia: Long = -1 // Variable para almacenar el idAlcancia
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -94,16 +95,19 @@ class Depositos : AppCompatActivity(), DepositoListener {
         depositoViewModel.depositosList.observe(this, Observer { depositos ->
             val recyclerViewDepositos = findViewById<RecyclerView>(R.id.recyclerViewDepositos)
             val ivListaVacia = findViewById<ImageView>(R.id.ivListaVacia)
+            val tvTitulo = findViewById<TextView>(R.id.tvTitulo)
 
             Log.d("Depositos", "Depósitos recibidos: ${depositos?.size}")
             if (!depositos.isNullOrEmpty()) {
                 depositoAdapter.updateList(depositos)
                 recyclerViewDepositos.visibility = View.VISIBLE
                 ivListaVacia.visibility = View.GONE
+                tvTitulo.visibility = View.GONE
                 Log.d("Depositos", "Lista de depósitos no vacía")
             } else {
                 recyclerViewDepositos.visibility = View.GONE
                 ivListaVacia.visibility = View.VISIBLE
+                tvTitulo.visibility = View.VISIBLE
                 Log.d("Depositos", "Lista de depósitos vacía")
             }
         })

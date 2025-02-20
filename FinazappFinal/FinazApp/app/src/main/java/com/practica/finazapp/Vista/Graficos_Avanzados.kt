@@ -120,9 +120,11 @@ class Graficos_Avanzados : Fragment(), AlcanciaListener {
                 binding.recyclerViewAlcancias.adapter = alcanciaAdapter
                 binding.recyclerViewAlcancias.visibility = View.VISIBLE
                 binding.ivListaVacia.visibility = View.GONE
+                binding.tvMensajeVacio.visibility = View.GONE
             } else {
                 binding.recyclerViewAlcancias.visibility = View.GONE
                 binding.ivListaVacia.visibility = View.VISIBLE
+                binding.tvMensajeVacio.visibility = View.VISIBLE
             }
         }
     }

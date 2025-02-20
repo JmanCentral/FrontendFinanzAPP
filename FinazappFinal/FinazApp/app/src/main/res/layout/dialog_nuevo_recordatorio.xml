@@ -20,7 +20,7 @@
         android:layout_height="45dp"
         android:layout_margin="8dp"
         android:background="@drawable/bg_btn_borde_amarillo"
-        android:hint="Nombre del recordatorio"
+        android:hint="Persona o entidad a pagar"
         android:padding="4dp" />
 
     <!-- TextView para la categoría límite -->
@@ -30,7 +30,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginBottom="4dp"
         android:gravity="center"
-        android:text="Elige el tipo de recordatorio"
+        android:text="TIpo de recordatorio"
         android:textColor="#001A41"
         android:textSize="25sp"
         android:textStyle="bold" />
@@ -87,10 +87,10 @@
 
     <TextView
         android:id="@+id/txtRecordatorio1"
+        style="@style/TxtVerdePequenoItalic"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        style="@style/TxtVerdePequenoItalic"
-        android:text="el ingreso se contara a partir de la fecha especificada y se tendra en cuenta cada mes."/>
+        android:text="El recordatorio sonara en un invertavo definido previamente y solo se podra cancelar al modificarlo o eliminarlo" />
 
 </LinearLayout>
 

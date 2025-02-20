@@ -27,7 +27,6 @@ class Recurrente : AppCompatActivity()  {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_recurrente)
-
         sharedViewModel = ViewModelProvider(this).get(SharedViewModel::class.java)
         gastosViewModel = ViewModelProvider(this).get(SpendViewModel::class.java)
         recyclerView = findViewById(R.id.recyclerViewRecurrente)

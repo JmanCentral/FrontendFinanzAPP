@@ -1,6 +1,7 @@
 package com.practica.finazapp.Utils
 
 import com.practica.finazapp.Entidades.AlcanciaDTO
+import com.practica.finazapp.Entidades.UsuarioDTO
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -16,4 +17,8 @@ interface AlcanciaService {
 
     @GET("BuscarAlcancias/{id_usuario}")
     fun obtenerAlcanciasporuser(@Path("id_usuario") idUsuario: Long): Call<List<AlcanciaDTO>>
+
+    @GET("BuscarAlcanciasPorUsuario/{id_alcancia}")
+    fun obtenerAlcanciasNotificacion(@Path("id_alcancia") idAlcancia: Long): Call<List<UsuarioDTO>>
+
 }
