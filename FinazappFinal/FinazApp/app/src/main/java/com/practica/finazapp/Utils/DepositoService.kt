@@ -3,6 +3,7 @@ package com.practica.finazapp.Utils
 import com.practica.finazapp.Entidades.DepositoDTO
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -18,4 +19,18 @@ interface DepositoService {
 
     @GET("ObtenerDepositos/{id_alcancia}")
     fun obtenerDepositos(@Path("id_alcancia") idAlcancia: Long): Call<List<DepositoDTO>>
+
+    @GET("ObtenerValorGastosMesDeposito/{id_usuario}")
+    fun obtenerValorGastosMesDeposito(
+        @Path("id_usuario") idUsuario: Long
+    ): Call<Double>
+
+    @DELETE("EliminarTodosLosGastos/{id_usuario}/{id_alcancia}/{id_deposito}")
+    fun eliminarDepositos(
+        @Path("id_usuario") idUsuario: Long,
+        @Path("id_alcancia") idAlcancia: Long,
+        @Path("id_deposito") idDeposito: Long
+    ): Call<Void>
+
+
 }

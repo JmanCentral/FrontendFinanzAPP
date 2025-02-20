@@ -46,4 +46,35 @@ class DepositoRepository(context: Context) {
             }
         })
     }
+
+    fun obtenerValorGastosMesDeposito(idUsuario: Long, callback: (Double?, String?) -> Unit) {
+        depositoService.obtenerValorGastosMesDeposito(idUsuario).enqueue(object : Callback<Double> {
+            override fun onResponse(call: Call<Double>, response: Response<Double>) {
+                if (response.isSuccessful) {
+                    callback(response.body(), null)
+                } else {
+                    callback(null, "Error al obtener valor de gastos: ${response.code()}")
+                }
+            }
+
+            override fun onFailure(call: Call<Double>, t: Throwable) {
+                callback(null, "Fallo en la conexión: ${t.message}")
+            }
+        })
+    }
+
+    fun eliminarDepositos(idUsuario: Long, idAlcanica: Long, idDeposito: Long , callback: (Boolean, String?) -> Unit) {
+        depositoService.eliminarDepositos(idUsuario, idAlcanica, idDeposito).enqueue(object : Callback<Void> {
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                if (response.isSuccessful) {
+                    callback(true, null)
+                } else {
+                    callback(false, "Error al eliminar Alerta: ${response.code()}")
+                }
+            }
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                callback(false, "Fallo en la conexión: ${t.message}")
+            }
+        })
+    }
 }

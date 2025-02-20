@@ -18,6 +18,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.TextInputEditText
+import com.practica.finazapp.Entidades.AlcanciaDTO
 import com.practica.finazapp.Entidades.DepositoDTO
 import com.practica.finazapp.R
 import com.practica.finazapp.ViewModelsApiRest.DepositoViewModel
@@ -89,6 +90,11 @@ class Depositos : AppCompatActivity(), DepositoListener {
 
     }
 
+    override fun onItemClick(deposito: DepositoDTO){
+
+
+    }
+
     private fun obtenerDepositos(idAlcancia: Long) {
         Log.d("Depositos", "Llamando a obtenerDepositos() para idAlcancia: $idAlcancia")
         depositoViewModel.obtenerDepositos(idAlcancia)
@@ -102,7 +108,6 @@ class Depositos : AppCompatActivity(), DepositoListener {
                 depositoAdapter.updateList(depositos)
                 recyclerViewDepositos.visibility = View.VISIBLE
                 ivListaVacia.visibility = View.GONE
-                tvTitulo.visibility = View.GONE
                 Log.d("Depositos", "Lista de depósitos no vacía")
             } else {
                 recyclerViewDepositos.visibility = View.GONE

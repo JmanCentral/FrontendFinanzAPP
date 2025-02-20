@@ -5,8 +5,11 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.distinctUntilChanged
+import androidx.lifecycle.viewModelScope
 import com.practica.finazapp.Entidades.DepositoDTO
 import com.practica.finazapp.RepositoriosApiRest.DepositoRepository
+import kotlinx.coroutines.launch
 
 class DepositoViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -22,6 +25,9 @@ class DepositoViewModel(application: Application) : AndroidViewModel(application
 
     private val _errorLiveData = MutableLiveData<String?>()
     val errorLiveData: LiveData<String?> get() = _errorLiveData
+
+    private val _valorGastosMesDepositoLiveData = MutableLiveData<Double?>()
+    val valorGastosMesDepositoLiveData: LiveData<Double?> = _valorGastosMesDepositoLiveData.distinctUntilChanged()
 
     private val _operacionCompletada = MutableLiveData<Boolean>()
     val operacionCompletada: LiveData<Boolean> = _operacionCompletada
@@ -48,4 +54,28 @@ class DepositoViewModel(application: Application) : AndroidViewModel(application
             }
         }
     }
+
+    fun obtenerValorGastosMesDeposito(idUsuario: Long) {
+        depositoRepository.obtenerValorGastosMesDeposito(idUsuario) { valor, error ->
+            if (error == null) {
+                _valorGastosMesDepositoLiveData.postValue(valor)
+            } else {
+                _errorLiveData.postValue(error)
+            }
+        }
+
+    }
+
+    fun eliminarDepositos(idUsuario: Long, idAlcancia: Long , idDeposito: Long) {
+        viewModelScope.launch {
+            depositoRepository.eliminarDepositos(idUsuario, idAlcancia, idDeposito) { resultado, error ->
+                if (error == null) {
+                    _operacionCompletada.postValue(true)
+                } else {
+                    _errorLiveData.postValue(error)
+                }
+            }
+        }
+    }
+
 }

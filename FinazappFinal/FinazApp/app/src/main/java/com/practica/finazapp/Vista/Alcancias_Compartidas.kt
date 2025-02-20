@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.finanzapp.viewmodels.AlcanciaViewModel
 import com.practica.finazapp.Entidades.AlcanciaDTO
+import com.practica.finazapp.Entidades.DepositoDTO
 import com.practica.finazapp.R
 
 class Alcancias_Compartidas : AppCompatActivity(), AlcanciaListener {
@@ -66,6 +67,7 @@ class Alcancias_Compartidas : AppCompatActivity(), AlcanciaListener {
             }
         }
     }
+
 
     override fun onItemClick5(alcancia: AlcanciaDTO) {
         // Crear un Intent para iniciar la Activity de depósitos

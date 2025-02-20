@@ -158,9 +158,7 @@ class Graficos_Avanzados : Fragment(), AlcanciaListener {
                 val codigo = dialogView.findViewById<TextInputEditText>(R.id.editTextCodigo).text.toString()
                 val fechaCreacion = editTextFechaCreacion.text.toString()
 
-
-
-                if (nombreAlcancia.isNotEmpty() && codigo.isNotEmpty() && fechaCreacion.isNotEmpty()) {
+                if (nombreAlcancia.isNotEmpty()  && fechaCreacion.isNotEmpty()) {
 
                     val parts = fechaCreacion.split("/")
                     val dia = parts[0].padStart(2, '0')

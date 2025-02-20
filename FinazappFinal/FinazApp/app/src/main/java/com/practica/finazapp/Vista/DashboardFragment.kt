@@ -26,6 +26,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
@@ -34,6 +35,7 @@ import com.practica.finazapp.Entidades.GastoDTO
 import com.practica.finazapp.Notificaciones.NotificationHelper
 import com.practica.finazapp.R
 import com.practica.finazapp.ViewModelsApiRest.AlertViewModel
+import com.practica.finazapp.ViewModelsApiRest.DepositoViewModel
 import com.practica.finazapp.ViewModelsApiRest.IncomeViewModel
 import com.practica.finazapp.ViewModelsApiRest.SharedViewModel
 import com.practica.finazapp.ViewModelsApiRest.SpendViewModel
@@ -51,6 +53,7 @@ class DashboardFragment : Fragment() {
     private lateinit var gastosViewModel: SpendViewModel
     private lateinit var ingresoViewModel: IncomeViewModel
     private lateinit var alertaViewModel: AlertViewModel
+    private lateinit var depositoViewModel: DepositoViewModel
     private lateinit var notificationHelper: NotificationHelper
     private lateinit var sharedPreferences: SharedPreferences
     private val notificacionesEnviadas = mutableSetOf<Long>()
@@ -92,6 +95,7 @@ class DashboardFragment : Fragment() {
         sharedViewModel = ViewModelProvider(requireActivity())[SharedViewModel::class.java]
         ingresoViewModel = ViewModelProvider(this)[IncomeViewModel::class.java]
         alertaViewModel = ViewModelProvider(this)[AlertViewModel::class.java]
+        depositoViewModel = ViewModelProvider(this)[DepositoViewModel::class.java]
 
 
         notificationHelper = NotificationHelper(requireContext())
@@ -462,17 +466,34 @@ class DashboardFragment : Fragment() {
             }
 
         gastosViewModel.obtenerValorGastosMes(usuarioId)
-        gastosViewModel.valorGastosMesLiveData.observe(viewLifecycleOwner) { gastosMes ->
-            Log.d("DashboardComporbacion", "Valor de gastosMes: $gastosMes")
-            if (gastosMes != null) {
-                val numberFormat = NumberFormat.getInstance()
-                numberFormat.maximumFractionDigits = 2
-                val cantidadGastos = gastosMes
-                val gastadosTextView = binding.TxtGastoTotal
-                gastadosTextView.setText("${numberFormat.format(cantidadGastos)}$")
-                cargarDona()
+        depositoViewModel.obtenerValorGastosMesDeposito(usuarioId)
+
+        // Usar MediatorLiveData para observar ambos valores al mismo tiempo
+        val combinedLiveData = MediatorLiveData<Pair<Double?, Double?>>().apply {
+            addSource(gastosViewModel.valorGastosMesLiveData) { gastosMes ->
+                value = Pair(gastosMes, depositoViewModel.valorGastosMesDepositoLiveData.value)
+            }
+            addSource(depositoViewModel.valorGastosMesDepositoLiveData) { valorDeposito ->
+                value = Pair(gastosViewModel.valorGastosMesLiveData.value, valorDeposito)
             }
         }
+
+        combinedLiveData.observe(viewLifecycleOwner) { (gastosMes, valorDeposito) ->
+            // Si ambos valores son nulos, los reemplazamos por 0.0
+            val totalGastos = (gastosMes ?: 0.0) + (valorDeposito ?: 0.0)
+
+            Log.d("DashboardComprobacion", "Total Gastado: $totalGastos")
+
+            val numberFormat = NumberFormat.getInstance().apply {
+                maximumFractionDigits = 2
+            }
+            binding.TxtGastoTotal.text = "${numberFormat.format(totalGastos)}$"
+
+            // Se carga la dona sin importar si hay valores o no
+            cargarDona()
+        }
+
+
 
         ingresoViewModel.obtenerTotalIngresos(usuarioId)
         ingresoViewModel.totalIngresosLiveData.observeOnce(viewLifecycleOwner) { ingresoMensual ->
@@ -668,27 +689,38 @@ class DashboardFragment : Fragment() {
 
 
     fun cargarBarraDisp(cantidad: Double, barra: View) {
+
         gastosViewModel.obtenerValorGastosMes(usuarioId)
-        gastosViewModel.valorGastosMesLiveData.observe(viewLifecycleOwner) { gastosMes ->
+        gastosViewModel.valorGastosMesLiveData.observe(viewLifecycleOwner) {gastosMes ->
+
             // Manejar el caso en que gastosMes sea nulo
             val gastosMesSeguro = gastosMes ?: 0.0
+
             val total = gastosMesSeguro + cantidad
 
             if (cantidad >= 0 && total > 0) { // Asegurarse de que haya algo que mostrar
                 val barraGris = binding.barraGrisDisponible
                 val cien = barraGris.width
-                val layoutParams = barra.layoutParams as ConstraintLayout.LayoutParams
 
-                // Ajustar el tamaño de la barra basado en la cantidad y el total
-                layoutParams.width = ((cien * cantidad) / total).toInt()
-                barra.layoutParams = layoutParams
-                barra.visibility = View.VISIBLE
+                if (cien > 0) {
+                    val layoutParams = barra.layoutParams as ConstraintLayout.LayoutParams
+
+                    // Calcular el ancho de la barra proporcionalmente
+                    val nuevoAncho = ((cien * cantidad) / total).toInt()
+
+                    layoutParams.width = nuevoAncho
+                    barra.layoutParams = layoutParams
+                    barra.visibility = View.VISIBLE
+                } else {
+                    Log.w("cargarBarraDisp", "Ancho de barraGrisDisponible es 0. La barra no se actualizará.")
+                }
             } else {
                 // Si no hay nada que mostrar, asegurarse de que la barra esté oculta
                 barra.visibility = View.INVISIBLE
             }
         }
     }
+
 
     // Variables globales para almacenar los valores a medida que se obtienen
     private var disponible1: Float = 0f
@@ -697,6 +729,7 @@ class DashboardFragment : Fragment() {
     private var transporte: Float = 0f
     private var servicios: Float = 0f
     private var mercado: Float = 0f
+    private var deposito: Float = 0f
 
     private fun cargarDona() {
         Log.d("CargarDona", "Método cargarDona() llamado")
@@ -736,6 +769,13 @@ class DashboardFragment : Fragment() {
             mercado = (valor ?: 0f).toFloat()
             actualizarGrafico()
         }
+
+        depositoViewModel.obtenerValorGastosMesDeposito(usuarioId)
+        depositoViewModel.valorGastosMesDepositoLiveData.observe(viewLifecycleOwner) { valor ->
+            deposito = (valor ?: 0f).toFloat()
+            actualizarGrafico()
+        }
+
     }
 
     // Función que se llama cada vez que un dato se actualiza
@@ -749,6 +789,7 @@ class DashboardFragment : Fragment() {
         if (servicios > 0) pieData.add(SliceValue(servicios, obtenerColorCategoria("Servicios")))
         if (mercado > 0) pieData.add(SliceValue(mercado, obtenerColorCategoria("Mercado")))
         if (disponible1 > 0) pieData.add(SliceValue(disponible1, obtenerColorCategoria("disponible")))
+        if (deposito > 0) pieData.add(SliceValue(deposito, obtenerColorCategoria("Deposito")))
 
         // Si al menos hay un dato válido, se actualiza el gráfico
         if (pieData.isNotEmpty()) {
@@ -772,7 +813,8 @@ class DashboardFragment : Fragment() {
             "Alimentos" to "#FF66C1",
             "Transporte" to "#339AF0",
             "Servicios" to "#EEB62B",
-            "Mercado" to "#FD8435"
+            "Mercado" to "#FD8435",
+            "Deposito" to "#001A41"
         )
         val color = Color1.parseColor(categoriasColores[categoria])
         return color

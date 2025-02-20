@@ -36,22 +36,25 @@
         android:layout_height="45dp"
         android:layout_margin="8dp"
         android:background="@drawable/bg_btn_borde_amarillo"
+        android:enabled="false"
         android:hint="Saldo Actual en 0 al crearla"
         android:inputType="numberDecimal"
         android:padding="4dp"
-        android:enabled="false" />
+        android:textColor="@color/amarillo_oscuro" />
 
     <!-- Campo para el código de la alcancía -->
     <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/editTextCodigo"
+        style="@style/EstiloEditText"
         android:layout_width="match_parent"
         android:layout_height="45dp"
-        android:hint="Código"
+        android:layout_margin="8dp"
+        android:background="@drawable/bg_btn_borde_amarillo"
+        android:focusable="false"
+        android:hint="Código Generado Automaticamente"
         android:inputType="text"
         android:padding="4dp"
-        style="@style/EstiloEditText"
-        android:background="@drawable/bg_btn_borde_amarillo"
-        android:layout_margin="8dp"/>
+        android:textColor="@color/amarillo_oscuro" />
 
     <!-- Campo para la fecha de creación de la alcancía -->
     <EditText

@@ -248,7 +248,6 @@ import kotlinx.coroutines.launch
                     _errorLiveData.postValue(error)
                 }
             }
-
     }
 
     // Función para obtener gastos por fechas
