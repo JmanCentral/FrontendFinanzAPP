@@ -67,12 +67,48 @@ class Graficos_Avanzados : Fragment(), AlcanciaListener {
             }
         }
 
+        binding.BuscarAlcancia.setOnClickListener {
+            BuscarPorCodigo()
+        }
 
         alcanciaViewModel.operacionCompletadaLiveData.observe(viewLifecycleOwner) { completada ->
             if (completada == true) {
                 obtenerAlcancias(usuarioId)  // Usa usuarioId directamente
             }
         }
+    }
+
+    private fun BuscarPorCodigo() {
+        // Inflar la vista del diálogo
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_buscar_alcancia, null)
+        val editTextNombre = dialogView.findViewById<EditText>(R.id.Busca_alcancia)
+        val buttonalcancia = dialogView.findViewById<Button>(R.id.buttonalcancia)
+
+        // Crear el diálogo
+        val dialog = AlertDialog.Builder(requireContext())
+            .setTitle("Buscar Alcancía")
+            .setView(dialogView)
+            .create()
+
+        // Configurar el listener del botón
+        buttonalcancia.setOnClickListener {
+            val codigo = editTextNombre.text.toString().trim()
+            if (codigo.isNotBlank()) {
+                // Redirigir a la nueva Activity
+                val intent = Intent(requireContext(), Alcancias_Compartidas::class.java).apply {
+                    putExtra("codigo", codigo)
+                    putExtra("usuarioId", usuarioId)
+                }
+                startActivity(intent)
+            } else {
+                // Mostrar mensaje de error si el campo está vacío
+                Toast.makeText(requireContext(), "Ingrese un código válido", Toast.LENGTH_SHORT).show()
+            }
+            dialog.dismiss()
+        }
+
+        // Mostrar el diálogo
+        dialog.show()
     }
 
     private fun obtenerAlcancias(usuarioId: Long) {

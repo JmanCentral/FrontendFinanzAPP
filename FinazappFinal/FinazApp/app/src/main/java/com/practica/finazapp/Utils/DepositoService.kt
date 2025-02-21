@@ -6,6 +6,7 @@ import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 
 interface DepositoService {
@@ -25,11 +26,17 @@ interface DepositoService {
         @Path("id_usuario") idUsuario: Long
     ): Call<Double>
 
-    @DELETE("EliminarTodosLosGastos/{id_usuario}/{id_alcancia}/{id_deposito}")
+    @PUT("ModificarDepositos/{id_deposito}/{id_alcancia}")
+    fun modificarDepositos(
+        @Body depositoDTO: DepositoDTO,
+        @Path("id_deposito") idDeposito: Long,
+        @Path("id_alcancia") idAlcancia: Long
+    ): Call<DepositoDTO>
+
+    @DELETE("EliminarDeposito/{id_deposito}/{id_alcancia}")
     fun eliminarDepositos(
-        @Path("id_usuario") idUsuario: Long,
-        @Path("id_alcancia") idAlcancia: Long,
-        @Path("id_deposito") idDeposito: Long
+        @Path("id_deposito") idDeposito: Long,
+        @Path("id_alcancia") idAlcancia: Long
     ): Call<Void>
 
 

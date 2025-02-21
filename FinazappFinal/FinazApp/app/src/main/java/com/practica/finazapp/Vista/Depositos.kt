@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
@@ -90,10 +91,60 @@ class Depositos : AppCompatActivity(), DepositoListener {
 
     }
 
-    override fun onItemClick(deposito: DepositoDTO){
+    @SuppressLint("MissingInflatedId")
+    override fun onItemClick(deposito: DepositoDTO) {
 
+        val dialogView = layoutInflater.inflate(R.layout.dialog_modificar_deposito, null)
 
+        val editTextMonto = dialogView.findViewById<EditText>(R.id.editTextMontoModificar)
+        val editTextdepositante = dialogView.findViewById<EditText>(R.id.editTextNombreDepositanteModificar)
+        val editTextFecha = dialogView.findViewById<EditText>(R.id.editTextFechaModificar)
+        val btnEliminar = dialogView.findViewById<Button>(R.id.btnEliminarDeposito)v
+
+        editTextFecha.setText(deposito.fecha.replace("-", "/"))
+
+        editTextFecha.setOnClickListener { showDatePickerDialog(editTextFecha) }
+
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setPositiveButton("Guardar") { _, _ ->
+                val monto = editTextMonto.text.toString().toDoubleOrNull()
+                val nombre = editTextdepositante.text.toString()
+                val fechaOriginal = editTextFecha.text.toString()
+
+                if (monto != null  && fechaOriginal.isNotBlank()) {
+
+                    // Realizar la conversión de fecha y guardar el nuevo gasto
+                    val parts = fechaOriginal.split("/")
+                    val dia = parts[0].padStart(2, '0')
+                    val mes = parts[1].padStart(2, '0')
+                    val anio = parts[2]
+                    val fecha = "${anio}-${mes}-${dia}"
+
+                    val DepositoActualizado = deposito.copy(
+                        monto = monto,
+                        nombre_depositante = nombre,
+                        fecha = fecha
+                    )
+                    depositoViewModel.modificarDepositos(DepositoActualizado , deposito.idDeposito , idAlcancia)
+                } else {
+                    Toast.makeText(
+                        this,
+                        "Complete todos los campos correctamente",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+            .setNegativeButton("Cancelar") { dialog, _ -> dialog.dismiss() }
+            .create()
+
+        btnEliminar.setOnClickListener {
+            depositoViewModel.eliminarDepositos(deposito.idDeposito, idAlcancia)
+            dialog.dismiss()
+        }
+        dialog.show()
     }
+
 
     private fun obtenerDepositos(idAlcancia: Long) {
         Log.d("Depositos", "Llamando a obtenerDepositos() para idAlcancia: $idAlcancia")
@@ -106,6 +157,7 @@ class Depositos : AppCompatActivity(), DepositoListener {
             Log.d("Depositos", "Depósitos recibidos: ${depositos?.size}")
             if (!depositos.isNullOrEmpty()) {
                 depositoAdapter.updateList(depositos)
+                depositoAdapter.setOnItemClickListener(this)
                 recyclerViewDepositos.visibility = View.VISIBLE
                 ivListaVacia.visibility = View.GONE
                 Log.d("Depositos", "Lista de depósitos no vacía")
@@ -192,11 +244,5 @@ class Depositos : AppCompatActivity(), DepositoListener {
         datePickerDialog.show()
     }
 
-    // Implementación de la interfaz DepositoListener
-    override fun onItemClick(deposito: DepositoDTO) {
-        Log.d("Depositos", "Clic en depósito: ${deposito.nombre_depositante}")
-        // Lógica al hacer clic en un elemento
-        Toast.makeText(this, "Clic en: ${deposito.nombre_depositante}", Toast.LENGTH_SHORT).show()
-    }
 }
 

@@ -13,7 +13,7 @@ import retrofit2.Response
 class IncomeRepository(context: Context) {
 
     private val ingresoService: IngresoService by lazy {
-        Cliente.getCliente("http://192.168.10.15:8862/Finanzapp/Ingresos/", context)
+        Cliente.getCliente("http://100.108.80.90:8862/Finanzapp/Ingresos/", context)
             .create(IngresoService::class.java)
     }
 

@@ -166,6 +166,7 @@ class ListaGastos : AppCompatActivity(), OnItemClickListener2 {
     }
 
     override fun onItemClick2(gasto: GastoDTO) {
+
         val dialogView = layoutInflater.inflate(R.layout.dialog_modificar_gasto, null)
 
         val spinnerCategoria = dialogView.findViewById<Spinner>(R.id.spinnerCategoria)

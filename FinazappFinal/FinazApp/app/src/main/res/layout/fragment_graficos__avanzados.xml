@@ -16,7 +16,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
-            android:text="Alcancias Digitales"
+            android:text="Alcancías Digitales"
             android:textSize="36sp"
             android:textStyle="bold|italic"
             app:layout_constraintEnd_toEndOf="parent"
@@ -29,25 +29,15 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginTop="20dp"
-            app:layout_constraintTop_toBottomOf="@id/textView6"
-            android:gravity="center">
+            android:gravity="center"
+            app:layout_constraintTop_toBottomOf="@id/textView6">
 
+            <!-- Solo la imagen centrada -->
             <ImageView
                 android:id="@+id/RegistrarAlcancia"
-                android:layout_width="41dp"
-                android:layout_height="match_parent"
-                android:layout_marginEnd="16dp"
-                android:layout_weight="1"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
                 android:src="@drawable/agregar" />
-
-            <!-- Imagen 2 -->
-            <ImageView
-                android:id="@+id/BuscarAlcancia"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:src="@drawable/buscar" />
-
         </LinearLayout>
 
         <!-- RecyclerView para la lista de alcancías -->
@@ -78,11 +68,10 @@
             android:textSize="18sp"
             android:textColor="@color/amarillo_oscuro"
             android:visibility="gone"
+            android:layout_marginTop="16dp"
             app:layout_constraintTop_toBottomOf="@id/ivListaVacia"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="16dp" />
-
+            app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

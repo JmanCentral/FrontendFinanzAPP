@@ -27,13 +27,18 @@ class DepositoViewModel(application: Application) : AndroidViewModel(application
     val errorLiveData: LiveData<String?> get() = _errorLiveData
 
     private val _valorGastosMesDepositoLiveData = MutableLiveData<Double?>()
-    val valorGastosMesDepositoLiveData: LiveData<Double?> = _valorGastosMesDepositoLiveData.distinctUntilChanged()
+    val valorGastosMesDepositoLiveData: LiveData<Double?> =
+        _valorGastosMesDepositoLiveData.distinctUntilChanged()
 
     private val _operacionCompletada = MutableLiveData<Boolean>()
     val operacionCompletada: LiveData<Boolean> = _operacionCompletada
 
     fun registrarDeposito(depositoDTO: DepositoDTO, idUsuario: Long, idAlcancia: Long) {
-        depositoRepository.registrarDeposito(depositoDTO, idUsuario, idAlcancia) { response, error ->
+        depositoRepository.registrarDeposito(
+            depositoDTO,
+            idUsuario,
+            idAlcancia
+        ) { response, error ->
             if (response != null) {
                 _operacionCompletada.postValue(true)
             } else {
@@ -66,16 +71,33 @@ class DepositoViewModel(application: Application) : AndroidViewModel(application
 
     }
 
-    fun eliminarDepositos(idUsuario: Long, idAlcancia: Long , idDeposito: Long) {
+    fun modificarDepositos(depositoDTO: DepositoDTO, idDeposito: Long, idAlcancia: Long) {
         viewModelScope.launch {
-            depositoRepository.eliminarDepositos(idUsuario, idAlcancia, idDeposito) { resultado, error ->
+            depositoRepository.modificarDepositos(
+                depositoDTO,
+                idDeposito,
+                idAlcancia
+            ) { resultado, error ->
                 if (error == null) {
                     _operacionCompletada.postValue(true)
                 } else {
                     _errorLiveData.postValue(error)
                 }
             }
+
         }
     }
 
-}
+        fun eliminarDepositos(idDeposito: Long, idAlcancia: Long) {
+            viewModelScope.launch {
+                depositoRepository.eliminarDepositos(idDeposito, idAlcancia) { resultado, error ->
+                    if (error == null) {
+                        _operacionCompletada.postValue(true)
+                    } else {
+                        _errorLiveData.postValue(error)
+                    }
+                }
+            }
+        }
+    }
+

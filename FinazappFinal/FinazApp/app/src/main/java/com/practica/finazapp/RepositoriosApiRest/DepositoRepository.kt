@@ -11,7 +11,7 @@ import retrofit2.Response
 class DepositoRepository(context: Context) {
 
     private val depositoService: DepositoService by lazy {
-        Cliente.getCliente("http://192.168.10.15:8862/Finanzapp/Deposito/", context)
+        Cliente.getCliente("http://100.108.80.90:8862/Finanzapp/Deposito/", context)
             .create(DepositoService::class.java)
     }
 
@@ -63,8 +63,24 @@ class DepositoRepository(context: Context) {
         })
     }
 
-    fun eliminarDepositos(idUsuario: Long, idAlcanica: Long, idDeposito: Long , callback: (Boolean, String?) -> Unit) {
-        depositoService.eliminarDepositos(idUsuario, idAlcanica, idDeposito).enqueue(object : Callback<Void> {
+    fun modificarDepositos(depositoDTO: DepositoDTO, idDeposito: Long, idAlcancia: Long, callback: (DepositoDTO?, String?) -> Unit) {
+        depositoService.modificarDepositos(depositoDTO, idDeposito, idAlcancia).enqueue(object : Callback<DepositoDTO> {
+            override fun onResponse(call: Call<DepositoDTO>, response: Response<DepositoDTO>) {
+                if (response.isSuccessful) {
+                    callback(response.body(), null)
+                    } else {
+                    callback(null, "Error al modificar Alerta: ${response.code()}")
+                }
+                }
+            override fun onFailure(call: Call<DepositoDTO>, t: Throwable) {
+                callback(null, "Fallo en la conexión: ${t.message}")
+            }
+        })
+
+    }
+
+    fun eliminarDepositos(idDeposito: Long, idAlcanica: Long, callback: (Boolean, String?) -> Unit) {
+        depositoService.eliminarDepositos(idDeposito , idAlcanica).enqueue(object : Callback<Void> {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
                 if (response.isSuccessful) {
                     callback(true, null)
