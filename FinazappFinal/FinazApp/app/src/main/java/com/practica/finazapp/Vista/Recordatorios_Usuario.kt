@@ -138,82 +138,10 @@ class Recordatorios_Usuario : AppCompatActivity() , RecordatorioListener {
             // Construir el diálogo
             val dialog = AlertDialog.Builder(this)
                 .setView(dialogView)
-                .setPositiveButton("Guardar") { _, _ ->
-                    Log.d("Recordatorio", "Botón Guardar del diálogo presionado")
-                    // Recoger los valores ingresados
-                    val nombrerecordatorio = editTextNombre.text.toString().trim()
-                    val estado = spinnerEstado.selectedItem.toString().trim()
-                    val diasSeleccionado = spinnerDias.selectedItem.toString().trim()
-                    val fechaOriginal = editTextFecha.text.toString().trim()
-                    val limiteStr = editTextCantidad.text.toString().trim()
-
-                    Log.d(
-                        "Recordatorio",
-                        "Valores ingresados - Nombre: '$nombrerecordatorio', Estado: '$estado', " +
-                                "Días: '$diasSeleccionado', Fecha: '$fechaOriginal', Límite: '$limiteStr'"
-                    )
-
-                    // Validar que no haya campos vacíos
-                    if (nombrerecordatorio.isBlank() || fechaOriginal.isBlank() || limiteStr.isBlank()) {
-                        Log.e("Recordatorio", "Error: Se encontraron campos vacíos")
-                        Toast.makeText(
-                            this,
-                            "Por favor, llene todos los campos",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        return@setPositiveButton
-                    }
-
-                    // Validar el formato de la fecha
-                    val parts = fechaOriginal.split("/")
-                    if (parts.size < 3) {
-                        Log.e("Recordatorio", "Formato de fecha incorrecto: $fechaOriginal")
-                        Toast.makeText(this, "Formato de fecha incorrecto", Toast.LENGTH_SHORT)
-                            .show()
-                        return@setPositiveButton
-                    }
-                    val dia = parts[0].padStart(2, '0')
-                    val mes = parts[1].padStart(2, '0')
-                    val anio = parts[2]
-                    val fecha = "${anio}-${mes}-${dia}"
-                    Log.d("Recordatorio", "Fecha formateada: $fecha")
-
-                    // Convertir la opción de días a milisegundos
-                    val dias = when (diasSeleccionado) {
-                        "Cada 2 minutos" -> 2 * 60 * 1000L  // 2 minutos en milisegundos
-                        "Cada 3 minutos" -> 3 * 60 * 1000L  // 3 minutos en milisegundos
-                        "Cada 5 minutos" -> 5 * 60 * 1000L  // 5 minutos en milisegundos
-                        else -> {
-                            Log.e("Recordatorio", "Opción de días no reconocida: $diasSeleccionado")
-                            0L
-                        }
-                    }
-                    // Convertir el límite a Double, manejando posibles errores
-                    val valorDouble = try {
-                        limiteStr.toDouble().also {
-                            Log.d("Recordatorio", "Límite convertido a Double: $it")
-                        }
-                    } catch (e: NumberFormatException) {
-                        Log.e("Recordatorio", "Error al convertir límite a Double: $limiteStr", e)
-                        Toast.makeText(this, "Límite inválido", Toast.LENGTH_SHORT).show()
-                        return@setPositiveButton
-                    }
-
-                    // Crear el objeto RecordatorioDTO
-                    val nuevoRecordatorio = RecordatorioDTO(
-                        id_recordatorio = 0,
-                        nombre = nombrerecordatorio,
-                        estado = estado,
-                        dias_recordatorio = dias,
-                        valor = valorDouble,
-                        fecha = fecha
-                    )
-                    Log.d("Recordatorio", "RecordatorioDTO creado: $nuevoRecordatorio")
-
-                    // Registrar el recordatorio mediante el ViewModel
-                    recordatoriosViewModel.registrarRecordatorio(usuarioId, nuevoRecordatorio)
-                    Log.d("Recordatorio", "Recordatorio enviado al ViewModel para su registro")
-                }
+                .setPositiveButton(
+                    "Guardar",
+                    null
+                ) // Se asignará más tarde para no cerrar el diálogo automáticamente
                 .setNegativeButton("Cancelar") { dialog, _ ->
                     Log.d(
                         "Recordatorio",
@@ -226,6 +154,99 @@ class Recordatorios_Usuario : AppCompatActivity() , RecordatorioListener {
             // Mostrar el diálogo
             dialog.show()
             Log.d("Recordatorio", "Diálogo mostrado en pantalla")
+
+            // Sobrescribir el comportamiento del botón "Guardar"
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                Log.d("Recordatorio", "Botón Guardar del diálogo presionado")
+
+                // Recoger los valores ingresados
+                val nombrerecordatorio = editTextNombre.text.toString().trim()
+                val estado = spinnerEstado.selectedItem.toString().trim()
+                val diasSeleccionado = spinnerDias.selectedItem.toString().trim()
+                val fechaOriginal = editTextFecha.text.toString().trim()
+                val limiteStr = editTextCantidad.text.toString().trim()
+
+                Log.d(
+                    "Recordatorio",
+                    "Valores ingresados - Nombre: '$nombrerecordatorio', Estado: '$estado', " +
+                            "Días: '$diasSeleccionado', Fecha: '$fechaOriginal', Límite: '$limiteStr'"
+                )
+
+                // Validar que no haya campos vacíos
+                if (nombrerecordatorio.isBlank() || fechaOriginal.isBlank() || limiteStr.isBlank()) {
+                    Log.e("Recordatorio", "Error: Se encontraron campos vacíos")
+                    AlertDialog.Builder(this)
+                        .setTitle("Campos vacíos")
+                        .setMessage("Por favor, llene todos los campos antes de guardar.")
+                        .setPositiveButton("OK") { alertDialog, _ -> alertDialog.dismiss() }
+                        .create()
+                        .show()
+                    return@setOnClickListener
+                }
+
+                // Validar el formato de la fecha
+                val parts = fechaOriginal.split("/")
+                if (parts.size < 3) {
+                    Log.e("Recordatorio", "Formato de fecha incorrecto: $fechaOriginal")
+                    AlertDialog.Builder(this)
+                        .setTitle("Formato de fecha incorrecto")
+                        .setMessage("El formato de la fecha debe ser dd/MM/yyyy.")
+                        .setPositiveButton("OK") { alertDialog, _ -> alertDialog.dismiss() }
+                        .create()
+                        .show()
+                    return@setOnClickListener
+                }
+                val dia = parts[0].padStart(2, '0')
+                val mes = parts[1].padStart(2, '0')
+                val anio = parts[2]
+                val fecha = "${anio}-${mes}-${dia}"
+                Log.d("Recordatorio", "Fecha formateada: $fecha")
+
+                // Convertir la opción de días a milisegundos
+                val dias = when (diasSeleccionado) {
+                    "Cada 2 minutos" -> 2 * 60 * 1000L  // 2 minutos en milisegundos
+                    "Cada 3 minutos" -> 3 * 60 * 1000L  // 3 minutos en milisegundos
+                    "Cada 5 minutos" -> 5 * 60 * 1000L  // 5 minutos en milisegundos
+                    else -> {
+                        Log.e("Recordatorio", "Opción de días no reconocida: $diasSeleccionado")
+                        0L
+                    }
+                }
+
+                // Convertir el límite a Double, manejando posibles errores
+                val valorDouble = try {
+                    limiteStr.toDouble().also {
+                        Log.d("Recordatorio", "Límite convertido a Double: $it")
+                    }
+                } catch (e: NumberFormatException) {
+                    Log.e("Recordatorio", "Error al convertir límite a Double: $limiteStr", e)
+                    AlertDialog.Builder(this)
+                        .setTitle("Límite inválido")
+                        .setMessage("Ingrese un valor numérico válido para el límite.")
+                        .setPositiveButton("OK") { alertDialog, _ -> alertDialog.dismiss() }
+                        .create()
+                        .show()
+                    return@setOnClickListener
+                }
+
+                // Crear el objeto RecordatorioDTO
+                val nuevoRecordatorio = RecordatorioDTO(
+                    id_recordatorio = 0,
+                    nombre = nombrerecordatorio,
+                    estado = estado,
+                    dias_recordatorio = dias,
+                    valor = valorDouble,
+                    fecha = fecha
+                )
+                Log.d("Recordatorio", "RecordatorioDTO creado: $nuevoRecordatorio")
+
+                // Registrar el recordatorio mediante el ViewModel
+                recordatoriosViewModel.registrarRecordatorio(usuarioId, nuevoRecordatorio)
+                Log.d("Recordatorio", "Recordatorio enviado al ViewModel para su registro")
+
+                // Cerrar el diálogo después de guardar
+                dialog.dismiss()
+            }
         }
     }
 

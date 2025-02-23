@@ -17,7 +17,7 @@
 
     <!-- Campo para el monto -->
     <com.google.android.material.textfield.TextInputEditText
-        android:id="@+id/editTextMontoModificar"
+        android:id="@+id/editTextMonto"
         style="@style/EstiloEditText"
         android:layout_width="match_parent"
         android:layout_height="45dp"
@@ -29,7 +29,7 @@
 
     <!-- Campo para el nombre del depositante -->
     <com.google.android.material.textfield.TextInputEditText
-        android:id="@+id/editTextNombreDepositanteModificar"
+        android:id="@+id/editTextNombreDepositante"
         style="@style/EstiloEditText"
         android:layout_width="match_parent"
         android:layout_height="45dp"
@@ -41,7 +41,7 @@
 
     <!-- Campo para la fecha -->
     <EditText
-        android:id="@+id/editTextFechaModificar"
+        android:id="@+id/editTextFecha"
         android:layout_width="match_parent"
         android:layout_height="45dp"
         android:hint="Fecha"

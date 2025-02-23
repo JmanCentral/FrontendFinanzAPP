@@ -13,7 +13,7 @@ import retrofit2.Response
 class UserRepository (context: Context) {
 
     private val usuarioService: UsuarioService by lazy {
-        Cliente.getCliente("http://100.108.80.90:8862/Finanzapp/", context)
+        Cliente.getCliente("http://100.115.249.2:8862/Finanzapp/", context)
             .create(UsuarioService::class.java)
     }
 

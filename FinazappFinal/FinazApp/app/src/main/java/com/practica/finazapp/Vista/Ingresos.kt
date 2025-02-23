@@ -86,44 +86,61 @@ class Ingresos : Fragment(), IngresosListener {
 
             val dialog = AlertDialog.Builder(requireContext())
                 .setView(dialogView)
-                .setPositiveButton("Guardar") { _, _ ->
-
-                    val cantidad = editTextCantidad.text.toString()
-                    val fechaOriginal = editTextFecha.text.toString()
-                    val descripcion = editTextDescripcion.text.toString()
-
-                    if (cantidad.isBlank() || fechaOriginal.isBlank() || descripcion.isBlank()) {
-                        Toast.makeText(
-                            requireContext(),
-                            "Por favor, llene todos los campos",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        return@setPositiveButton
-                    }
-
-                    val parts = fechaOriginal.split("/")
-                    val dia = parts[0].padStart(2, '0')
-                    val mes = parts[1].padStart(2, '0')
-                    val anio = parts[2]
-                    val fecha = "${anio}-${mes}-${dia}"
-
-                        val nuevoIngreso = IngresoDTO(
-                            id_ingreso = 0,
-                            nombre_ingreso = descripcion,
-                            valor = cantidad.toDouble(),
-                            fecha = fecha,
-                            tipo_ingreso = "casual"
-                        )
-
-                        ingresoViewModel.registrarIngreso(usuarioId, nuevoIngreso)
-
-                }
-                .setNegativeButton("Cancelar") { dialog, _ ->
-                    dialog.dismiss()
-                }
+                .setPositiveButton("Guardar", null) // Se asignará más tarde para no cerrar el diálogo automáticamente
+                .setNegativeButton("Cancelar") { dialog, _ -> dialog.dismiss() }
                 .create()
 
             dialog.show()
+
+            // Sobrescribir el comportamiento del botón "Guardar"
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                val cantidad = editTextCantidad.text.toString()
+                val fechaOriginal = editTextFecha.text.toString()
+                val descripcion = editTextDescripcion.text.toString()
+
+                if (cantidad.isBlank() || fechaOriginal.isBlank() || descripcion.isBlank()) {
+                    // Mostrar alerta sin cerrar el diálogo principal
+                    AlertDialog.Builder(requireContext())
+                        .setTitle("Campos vacíos")
+                        .setMessage("Por favor, llene todos los campos antes de guardar.")
+                        .setPositiveButton("OK") { alertDialog, _ -> alertDialog.dismiss() }
+                        .create()
+                        .show()
+                    return@setOnClickListener
+                }
+
+                val cantidadValor = cantidad.toDoubleOrNull()
+                if (cantidadValor == null) {
+                    // Mostrar alerta si la cantidad no es válida
+                    AlertDialog.Builder(requireContext())
+                        .setTitle("Cantidad inválida")
+                        .setMessage("Ingrese una cantidad numérica válida.")
+                        .setPositiveButton("OK") { alertDialog, _ -> alertDialog.dismiss() }
+                        .create()
+                        .show()
+                    return@setOnClickListener
+                }
+
+                // Formatear la fecha
+                val parts = fechaOriginal.split("/")
+                val dia = parts[0].padStart(2, '0')
+                val mes = parts[1].padStart(2, '0')
+                val anio = parts[2]
+                val fecha = "${anio}-${mes}-${dia}"
+
+                // Crear el nuevo ingreso
+                val nuevoIngreso = IngresoDTO(
+                    id_ingreso = 0,
+                    nombre_ingreso = descripcion,
+                    valor = cantidadValor,
+                    fecha = fecha,
+                    tipo_ingreso = "casual"
+                )
+
+                // Registrar el ingreso
+                ingresoViewModel.registrarIngreso(usuarioId, nuevoIngreso)
+                dialog.dismiss() // Cerrar el diálogo principal después del guardado exitoso
+            }
         }
 
 
@@ -139,51 +156,62 @@ class Ingresos : Fragment(), IngresosListener {
 
             val dialog = AlertDialog.Builder(requireContext())
                 .setView(dialogView)
-                .setPositiveButton("Guardar") { _, _ ->
-
-                    val cantidadText = editTextCantidad.text.toString()
-                    val fechaOriginal = editTextFecha.text.toString()
-                    val descripcion = editTextDescripcion.text.toString()
-
-                    // Validación de campos vacíos
-                    if (cantidadText.isBlank() || fechaOriginal.isBlank() || descripcion.isBlank()) {
-                        Toast.makeText(requireContext(), "Por favor, llene todos los campos", Toast.LENGTH_SHORT).show()
-                        return@setPositiveButton
-                    }
-
-                    val cantidad = cantidadText.toDoubleOrNull()
-                    if (cantidad == null) {
-                        Toast.makeText(requireContext(), "Cantidad inválida", Toast.LENGTH_SHORT).show()
-                        return@setPositiveButton
-                    }
-
-
-                        val parts = fechaOriginal.split("/")
-                        val dia = parts[0].padStart(2, '0')
-                        val mes = parts[1].padStart(2, '0')
-                        val anio = parts[2]
-                        val fecha = "${anio}-${mes}-${dia}"
-
-                        val nuevoIngreso = IngresoDTO(
-                            id_ingreso = 0,
-                            nombre_ingreso = descripcion,
-                            valor = cantidad,
-                            fecha = fecha,
-                            tipo_ingreso = "mensual"
-                        )
-
-                        // Obtener el idUsuario desde el SharedViewModel
-
-                            ingresoViewModel.registrarIngreso(usuarioId, nuevoIngreso)
-
-
-                }
-                .setNegativeButton("Cancelar") { dialog, _ ->
-                    dialog.dismiss()
-                }
+                .setPositiveButton("Guardar", null) // Se asignará más tarde para no cerrar el diálogo automáticamente
+                .setNegativeButton("Cancelar") { dialog, _ -> dialog.dismiss() }
                 .create()
 
             dialog.show()
+
+            // Sobrescribir el comportamiento del botón "Guardar"
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                val cantidadText = editTextCantidad.text.toString()
+                val fechaOriginal = editTextFecha.text.toString()
+                val descripcion = editTextDescripcion.text.toString()
+
+                // Validación de campos vacíos
+                if (cantidadText.isBlank() || fechaOriginal.isBlank() || descripcion.isBlank()) {
+                    // Mostrar alerta sin cerrar el diálogo principal
+                    AlertDialog.Builder(requireContext())
+                        .setTitle("Campos vacíos")
+                        .setMessage("Por favor, llene todos los campos antes de guardar.")
+                        .setPositiveButton("OK") { alertDialog, _ -> alertDialog.dismiss() }
+                        .create()
+                        .show()
+                    return@setOnClickListener
+                }
+
+                val cantidad = cantidadText.toDoubleOrNull()
+                if (cantidad == null) {
+                    // Mostrar alerta si la cantidad no es válida
+                    AlertDialog.Builder(requireContext())
+                        .setTitle("Cantidad inválida")
+                        .setMessage("Ingrese una cantidad numérica válida.")
+                        .setPositiveButton("OK") { alertDialog, _ -> alertDialog.dismiss() }
+                        .create()
+                        .show()
+                    return@setOnClickListener
+                }
+
+                // Formatear la fecha
+                val parts = fechaOriginal.split("/")
+                val dia = parts[0].padStart(2, '0')
+                val mes = parts[1].padStart(2, '0')
+                val anio = parts[2]
+                val fecha = "${anio}-${mes}-${dia}"
+
+                // Crear el nuevo ingreso
+                val nuevoIngreso = IngresoDTO(
+                    id_ingreso = 0,
+                    nombre_ingreso = descripcion,
+                    valor = cantidad,
+                    fecha = fecha,
+                    tipo_ingreso = "mensual"
+                )
+
+                // Registrar el ingreso
+                ingresoViewModel.registrarIngreso(usuarioId, nuevoIngreso)
+                dialog.dismiss() // Cerrar el diálogo principal después del guardado exitoso
+            }
         }
 
     }
@@ -293,43 +321,14 @@ class Ingresos : Fragment(), IngresosListener {
                     val editTextCantidad = dialogView.findViewById<TextInputEditText>(R.id.editTextCantidad)
                     val editTextFecha = dialogView.findViewById<EditText>(R.id.editTextFecha)
                     val btnEliminarIngreso = dialogView.findViewById<Button>(R.id.btnEliminarIngreso)
+
                     val dialogModificarIngreso = AlertDialog.Builder(requireContext())
                         .setView(dialogView)
-                        .setPositiveButton("Aceptar") { dialog, _ ->
-                            val cantidad = editTextCantidad.text.toString()
-                            val fecha = editTextFecha.text.toString()
-                            if (cantidad.isBlank() || fecha.isBlank()) {
-                                Toast.makeText(requireContext(), "Por favor, llene todos los campos", Toast.LENGTH_SHORT).show()
-                                return@setPositiveButton
-                            }
-                            val parts = fecha.split("/")
-                            val dia = parts[0].padStart(2, '0')
-                            val mes = parts[1].padStart(2, '0')
-                            val anio = parts[2]
-                            val fechaFormateada = "${anio}-${mes}-${dia}"
-
-                            // Crear un nuevo objeto de ingreso con los valores actualizados
-                            val ingresoModificado = ingreso.copy(
-                                valor = cantidad.toDouble(),  // Modificar solo la cantidad
-                                fecha = fechaFormateada       // Modificar solo la fecha
-                            )
-
-                            // Llamar a la función que actualiza el ingreso con el id y el nuevo objeto
-                            lifecycleScope.launch {
-                                withContext(Dispatchers.IO) {
-                                    ingresoViewModel.modificarIngreso(idIngreso = ingreso.id_ingreso, ingresoDTO = ingresoModificado)
-
-                                }
-
-                            }
-
-
-                            dialog.dismiss()
-                        }
+                        .setPositiveButton("Aceptar", null) // Se asignará más tarde para no cerrar el diálogo automáticamente
                         .setNegativeButton("Cancelar") { dialog, _ -> dialog.dismiss() }
                         .create()
 
-                    textViewTitulo.setText("modificar ingreso ${ingreso.nombre_ingreso}")
+                    textViewTitulo.setText("Modificar ingreso ${ingreso.nombre_ingreso}")
 
                     val fecha = ingreso.fecha
                     val parts = fecha.split("-")
@@ -340,18 +339,67 @@ class Ingresos : Fragment(), IngresosListener {
                     editTextFecha.setOnClickListener {
                         showDatePickerDialog(editTextFecha)
                     }
+
                     btnEliminarIngreso.setOnClickListener {
                         lifecycleScope.launch {
                             withContext(Dispatchers.IO) {
-
                                 ingresoViewModel.eliminarIngreso(ingreso.id_ingreso)
-
                             }
-
                         }
                         dialogModificarIngreso.dismiss()
                     }
+
                     dialogModificarIngreso.show()
+
+                    // Sobrescribir el comportamiento del botón "Aceptar"
+                    dialogModificarIngreso.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                        val cantidad = editTextCantidad.text.toString()
+                        val fecha = editTextFecha.text.toString()
+
+                        if (cantidad.isBlank() || fecha.isBlank()) {
+                            // Mostrar alerta sin cerrar el diálogo principal
+                            AlertDialog.Builder(requireContext())
+                                .setTitle("Campos vacíos")
+                                .setMessage("Por favor, llene todos los campos antes de guardar.")
+                                .setPositiveButton("OK") { alertDialog, _ -> alertDialog.dismiss() }
+                                .create()
+                                .show()
+                            return@setOnClickListener
+                        }
+
+                        val cantidadValor = cantidad.toDoubleOrNull()
+                        if (cantidadValor == null) {
+                            // Mostrar alerta si la cantidad no es válida
+                            AlertDialog.Builder(requireContext())
+                                .setTitle("Cantidad inválida")
+                                .setMessage("Ingrese una cantidad numérica válida.")
+                                .setPositiveButton("OK") { alertDialog, _ -> alertDialog.dismiss() }
+                                .create()
+                                .show()
+                            return@setOnClickListener
+                        }
+
+                        // Formatear la fecha
+                        val partsFecha = fecha.split("/")
+                        val dia = partsFecha[0].padStart(2, '0')
+                        val mes = partsFecha[1].padStart(2, '0')
+                        val anio = partsFecha[2]
+                        val fechaFormateadaModificada = "${anio}-${mes}-${dia}"
+
+                        // Crear el nuevo ingreso modificado
+                        val ingresoModificado = ingreso.copy(
+                            valor = cantidadValor,
+                            fecha = fechaFormateadaModificada
+                        )
+
+                        // Modificar el ingreso
+                        lifecycleScope.launch {
+                            withContext(Dispatchers.IO) {
+                                ingresoViewModel.modificarIngreso(idIngreso = ingreso.id_ingreso, ingresoDTO = ingresoModificado)
+                            }
+                        }
+                        dialogModificarIngreso.dismiss() // Cerrar el diálogo principal después del guardado exitoso
+                    }
                 }
             }
 

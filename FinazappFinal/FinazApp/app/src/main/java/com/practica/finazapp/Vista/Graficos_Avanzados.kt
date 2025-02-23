@@ -115,36 +115,7 @@ class Graficos_Avanzados : Fragment(), AlcanciaListener {
         val dialog = AlertDialog.Builder(requireContext())
             .setTitle("Registrar Alcancía")
             .setView(dialogView)
-            .setPositiveButton("Guardar") { _, _ ->
-                val nombreAlcancia = dialogView.findViewById<TextInputEditText>(R.id.editTextNombreAlcancia).text.toString()
-                val meta = dialogView.findViewById<TextInputEditText>(R.id.editTextMeta).text.toString().toDoubleOrNull() ?: 0.0
-                val saldoActual = dialogView.findViewById<TextInputEditText>(R.id.editTextSaldoActual).text.toString().toDoubleOrNull() ?: 0.0
-                val codigo = dialogView.findViewById<TextInputEditText>(R.id.editTextCodigo).text.toString()
-                val fechaCreacion = editTextFechaCreacion.text.toString()
-
-                if (nombreAlcancia.isNotEmpty()  && fechaCreacion.isNotEmpty()) {
-
-                    val parts = fechaCreacion.split("/")
-                    val dia = parts[0].padStart(2, '0')
-                    val mes = parts[1].padStart(2, '0')
-                    val anio = parts[2]
-                    val fechaoriginal = "${anio}-${mes}-${dia}"
-
-                    val alcanciaDTO = AlcanciaDTO(
-                        idAlcancia = 0,
-                        nombre_alcancia = nombreAlcancia,
-                        meta = meta,
-                        saldoActual = saldoActual,
-                        codigo = codigo,
-                        fechaCreacion = fechaoriginal
-                    )
-
-                    alcanciaViewModel.registrarAlcancia(alcanciaDTO, usuarioId)
-                    Toast.makeText(requireContext(), "Alcancía registrada correctamente", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(requireContext(), "Por favor, complete todos los campos", Toast.LENGTH_SHORT).show()
-                }
-            }
+            .setPositiveButton("Guardar", null) // Se asignará más tarde para no cerrar el diálogo automáticamente
             .setNegativeButton("Cancelar") { dialog, _ ->
                 dialog.dismiss()
             }
@@ -156,6 +127,59 @@ class Graficos_Avanzados : Fragment(), AlcanciaListener {
         }
 
         dialog.show()
+
+        // Sobrescribir el comportamiento del botón "Guardar"
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+            val nombreAlcancia = dialogView.findViewById<TextInputEditText>(R.id.editTextNombreAlcancia).text.toString()
+            val meta = dialogView.findViewById<TextInputEditText>(R.id.editTextMeta).text.toString().toDoubleOrNull() ?: 0.0
+            val saldoActual = dialogView.findViewById<TextInputEditText>(R.id.editTextSaldoActual).text.toString().toDoubleOrNull() ?: 0.0
+            val codigo = dialogView.findViewById<TextInputEditText>(R.id.editTextCodigo).text.toString()
+            val fechaCreacion = editTextFechaCreacion.text.toString()
+
+            if (nombreAlcancia.isEmpty() || fechaCreacion.isEmpty()) {
+                // Mostrar alerta sin cerrar el diálogo principal
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Campos vacíos")
+                    .setMessage("Por favor, complete todos los campos antes de guardar.")
+                    .setPositiveButton("OK") { alertDialog, _ -> alertDialog.dismiss() }
+                    .create()
+                    .show()
+                return@setOnClickListener
+            }
+
+            // Validar el formato de la fecha
+            val parts = fechaCreacion.split("/")
+            if (parts.size < 3) {
+                // Mostrar alerta si el formato de la fecha es incorrecto
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Formato de fecha incorrecto")
+                    .setMessage("El formato de la fecha debe ser dd/MM/yyyy.")
+                    .setPositiveButton("OK") { alertDialog, _ -> alertDialog.dismiss() }
+                    .create()
+                    .show()
+                return@setOnClickListener
+            }
+
+            val dia = parts[0].padStart(2, '0')
+            val mes = parts[1].padStart(2, '0')
+            val anio = parts[2]
+            val fechaoriginal = "${anio}-${mes}-${dia}"
+
+            // Crear el objeto AlcanciaDTO
+            val alcanciaDTO = AlcanciaDTO(
+                idAlcancia = 0,
+                nombre_alcancia = nombreAlcancia,
+                meta = meta,
+                saldoActual = saldoActual,
+                codigo = codigo,
+                fechaCreacion = fechaoriginal
+            )
+
+            // Registrar la alcancía
+            alcanciaViewModel.registrarAlcancia(alcanciaDTO, usuarioId)
+            Toast.makeText(requireContext(), "Alcancía registrada correctamente", Toast.LENGTH_SHORT).show()
+            dialog.dismiss() // Cerrar el diálogo principal después del guardado exitoso
+        }
     }
 
     private fun showDatePickerDialog(editTextFecha: EditText) {

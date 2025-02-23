@@ -180,17 +180,13 @@ class DashboardFragment : Fragment() {
             ingresoViewModel.obtenerTotalIngresos(usuarioId)
             ingresoViewModel.totalIngresosLiveData.observeOnce(viewLifecycleOwner) { totalIngresos ->
                 if (totalIngresos == null || totalIngresos == 0.0) {
-                    // No hay ingresos registrados, mostrar un mensaje y evitar el registro de gastos
                     val builder = AlertDialog.Builder(requireContext())
                     builder.setTitle("Aviso")
-                    builder.setMessage("Debe poner ingresos antes de registrar un gasto.")
-                    builder.setPositiveButton("OK") { dialog, _ ->
-                        dialog.dismiss()
-                    }
-                    builder.create().show()
-
+                        .setMessage("Debe poner ingresos antes de registrar un gasto.")
+                        .setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
+                        .create()
+                        .show()
                 } else {
-
                     val dialogView = layoutInflater.inflate(R.layout.dialog_nuevo_gasto, null)
                     val spinnerCategoria = dialogView.findViewById<Spinner>(R.id.spinnerCategoria)
                     val items = resources.getStringArray(R.array.categorias).toList()
@@ -198,8 +194,7 @@ class DashboardFragment : Fragment() {
                     spinnerCategoria.adapter = adapter
                     val editTextCantidad = dialogView.findViewById<EditText>(R.id.editTextCantidad)
                     val editTextFecha = dialogView.findViewById<EditText>(R.id.editTextFecha)
-                    val editTextDescripcion =
-                        dialogView.findViewById<EditText>(R.id.editTextDescripcion)
+                    val editTextDescripcion = dialogView.findViewById<EditText>(R.id.editTextDescripcion)
 
                     editTextFecha.setOnClickListener {
                         showDatePickerDialog(editTextFecha)
@@ -207,57 +202,56 @@ class DashboardFragment : Fragment() {
 
                     val dialog = AlertDialog.Builder(requireContext())
                         .setView(dialogView)
-                        .setPositiveButton("Guardar") { dialog, _ ->
-                            val categoria = spinnerCategoria.selectedItem.toString()
-                            val cantidad = editTextCantidad.text.toString()
-                            val fechaOriginal = editTextFecha.text.toString()
-                            val descripcion = editTextDescripcion.text.toString()
-
-                            // Validar que los campos obligatorios no estén vacíos
-                            if (categoria.isNotBlank() && cantidad.isNotBlank() && fechaOriginal.isNotBlank() && descripcion.isNotBlank()) {
-                                try {
-                                    // Validar que la cantidad sea un número válido
-                                    val valor = cantidad.toDouble()
-
-                                    // Realizar la conversión de fecha y guardar el nuevo gasto
-                                    val parts = fechaOriginal.split("/")
-                                    val dia = parts[0].padStart(2, '0')
-                                    val mes = parts[1].padStart(2, '0')
-                                    val anio = parts[2]
-                                    val fecha = "${anio}-${mes}-${dia}"
-                                    val nuevoGasto = GastoDTO(
-                                        id_gasto = 0,
-                                        categoria = categoria,
-                                        fecha = fecha,
-                                        valor = valor,
-                                        nombre_gasto = descripcion
-                                    )
-
-                                    gastosViewModel.registrarGasto(usuarioId,nuevoGasto)
-                                    verificarAlertasExcedidas()
-                                } catch (e: NumberFormatException) {
-                                    // Manejar el caso en que la cantidad no sea un número válido
-                                    Toast.makeText(
-                                        requireContext(),
-                                        "La cantidad ingresada no es válida",
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-                            } else {
-                                // Mostrar un mensaje de error si algún campo obligatorio está vacío
-                                Toast.makeText(
-                                    requireContext(),
-                                    "Por favor complete todos los campos",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                        }
-                        .setNegativeButton("Cancelar") { dialog, _ ->
-                            dialog.dismiss()
-                        }
+                        .setPositiveButton("Guardar", null) // Se asignará más tarde para no cerrar el diálogo automáticamente
+                        .setNegativeButton("Cancelar") { dialog, _ -> dialog.dismiss() }
                         .create()
 
                     dialog.show()
+
+                    // Sobrescribir el comportamiento del botón "Guardar"
+                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                        val categoria = spinnerCategoria.selectedItem.toString()
+                        val cantidad = editTextCantidad.text.toString()
+                        val fechaOriginal = editTextFecha.text.toString()
+                        val descripcion = editTextDescripcion.text.toString()
+
+                        if (categoria.isBlank() || cantidad.isBlank() || fechaOriginal.isBlank() || descripcion.isBlank()) {
+                            // Mostrar alerta sin cerrar el diálogo principal
+                            AlertDialog.Builder(requireContext())
+                                .setTitle("Campos vacíos")
+                                .setMessage("Por favor complete todos los campos antes de guardar.")
+                                .setPositiveButton("OK") { alertDialog, _ -> alertDialog.dismiss() }
+                                .create()
+                                .show()
+                        } else {
+                            try {
+                                val valor = cantidad.toDouble()
+                                val parts = fechaOriginal.split("/")
+                                val dia = parts[0].padStart(2, '0')
+                                val mes = parts[1].padStart(2, '0')
+                                val anio = parts[2]
+                                val fecha = "$anio-$mes-$dia"
+                                val nuevoGasto = GastoDTO(
+                                    id_gasto = 0,
+                                    categoria = categoria,
+                                    fecha = fecha,
+                                    valor = valor,
+                                    nombre_gasto = descripcion
+                                )
+
+                                gastosViewModel.registrarGasto(usuarioId, nuevoGasto)
+                                verificarAlertasExcedidas()
+                                dialog.dismiss() // Cerrar el diálogo principal después del guardado exitoso
+                            } catch (e: NumberFormatException) {
+                                AlertDialog.Builder(requireContext())
+                                    .setTitle("Cantidad inválida")
+                                    .setMessage("Ingrese una cantidad numérica válida.")
+                                    .setPositiveButton("OK") { alertDialog, _ -> alertDialog.dismiss() }
+                                    .create()
+                                    .show()
+                            }
+                        }
+                    }
                 }
             }
         }
