@@ -75,6 +75,7 @@ dependencies {
     implementation("androidx.activity:activity:1.9.2")
     implementation("androidx.work:work-runtime-ktx:2.9.1")
     implementation ("com.google.firebase:firebase-messaging:23.2.1")
+    implementation ("com.airbnb.android:lottie:6.1.0")
     val room_version = "2.6.1"
     implementation("androidx.room:room-runtime:$room_version")
     implementation("androidx.core:core-splashscreen:1.0.1")
