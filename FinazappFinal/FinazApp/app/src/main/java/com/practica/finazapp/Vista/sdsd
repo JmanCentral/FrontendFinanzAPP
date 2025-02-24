@@ -1,5 +1,12 @@
 package com.practica.finazapp.Vista
 
+
+
+ <style name="AppTheme" parent="Theme.MaterialComponents.Light.DarkActionBar">
+        <item name="android:fontFamily">@font/mi_fuente</item>
+    </style>
+
+
 import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.app.DatePickerDialog

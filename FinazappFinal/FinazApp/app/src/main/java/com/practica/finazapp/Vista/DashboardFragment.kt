@@ -30,6 +30,7 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
+import com.airbnb.lottie.LottieAnimationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.practica.finazapp.Entidades.GastoDTO
 import com.practica.finazapp.Notificaciones.NotificationHelper
@@ -75,13 +76,11 @@ class DashboardFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
 
-        // Obtener la referencia del ImageView correctamente
-        val miImagen = view.findViewById<ImageView>(R.id.campana)
+        val lottieCampana = view.findViewById<LottieAnimationView>(R.id.lottieCampana)
 
-        miImagen?.setOnClickListener {
-            Recordatorios()
+        lottieCampana.setOnClickListener {
+                Recordatorios()
         }
-
 
         // Registrar un OnBackPressedCallback
         val callback: OnBackPressedCallback = object : OnBackPressedCallback(true) {
@@ -129,11 +128,13 @@ class DashboardFragment : Fragment() {
                 val bloqueMercado = binding.bloqueMercado
                 val bloqueServicios = binding.bloqueServicios
                 val bloqueAlimentos = binding.bloqueAlimentos
+                val bloqueDeudas = binding.bloqueDeudas
                 val recyclrerViewTransporte = binding.recyclerViewTransporte
                 val recyclrerViewGastosVarios = binding.recyclerViewGastosVarios
                 val recyclrerViewMercado = binding.recyclerViewMercado
                 val recyclrerViewServicios = binding.recyclerViewServicios
                 val recyclrerViewAlimentos = binding.recyclerViewAlimentos
+                val recyclrerViewDeudas = binding.recyclerViewDeudas
 
                 Log.d("FragmentGastos", "Configurando listeners para los bloques de gastos")
 
@@ -160,6 +161,11 @@ class DashboardFragment : Fragment() {
                 bloqueGastosVarios.setOnClickListener {
                     Log.d("FragmentGastos", "Clic en bloque Gastos Varios")
                     mostrarListaDeGastos(recyclrerViewGastosVarios, "Gastos Hormiga")
+                }
+
+                bloqueDeudas.setOnClickListener {
+                    Log.d("FragmentGastos", "Clic en bloque Deudas")
+                    mostrarListaDeGastos(recyclrerViewDeudas, "Deudas")
                 }
 
             } ?: run {
@@ -459,6 +465,21 @@ class DashboardFragment : Fragment() {
                 }
             }
 
+        gastosViewModel.obtenerValorGastosMesCategoriaDeudas(usuarioId, "Deudas")
+        gastosViewModel.valorGastosMesCategoriaLiveDataDeudas
+            .observe(viewLifecycleOwner) { cantidad ->
+                if (cantidad != null) {
+                    val numberFormat = NumberFormat.getInstance()
+                    numberFormat.maximumFractionDigits = 2
+                    val cantidadCategoria = cantidad
+                    val MercadoTextView = binding.cantidadDeudas
+                    MercadoTextView.setText("${numberFormat.format(cantidadCategoria)}$")
+                    val barraMercado = binding.barraDeudas
+                    cargarBarra(cantidadCategoria, barraMercado)
+                }
+            }
+
+
         gastosViewModel.obtenerValorGastosMes(usuarioId)
         depositoViewModel.obtenerValorGastosMesDeposito(usuarioId)
 
@@ -556,6 +577,17 @@ class DashboardFragment : Fragment() {
                     val porcentajeMercado = (cantidadMercado / ingresoMensual) * 100
                     if (porcentajeMercado > obtenerLimitePorCategoria("Mercado", ingresoMensual)) {
                         mostrarAdvertencia("Mercado", porcentajeMercado)
+                    }
+                }
+            }
+
+        gastosViewModel.obtenerValorGastosMesCategoriaDeudas(usuarioId, "Deudas")
+        gastosViewModel.valorGastosMesCategoriaLiveDataDeudas
+            .observeOnce(viewLifecycleOwner) { cantidadDeuda ->
+                cantidadDeuda?.let {
+                    val porcentajeMercado = (cantidadDeuda / ingresoMensual) * 100
+                    if (porcentajeMercado > obtenerLimitePorCategoria("Deudas", ingresoMensual)) {
+                        mostrarAdvertencia("Deudas", porcentajeMercado)
                     }
                 }
             }
@@ -723,6 +755,7 @@ class DashboardFragment : Fragment() {
     private var transporte: Float = 0f
     private var servicios: Float = 0f
     private var mercado: Float = 0f
+    private var deudas: Float = 0f
     private var deposito: Float = 0f
 
     private fun cargarDona() {
@@ -764,6 +797,13 @@ class DashboardFragment : Fragment() {
             actualizarGrafico()
         }
 
+        gastosViewModel.obtenerValorGastosMesCategoriaDeudas(usuarioId, "Deudas")
+        gastosViewModel.valorGastosMesCategoriaLiveDataDeudas.observe(viewLifecycleOwner) { valor ->
+            deudas = (valor ?: 0f).toFloat()
+            actualizarGrafico()
+        }
+
+
         depositoViewModel.obtenerValorGastosMesDeposito(usuarioId)
         depositoViewModel.valorGastosMesDepositoLiveData.observe(viewLifecycleOwner) { valor ->
             deposito = (valor ?: 0f).toFloat()
@@ -782,6 +822,7 @@ class DashboardFragment : Fragment() {
         if (transporte > 0) pieData.add(SliceValue(transporte, obtenerColorCategoria("Transporte")))
         if (servicios > 0) pieData.add(SliceValue(servicios, obtenerColorCategoria("Servicios")))
         if (mercado > 0) pieData.add(SliceValue(mercado, obtenerColorCategoria("Mercado")))
+        if (deudas > 0) pieData.add(SliceValue(deudas, obtenerColorCategoria("Deudas")))
         if (disponible1 > 0) pieData.add(SliceValue(disponible1, obtenerColorCategoria("disponible")))
         if (deposito > 0) pieData.add(SliceValue(deposito, obtenerColorCategoria("Deposito")))
 
@@ -808,6 +849,7 @@ class DashboardFragment : Fragment() {
             "Transporte" to "#339AF0",
             "Servicios" to "#EEB62B",
             "Mercado" to "#FD8435",
+            "Deudas" to "#00B8B3",
             "Deposito" to "#001A41"
         )
         val color = Color1.parseColor(categoriasColores[categoria])

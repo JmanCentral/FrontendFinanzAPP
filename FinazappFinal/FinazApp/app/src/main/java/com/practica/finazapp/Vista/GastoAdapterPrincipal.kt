@@ -46,6 +46,7 @@ class GastoAdapterPrincipal(private val gastos: List<GastoDTO>) :
             "Servicios" -> R.drawable.servicios
             "Gastos Hormiga" -> R.drawable.hormiga
             "Mercado" -> R.drawable.mercado
+            "Deudas" -> R.drawable.deudis
             else -> {
                 // Manejar otras categorías si es necesario
                 R.drawable.savings_24dp_321d71
@@ -73,8 +74,6 @@ class GastoAdapterPrincipal(private val gastos: List<GastoDTO>) :
         val cv: View = itemView.findViewById(R.id.cv)
         val categoriaImageView: ImageView = itemView.findViewById(R.id.iconImageView)
 
-
     }
-
 
 }

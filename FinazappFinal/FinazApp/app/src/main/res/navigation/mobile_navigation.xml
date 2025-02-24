@@ -33,10 +33,10 @@
         android:label="Alcancias"
         tools:layout="@layout/fragment_graficos__avanzados" />
     <fragment
-        android:id="@+id/fragmentCategorias"
-        android:name="com.practica.finazapp.Vista.FragmentCategorias"
-        android:label="fragment_categorias"
-        tools:layout="@layout/fragment_categorias" />
+        android:id="@+id/nav_perfil"
+        android:name="com.practica.finazapp.Vista.Perfil"
+        android:label="Consejos"
+        tools:layout="@layout/fragment_perfil" />
     <fragment
         android:id="@+id/gastosAltos"
         android:name="com.practica.finazapp.Vista.GastosAltos"

@@ -70,6 +70,10 @@ class ListaGastos : AppCompatActivity(), OnItemClickListener2 {
 
     }
 
+    override fun onBackPressed() {
+        // No hagas nada para bloquear el botón atrás
+    }
+
     private fun ObtenerGastos() {
         usuarioId = intent.getLongExtra("usuarioId", -1)
         val categoria = intent.getStringExtra("categoria") ?: ""

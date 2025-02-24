@@ -53,7 +53,8 @@ class Recurrente : AppCompatActivity()  {
         }
     }
 
-
-
-
+    override fun onBackPressed() {
+        // No hagas nada para bloquear el botón atrás
+    }
+    
 }

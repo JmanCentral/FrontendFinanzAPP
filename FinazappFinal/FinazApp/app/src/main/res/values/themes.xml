@@ -153,11 +153,16 @@
     </style>
 
     <style name="EstiloEditText">
-        <item name="android:textSize">20sp</item>
+        <item name="android:textSize">15sp</item>
         <item name="android:textStyle">italic</item>
-        <item name="android:textColor">@color/texto2</item>
+        <item name="android:textColor">@color/amarillo_oscuro</item>
         <item name="hintAnimationEnabled">false</item>
     </style>
+
+    <style name="Theme.MiApp" parent="Theme.MaterialComponents.Light.DarkActionBar">
+        <item name="android:fontFamily">@font/amaranth</item>
+    </style>
+
 
 
     <style name="Theme.NavigationDrawer" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
@@ -201,12 +206,15 @@
     <!-- Tema para el Splash Screen -->
     <style name="Theme.App.Starting" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Color de fondo del Splash Screen -->
-        <item name="android:windowBackground">@drawable/splash_background</item>
+        <item name="android:windowBackground">@color/blanco</item>
         <!-- Duración de la animación del ícono (opcional) -->
         <item name="windowSplashScreenAnimationDuration">100</item>
         <!-- Tema que se aplicará después del Splash Screen -->
         <item name="postSplashScreenTheme">@style/AppTheme</item>
     </style>
+
+
+
 
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />

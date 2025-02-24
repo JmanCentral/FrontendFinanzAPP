@@ -99,16 +99,16 @@ class Registro : AppCompatActivity() {
             val layoutCorreo = findViewById<TextInputLayout>(R.id.wrapperinputCorreo)
 
             when {
-                nombres.isEmpty() || apellidos.isEmpty() || usuario.isEmpty() || contrasena.isEmpty() || confirmContrasena.isEmpty() || email.isEmpty()  -> {
-                    txtAdvertencia.text = getString(R.string.todos_los_campos_son_obligatorios)
+                nombres.isEmpty() || apellidos.isEmpty() || usuario.isEmpty() || contrasena.isEmpty() || confirmContrasena.isEmpty() || email.isEmpty() -> {
+                    mostrarAlerta(getString(R.string.todos_los_campos_son_obligatorios))
                     return@setOnClickListener
                 }
                 contrasena != confirmContrasena -> {
-                    txtAdvertencia.text = getString(R.string.las_contrase_as_no_coinciden)
+                    mostrarAlerta(getString(R.string.las_contrase_as_no_coinciden))
                     return@setOnClickListener
                 }
                 !regex.matches(contrasena) -> {
-                    txtAdvertencia.text = getString(R.string.requerimientos_cont)
+                    mostrarAlerta(getString(R.string.requerimientos_cont))
                     return@setOnClickListener
                 }
                 !esCorreoValido(email) -> {
@@ -150,6 +150,14 @@ class Registro : AppCompatActivity() {
             startActivity(intent)
             finish()
         }
+    }
+
+    private fun mostrarAlerta(mensaje: String) {
+        AlertDialog.Builder(this)
+            .setTitle("Error")
+            .setMessage(mensaje)
+            .setPositiveButton("Aceptar") { dialog, _ -> dialog.dismiss() }
+            .show()
     }
 
     private fun validarCorreoEnTiempoReal() {

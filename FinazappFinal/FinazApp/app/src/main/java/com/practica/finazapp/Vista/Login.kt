@@ -40,10 +40,9 @@ class Login : AppCompatActivity() {
 
 
         val btnIngresar = findViewById<Button>(R.id.btnIngresar)
-        val btnRegistrarse = findViewById<TextView>(R.id.btnRegistrarse)
+        val btnRegistrarse = findViewById<Button>(R.id.btnRegistrarse)
         val txtUsuario = findViewById<TextInputEditText>(R.id.txtinputUsuario)
         val txtContrasena = findViewById<TextInputEditText>(R.id.txtinputContrasena)
-        val txtAdvertencia = findViewById<TextView>(R.id.txtAdvertenciaLogin)
         val btnMostrarOcultar = findViewById<ImageView>(R.id.btnMostrarOcultar)
         var isPasswordVisible = false
 
@@ -95,8 +94,15 @@ class Login : AppCompatActivity() {
             val contrasenaInput = txtContrasena.text.toString()
 
             if (usuarioInput.isEmpty() || contrasenaInput.isEmpty()) {
-                txtAdvertencia.text = "Por favor, ingrese usuario y contraseña"
-            } else {
+                AlertDialog.Builder(this)
+                    .setTitle("Advertencia")
+                    .setMessage("Por favor, ingrese usuario y contraseña")
+                    .setPositiveButton("Aceptar") { dialog, _ ->
+                        dialog.dismiss() // Cierra el diálogo cuando el usuario presiona "Aceptar"
+                    }
+                    .show()
+            }
+            else {
                 val loginDTO = LoginDTO(
                     username = usuarioInput,
                     contrasena = contrasenaInput

@@ -27,7 +27,7 @@
             android:layout_height="48dp"
             android:src="@drawable/devolver"
             android:contentDescription="Regresar"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="25dp"
             android:clickable="true"
             android:focusable="true" />
 
@@ -36,7 +36,7 @@
             android:id="@+id/textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="25dp"
             android:text="Lista De Gastos"
             android:textColor="#0F1250"
             android:textSize="36sp"

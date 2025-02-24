@@ -92,6 +92,10 @@ class Depositos : AppCompatActivity(), DepositoListener {
 
     }
 
+    override fun onBackPressed() {
+        // No hagas nada para bloquear el botón atrás
+    }
+
     @SuppressLint("MissingInflatedId")
     override fun onItemClick(deposito: DepositoDTO) {
         Log.d("DepositoClick", "Depósito seleccionado: $deposito")

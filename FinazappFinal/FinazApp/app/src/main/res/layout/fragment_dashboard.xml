@@ -25,6 +25,7 @@
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.666"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -403,7 +404,6 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerViewMercado"
                 android:layout_width="match_parent"
@@ -412,6 +412,76 @@
                 android:layout_marginBottom="16dp"
                 android:visibility="gone"
                 app:layout_constraintTop_toBottomOf="@id/bloqueMercado" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/bloqueDeudas"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="16dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/recyclerViewMercado">
+
+                <ImageView
+                    android:id="@+id/imgDeudas"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/deuda"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/txtDeudas"
+                    style="@style/TxtNegroMedianoItalic"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:text="@string/deudas"
+                    app:layout_constraintBottom_toBottomOf="@id/imgDeudas"
+                    app:layout_constraintStart_toEndOf="@id/imgDeudas" />
+
+
+                <View
+                    android:id="@+id/barraGrisDeudas"
+                    android:layout_width="match_parent"
+                    android:layout_height="16dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@color/gris"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/imgDeudas" />
+
+                <View
+                    android:id="@+id/barraDeudas"
+                    android:layout_width="0dp"
+                    android:layout_height="16dp"
+                    android:layout_marginTop="8dp"
+                    android:background="#00B8B3"
+                    android:visibility="invisible"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/imgDeudas" />
+
+
+                <TextView
+                    android:id="@+id/cantidadDeudas"
+                    style="@style/TxtNegroPequenoItalic"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:text="@string/ceros"
+                    app:layout_constraintStart_toEndOf="@id/imgDeudas"
+                    app:layout_constraintTop_toBottomOf="@id/barraDeudas" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewDeudas"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginBottom="16dp"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/bloqueDeudas" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/bloqueDisponible"
@@ -472,18 +542,22 @@
                     app:layout_constraintTop_toBottomOf="@id/barraDisponible" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/lottieCampana"
+                android:layout_width="109dp"
+                android:layout_height="88dp"
+                android:clickable="true"
+                app:lottie_autoPlay="true"
+                app:lottie_loop="true"
+                app:lottie_rawRes="@raw/bell2"
+                tools:layout_editor_absoluteX="3dp"
+                tools:layout_editor_absoluteY="2dp"
+                tools:ignore="MissingConstraints" />
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 
-    <ImageView
-        android:id="@+id/campana"
-        android:layout_width="79dp"
-        android:layout_height="62dp"
-        android:layout_marginTop="10dp"
-        android:src="@drawable/campana"
-        app:layout_constraintTop_toTopOf="parent"
-        />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/floatingActionButton"

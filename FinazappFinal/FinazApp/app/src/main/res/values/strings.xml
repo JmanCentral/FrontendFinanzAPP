@@ -49,6 +49,7 @@
     <string name="servicios">servicios</string>
     <string name="disponible">dinero disponible</string>
     <string name="mercado">mercado</string>
+    <string name="deudas">Deudas</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="title_activity_login">Login</string>
     <string name="title_activity_dashboard">Dashboard</string>
@@ -70,6 +71,7 @@
         <item>Transporte</item>
         <item>Servicios</item>
         <item>Mercado</item>
+        <item>Deudas</item>
     </string-array>
 
     <string-array name="tiempos">

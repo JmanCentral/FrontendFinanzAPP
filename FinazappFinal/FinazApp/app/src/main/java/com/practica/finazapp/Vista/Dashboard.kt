@@ -54,7 +54,7 @@ class Dashboard : AppCompatActivity() {
         val navController = navHostFragment.navController
         // Definir los destinos de nivel superior del menú de hamburguesa
         appBarConfiguration = AppBarConfiguration(setOf(
-            R.id.nav_dashboard, R.id.nav_perfil, R.id.nav_ingresos, R.id.nav_reporte , R.id.fragmentCategorias, R.id.graficos_Avanzados, R.id.gastosAltos, R.id.fragmentAlertas, R.id.fragmentProyecciones
+            R.id.nav_dashboard, R.id.nav_perfil, R.id.nav_ingresos, R.id.nav_reporte , R.id.graficos_Avanzados, R.id.gastosAltos, R.id.fragmentAlertas, R.id.fragmentProyecciones
         ), drawerLayout
         )
 

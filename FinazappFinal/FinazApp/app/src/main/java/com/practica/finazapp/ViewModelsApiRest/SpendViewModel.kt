@@ -51,6 +51,9 @@ import kotlinx.coroutines.launch
         private val _valorGastosMesCategoriaLiveData4 = MutableLiveData<Double?>()
         val valorGastosMesCategoriaLiveData4: LiveData<Double?> = _valorGastosMesCategoriaLiveData4.distinctUntilChanged()
 
+        private val _valorGastosMesCategoriaLiveDataDeudas = MutableLiveData<Double?>()
+        val valorGastosMesCategoriaLiveDataDeudas: LiveData<Double?> = _valorGastosMesCategoriaLiveDataDeudas.distinctUntilChanged()
+
         private val _valorGastosMesCategoriaLiveData5 = MutableLiveData<Double?>()
         val valorGastosMesCategoriaLiveData5: LiveData<Double?> = _valorGastosMesCategoriaLiveData5
 
@@ -217,6 +220,19 @@ import kotlinx.coroutines.launch
             repository.obtenerValorGastosMesCategoria(idUsuario, categoria) { valor, error ->
                 if (error == null) {
                     _valorGastosMesCategoriaLiveData4.postValue(valor)
+                } else {
+                    _errorLiveData.postValue(error)
+                }
+            }
+
+        }
+
+        // Función para obtener el valor general de gastos por mes y categoría
+        fun obtenerValorGastosMesCategoriaDeudas(idUsuario: Long, categoria: String) {
+
+            repository.obtenerValorGastosMesCategoria(idUsuario, categoria) { valor, error ->
+                if (error == null) {
+                    _valorGastosMesCategoriaLiveDataDeudas.postValue(valor)
                 } else {
                     _errorLiveData.postValue(error)
                 }

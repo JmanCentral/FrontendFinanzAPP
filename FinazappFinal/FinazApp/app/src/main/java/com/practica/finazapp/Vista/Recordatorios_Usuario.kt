@@ -27,6 +27,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.airbnb.lottie.Lottie
+import com.airbnb.lottie.LottieAnimationView
 import com.google.android.material.textfield.TextInputEditText
 import com.practica.finazapp.Entidades.RecordatorioDTO
 import com.practica.finazapp.Notificaciones.RecordatorioReceiver
@@ -44,7 +46,7 @@ class Recordatorios_Usuario : AppCompatActivity() , RecordatorioListener {
     private lateinit var recordatoriosViewModel: ReminderViewModel
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: RecordatorioAdapter
-    private lateinit var imgNoGastos1: ImageView
+    private lateinit var imgNoGastos1: LottieAnimationView
     private lateinit var txtNoGastos1: TextView
     private var recordatoriosAnteriores: List<RecordatorioDTO> = emptyList()
 
@@ -60,8 +62,7 @@ class Recordatorios_Usuario : AppCompatActivity() , RecordatorioListener {
 
         usuarioId = intent.getLongExtra("usuarioId", -1)
 
-        imgNoGastos1 = findViewById(R.id.img_no_gastos1)
-        txtNoGastos1 = findViewById(R.id.txt_no_gastos2)
+        imgNoGastos1 = findViewById(R.id.lottie_no_gastos)
 
         fetchRecordatorios()
 
@@ -248,6 +249,10 @@ class Recordatorios_Usuario : AppCompatActivity() , RecordatorioListener {
                 dialog.dismiss()
             }
         }
+    }
+
+    override fun onBackPressed() {
+        // No hagas nada para bloquear el botón atrás
     }
 
     private fun Advertencia() {
