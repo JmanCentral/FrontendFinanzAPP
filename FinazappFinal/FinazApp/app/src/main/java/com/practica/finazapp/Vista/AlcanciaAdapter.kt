@@ -24,6 +24,7 @@ class AlcanciaAdapter(private val alcancias: List<AlcanciaDTO>) :
     }
 
     override fun onBindViewHolder(holder: AlcanciaViewHolder, position: Int) {
+
         holder.cv.setAnimation(AnimationUtils.loadAnimation(holder.itemView.context, R.anim.fade_transition))
 
         val currentAlcancia = alcancias[position]

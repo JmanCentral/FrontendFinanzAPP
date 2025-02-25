@@ -3,7 +3,9 @@ package com.practica.finazapp.Vista
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.practica.finazapp.Entidades.GastoDTO
 import com.practica.finazapp.R
@@ -21,6 +23,9 @@ class GastoListaAdapter(private val gastos: List<GastoDTO>) :
     }
 
     override fun onBindViewHolder(holder: GastoListaViewHolder, position: Int) {
+
+        holder.ViewCardview.setAnimation(AnimationUtils.loadAnimation(holder.itemView.context, R.anim.fade_transition))
+
         val currentGasto = gastos[position]
         val numberFormat = NumberFormat.getInstance()
         numberFormat.maximumFractionDigits = 2
@@ -42,6 +47,7 @@ class GastoListaAdapter(private val gastos: List<GastoDTO>) :
         val categoriaTextView: TextView = itemView.findViewById(R.id.Viewcategoria)
         val fechaTextView: TextView = itemView.findViewById(R.id.Viewfecha)
         val valorTextView: TextView = itemView.findViewById(R.id.Viewvalor)
+        val ViewCardview: CardView = itemView.findViewById(R.id.cvlistagastos)
     }
 
     fun setOnItemClickListener(listener: OnItemClickListener) {

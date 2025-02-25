@@ -68,7 +68,7 @@ class Reporte : Fragment() {
                 val atrasAn = binding.btonAtrasAn
                 var fechaActual = LocalDate.now()
                 Log.d("FragmentReporte", "fecha de referencia: $fechaActual")
-                listOf<String>("disponible", "Gastos hormiga", "Alimentos", "Transporte", "Servicios", "Mercado" , "Deudas")
+                listOf<String>("disponible", "Gastos hormiga", "Alimentos", "Transporte", "Servicios", "Mercado")
 
                 adelanteSem.setOnClickListener {
                     fechaActual = fechaActual.plusWeeks(1)
@@ -243,10 +243,9 @@ class Reporte : Fragment() {
         return when (tiempo) {
             "Semanal" -> {
                 val inicioSemana = fechaActual.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
-                val finSemana = fechaActual // En lugar de domingo, se usa el día actual
+                val finSemana = fechaActual.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY))
                 Pair(inicioSemana, finSemana)
             }
-
             "Mensual" -> {
                 val inicioMes = fechaActual.with(TemporalAdjusters.firstDayOfMonth())
                 val finMes = fechaActual.with(TemporalAdjusters.lastDayOfMonth())
@@ -550,7 +549,6 @@ class Reporte : Fragment() {
             "Transporte" to "#339AF0",
             "Servicios" to "#EEB62B",
             "Mercado" to "#FD8435"
-            ,"Deudas" to "#00B8B3"
         )
         val color = Color.parseColor(categoriasColores[categoria])
         return color // Devuelve el color correspondiente a la categoría
@@ -572,6 +570,8 @@ class Reporte : Fragment() {
         }
         return true
     }
+
+
 
     override fun onDestroyView() {
         super.onDestroyView()

@@ -1,58 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:cardview="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cvlistagastos"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="8dp"
-    android:orientation="vertical">
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="6dp">
 
-
-    <androidx.cardview.widget.CardView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        cardview:cardCornerRadius="8dp"
-        cardview:cardElevation="4dp">
+        android:orientation="horizontal"
+        android:padding="16dp">
 
+        <!-- Contenedor de la imagen -->
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/lottie_listagastos"
+            android:layout_width="151dp"
+            android:layout_height="117dp"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="true"
+            app:lottie_rawRes="@raw/cash"/>
+
+        <!-- Contenedor de texto -->
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-            <!-- ImageView para la imagen -->
-            <ImageView
-                android:id="@+id/ViewImage"
-                android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:scaleType="centerCrop"
-                android:src="@drawable/dineroo"
-                />
+            android:layout_weight="1"
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/Viewdescripcion"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="24sp" />
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#000"/>
 
             <TextView
                 android:id="@+id/Viewcategoria"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="24sp" />
+                android:textSize="16sp"
+                android:textColor="#555"
+                android:layout_marginTop="4dp"/>
 
             <TextView
                 android:id="@+id/Viewfecha"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="24sp" />
+                android:textSize="14sp"
+                android:textColor="#777"
+                android:layout_marginTop="4dp"/>
 
             <TextView
                 android:id="@+id/Viewvalor"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="24sp" />
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#008000"
+                android:layout_marginTop="6dp"/>
         </LinearLayout>
-    </androidx.cardview.widget.CardView>
-</LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

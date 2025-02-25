@@ -44,7 +44,6 @@ class Registro : AppCompatActivity() {
         val txtInputApellidos = findViewById<TextInputEditText>(R.id.txtinputApellidos)
         val txtInputUsuario = findViewById<TextInputEditText>(R.id.txtinputUsuario)
         val btnRegistro1 = findViewById<Button>(R.id.btnRegistro)
-        val txtAdvertencia = findViewById<TextView>(R.id.Advertencia)
         val txtCorreo = findViewById<TextInputEditText>(R.id.txtinputCorreo)
 
         val btnMostrarOcultar = findViewById<ImageView>(R.id.btnMostrarOcultar1)
@@ -216,7 +215,7 @@ class Registro : AppCompatActivity() {
         AlertDialog.Builder(this)
             .setTitle("Error al registrarse")
             .setIcon(R.drawable.problem)
-            .setMessage("El nombre de usuario ya existe. Porfavor intenta con otro nombre de usuario.")
+            .setMessage("El nombre de usuario o correo electrónico ya existen en la aplicación. Porfavor intenta con otro nombre de usuario o correo.")
             .setPositiveButton("Entendido") { dialog, _ -> dialog.dismiss() }
             .create().show()
 
