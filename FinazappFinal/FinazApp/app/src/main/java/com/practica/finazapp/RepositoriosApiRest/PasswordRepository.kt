@@ -24,7 +24,6 @@ class PasswordRepository (context: Context) {
                 if (response.isSuccessful) {
                     callback(response.body(), null)
                 } else {
-                    // 🔴 Manejar error 400 como si fuera un fallo
                     onFailure(call, Throwable("Error en la solicitud: ${response.code()}"))
                 }
             }

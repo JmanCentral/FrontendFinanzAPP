@@ -25,7 +25,7 @@ class PasswordViewModel (application: Application) : AndroidViewModel(applicatio
             if (error.isNullOrEmpty()) {  // ✅ Solo actualizar si no hay error
                 _passwordLiveData.postValue(recuperadorResponse)
             }
-            _errorLiveData.postValue(error)
+                _errorLiveData.postValue(error)
         }
     }
 }

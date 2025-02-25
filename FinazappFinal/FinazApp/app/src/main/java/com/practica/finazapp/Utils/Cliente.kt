@@ -11,7 +11,6 @@ object Cliente {
     fun getCliente(url: String, context: Context): Retrofit {
         val client = OkHttpClient.Builder()
             .addInterceptor(AuthInterceptor(context))
-            .readTimeout(30, TimeUnit.SECONDS)// Agregamos el interceptor aquí
             .build()
         return Retrofit.Builder()
             .baseUrl(url)

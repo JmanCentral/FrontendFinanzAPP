@@ -6,6 +6,6 @@ import retrofit2.http.GET
 
 interface ConsejosService {
 
-    @GET("run")
+    @GET("consejos")
     fun obtenerConsejos(): Call<ConsejosDTO>
 }

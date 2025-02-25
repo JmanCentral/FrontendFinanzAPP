@@ -40,7 +40,7 @@ class Login : AppCompatActivity() {
 
 
         val btnIngresar = findViewById<Button>(R.id.btnIngresar)
-        val btnRegistrarse = findViewById<Button>(R.id.btnRegistrarse)
+        val btnRegistrarse = findViewById<TextView>(R.id.btnRegistrarse)
         val txtUsuario = findViewById<TextInputEditText>(R.id.txtinputUsuario)
         val txtContrasena = findViewById<TextInputEditText>(R.id.txtinputContrasena)
         val btnMostrarOcultar = findViewById<ImageView>(R.id.btnMostrarOcultar)
@@ -84,31 +84,31 @@ class Login : AppCompatActivity() {
             }
         }
 
+
         passwordViewModel.errorLiveData.observe(this) { error ->
+            Log.d("Login", "Error recibido en el observador: $error") // 🕵️‍♂️ Verificar qué llega aquí
             if (!error.isNullOrEmpty()) {
                 mostrarDialogoError1()
-            }}
+            }
+            }
+
+        passwordViewModel.passwordLiveData.observe(this) { password ->
+            Log.d("Login", "Password recibido en el observador: $password") // 🕵️‍♂️ Verificar qué llega aquí
+            password?.let {
+                mostrarDialogoEnvio()
+            }
+        }
 
         btnIngresar.setOnClickListener {
             val usuarioInput = txtUsuario.text.toString()
             val contrasenaInput = txtContrasena.text.toString()
 
-            if (usuarioInput.isEmpty() || contrasenaInput.isEmpty()) {
-                AlertDialog.Builder(this)
-                    .setTitle("Advertencia")
-                    .setMessage("Por favor, ingrese usuario y contraseña")
-                    .setPositiveButton("Aceptar") { dialog, _ ->
-                        dialog.dismiss() // Cierra el diálogo cuando el usuario presiona "Aceptar"
-                    }
-                    .show()
-            }
-            else {
                 val loginDTO = LoginDTO(
                     username = usuarioInput,
                     contrasena = contrasenaInput
                 )
                 userViewModel.iniciarSesion(loginDTO)
-            }
+
         }
 
         btnRegistrarse.setOnClickListener {
@@ -137,9 +137,19 @@ class Login : AppCompatActivity() {
 
     }
 
+    private fun mostrarDialogoEnvio(){
+        AlertDialog.Builder(this)
+            .setTitle("Mensaje enviado al correo electrónico")
+            .setIcon(R.drawable.disponi)
+            .setMessage("Se envio el mensaje de recuperación de contraseña.")
+            .setPositiveButton("Entendido") { dialog, _ -> dialog.dismiss() }
+            .create().show()
+
+    }
+
     private fun mostrarDialogoError1(){
         AlertDialog.Builder(this)
-            .setTitle("Error al recuperarcontraseña")
+            .setTitle("Error al recuperar contraseña")
             .setIcon(R.drawable.problem)
             .setMessage("Correo electrónico incorrecto")
             .setPositiveButton("Entendido") { dialog, _ -> dialog.dismiss() }

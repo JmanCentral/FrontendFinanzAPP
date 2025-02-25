@@ -38,24 +38,45 @@ class Perfil : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         consejoViewModel = ViewModelProvider(this)[ConsejosViewModel::class.java]
 
-        MostrarConsejos()
+        setupObservers()
+        consejoViewModel.obtenerConsejos()
 
     }
 
-    private fun MostrarConsejos() {
-
-        consejoViewModel.obtenerConsejos()
-        consejoViewModel.consejosResponse.observe(viewLifecycleOwner) { consejos ->
-            binding.textViewConsejo1.text = consejos!!.consejo1
-            binding.textViewConsejo2.text = consejos!!.consejo2
-            binding.textViewConsejo3.text = consejos!!.consejo3
-            binding.textViewConsejo4.text = consejos!!.consejo4
-            binding.textViewConsejo5.text = consejos!!.consejo5
-            binding.textViewConsejo6.text = consejos!!.consejo6
-            binding.textViewConsejo7.text = consejos!!.consejo7
-            binding.textViewConsejo8.text = consejos!!.consejo8
-            binding.textViewConsejo9.text = consejos!!.consejo9
+    private fun setupObservers() {
+        // Observer para manejar la animación de carga y visibilidad de los elementos
+        consejoViewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            if (isLoading) {
+                // Mostrar solo la animación y ocultar el contenido
+                binding.lottieLoading.visibility = View.VISIBLE
+                binding.layout.visibility = View.GONE
+            } else {
+                // Ocultar la animación y mostrar el contenido
+                binding.lottieLoading.visibility = View.GONE
+                binding.layout.visibility = View.VISIBLE
+            }
         }
+
+        // Observer para mostrar los datos obtenidos de la API
+        consejoViewModel.consejosResponse.observe(viewLifecycleOwner) { consejos ->
+            if (consejos != null) {
+                binding.textViewConsejo1.text = consejos.consejo1
+                binding.textViewConsejo2.text = consejos.consejo2
+                binding.textViewConsejo3.text = consejos.consejo3
+                binding.textViewConsejo4.text = consejos.consejo4
+                binding.textViewConsejo5.text = consejos.consejo5
+                binding.textViewConsejo6.text = consejos.consejo6
+                binding.textViewConsejo7.text = consejos.consejo7
+                binding.textViewConsejo8.text = consejos.consejo8
+                binding.textViewConsejo9.text = consejos.consejo9
+            }
+        }
+
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
 }

@@ -19,7 +19,11 @@ class ConsejosViewModel(application: Application) : AndroidViewModel(application
     private val _errorLiveData = MutableLiveData<String?>()
     val errorLiveData: LiveData<String?> get() = _errorLiveData
 
+    private val _isLoading = MutableLiveData<Boolean>()
+    val isLoading: LiveData<Boolean> get() = _isLoading
+
     fun obtenerConsejos() {
+        _isLoading.value = true
         consejosRepository.ObtenerConsejos() { response, error ->
             if (response != null) {
                 _consejosResponse.postValue(response)
@@ -27,6 +31,7 @@ class ConsejosViewModel(application: Application) : AndroidViewModel(application
             } else {
                 _errorLiveData.postValue(error)
             }
+            _isLoading.postValue(false)
         }
     }
 

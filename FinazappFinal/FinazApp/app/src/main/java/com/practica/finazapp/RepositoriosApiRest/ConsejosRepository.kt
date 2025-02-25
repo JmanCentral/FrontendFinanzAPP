@@ -11,7 +11,7 @@ import retrofit2.Response
 class ConsejosRepository(context: Context)  {
 
     private val consejosService: ConsejosService by lazy {
-        Cliente.getCliente("https://magicloops.dev/api/loop/1ddfa249-4cf1-44a9-ac22-3391b90b5d33/", context)
+        Cliente.getCliente("http://100.115.249.2:8862/api/gemini/", context)
             .create(ConsejosService::class.java)
     }
 

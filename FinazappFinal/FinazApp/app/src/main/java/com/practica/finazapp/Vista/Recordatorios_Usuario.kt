@@ -313,11 +313,11 @@ class Recordatorios_Usuario : AppCompatActivity() , RecordatorioListener {
                         recyclerView.adapter = adapter
                         recyclerView.visibility = View.VISIBLE
                         imgNoGastos1.visibility = View.GONE
-                        txtNoGastos1.visibility = View.GONE
+                       // txtNoGastos1.visibility = View.GONE
                     } else {
                         recyclerView.visibility = View.GONE
                         imgNoGastos1.visibility = View.VISIBLE
-                        txtNoGastos1.visibility = View.VISIBLE
+                      //  txtNoGastos1.visibility = View.VISIBLE
                     }
                 }
             } else {
@@ -360,7 +360,7 @@ class Recordatorios_Usuario : AppCompatActivity() , RecordatorioListener {
                     recyclerView.adapter = adapter
                     recyclerView.visibility = View.VISIBLE
                     imgNoGastos1.visibility = View.GONE
-                    txtNoGastos1.visibility = View.GONE
+                   // txtNoGastos1.visibility = View.GONE
 
                     // Reprogramar alarmas necesarias
                     recordatorioslist.forEach { recordatorio ->
@@ -373,7 +373,7 @@ class Recordatorios_Usuario : AppCompatActivity() , RecordatorioListener {
                 } else {
                     recyclerView.visibility = View.GONE
                     imgNoGastos1.visibility = View.VISIBLE
-                    txtNoGastos1.visibility = View.VISIBLE
+                  //  txtNoGastos1.visibility = View.VISIBLE
                     recordatoriosAnteriores = emptyList()
                 }
             }
