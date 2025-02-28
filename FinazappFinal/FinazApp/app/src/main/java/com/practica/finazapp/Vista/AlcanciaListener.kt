@@ -7,4 +7,7 @@ import com.practica.finazapp.Entidades.RecordatorioDTO
 interface AlcanciaListener {
 
     fun onItemClick5(alcancia: AlcanciaDTO)
+
+    fun onItemClickModificar(alcancia: AlcanciaDTO)
+
 }

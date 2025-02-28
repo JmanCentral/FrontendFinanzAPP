@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
+import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
@@ -52,9 +53,14 @@ class AlcanciaAdapter(private val alcancias: List<AlcanciaDTO>) :
             holder.progresoMetaTextView.setTextColor(holder.itemView.context.getColor(R.color.negro)) // Meta en progreso
         }
 
-        // Manejar el clic en el elemento
+        // Manejar el clic en el elemento (ver detalles)
         holder.itemView.setOnClickListener {
             listener?.onItemClick5(currentAlcancia)
+        }
+
+        // Manejar el clic en el botón de modificar
+        holder.btnModificar.setOnClickListener {
+            listener?.onItemClickModificar(currentAlcancia)
         }
     }
 
@@ -73,5 +79,6 @@ class AlcanciaAdapter(private val alcancias: List<AlcanciaDTO>) :
         val progressBarMeta: ProgressBar = itemView.findViewById(R.id.progressBarMeta)
         val progresoMetaTextView: TextView = itemView.findViewById(R.id.tvProgresoMeta)
         val cv: View = itemView.findViewById(R.id.cv) // Contenedor principal para la animación
+        val btnModificar: ImageView = itemView.findViewById(R.id.btnModificar) // Botón para modificar
     }
 }

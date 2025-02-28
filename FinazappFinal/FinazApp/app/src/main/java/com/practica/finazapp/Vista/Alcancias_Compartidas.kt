@@ -15,7 +15,7 @@ import com.practica.finazapp.Entidades.AlcanciaDTO
 import com.practica.finazapp.Entidades.DepositoDTO
 import com.practica.finazapp.R
 
-class Alcancias_Compartidas : AppCompatActivity(), AlcanciaListener {
+abstract class Alcancias_Compartidas : AppCompatActivity(), AlcanciaListener {
 
     private var usuarioId: Long = -1
     private lateinit var alcanciaViewModel: AlcanciaViewModel

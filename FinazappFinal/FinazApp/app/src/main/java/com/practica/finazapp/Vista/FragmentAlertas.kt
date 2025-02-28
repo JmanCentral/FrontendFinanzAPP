@@ -109,57 +109,83 @@ class FragmentAlertas : Fragment(), AlertasListener {
 
         val dialog = AlertDialog.Builder(requireContext())
             .setView(dialogView)
-            .setPositiveButton("Guardar") { dialog, _ ->
-                val nombreAlarma = editTextNombreAlarma.text.toString().trim()
-                val descripcion = spinnerDescripcion.selectedItem.toString().trim()
-                val fechaOriginal = editTextFecha.text.toString().trim()
-                val limiteStr = editTextAlertalimite.text.toString().trim()
-
-                if (nombreAlarma.isBlank() || fechaOriginal.isBlank() || limiteStr.isBlank()) {
-                    Toast.makeText(requireContext(), "Por favor, llene todos los campos", Toast.LENGTH_SHORT).show()
-                    return@setPositiveButton
-                }
-
-                val limite: Double
-                try {
-                    limite = limiteStr.toDouble()
-                } catch (e: NumberFormatException) {
-                    Toast.makeText(requireContext(), "Ingrese un valor válido para el límite", Toast.LENGTH_SHORT).show()
-                    return@setPositiveButton
-                }
-
-                val fecha = convertirFecha(fechaOriginal)
-
-                // Obtener el ingreso total del mes y proceder con la comparación
-                ingresoViewModel.obtenerTotalIngresos(usuarioId)
-                ingresoViewModel.totalIngresosLiveData.observeOnce(viewLifecycleOwner) { ingresoTotal ->
-                    ingresoTotal?.let {
-                        if (limite > it) {
-                            Toast.makeText(requireContext(), "El valor de la alerta supera el ingreso total.", Toast.LENGTH_LONG).show()
-                        } else {
-                            // Guardar la nueva alerta si no excede el ingreso total
-                            val nuevaAlerta = AlertaDTO(
-                                id_alerta = 0,
-                                nombre = nombreAlarma,
-                                descripcion = descripcion,
-                                fecha = fecha,
-                                valor = limite
-                            )
-                            alertaViewModel.registrarAlerta(usuarioId , nuevaAlerta)
-                            Toast.makeText(requireContext(), "Alerta guardada correctamente.", Toast.LENGTH_SHORT).show()
-                            cargarAlertas()
-                        }
-                    } ?: run {
-                        Toast.makeText(requireContext(), "No se pudo obtener el ingreso total.", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
-            .setNegativeButton("Cancelar") { dialog, _ ->
-                dialog.dismiss()
-            }
+            .setPositiveButton("Guardar", null) // Se asignará más tarde para no cerrar el diálogo automáticamente
+            .setNegativeButton("Cancelar") { dialog, _ -> dialog.dismiss() }
             .create()
 
         dialog.show()
+
+        // Sobrescribir el comportamiento del botón "Guardar"
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+            val nombreAlarma = editTextNombreAlarma.text.toString().trim()
+            val descripcion = spinnerDescripcion.selectedItem.toString().trim()
+            val fechaOriginal = editTextFecha.text.toString().trim()
+            val limiteStr = editTextAlertalimite.text.toString().trim()
+
+            if (nombreAlarma.isBlank() || fechaOriginal.isBlank() || limiteStr.isBlank()) {
+                // Mostrar alerta sin cerrar el diálogo principal
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Campos vacíos")
+                    .setMessage("Por favor, llene todos los campos antes de guardar.")
+                    .setPositiveButton("OK") { alertDialog, _ -> alertDialog.dismiss() }
+                    .create()
+                    .show()
+                return@setOnClickListener
+            }
+
+            val limite: Double
+            try {
+                limite = limiteStr.toDouble()
+            } catch (e: NumberFormatException) {
+                // Mostrar alerta si el límite no es válido
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Valor inválido")
+                    .setMessage("Ingrese un valor numérico válido para el límite.")
+                    .setPositiveButton("OK") { alertDialog, _ -> alertDialog.dismiss() }
+                    .create()
+                    .show()
+                return@setOnClickListener
+            }
+
+            val fecha = convertirFecha(fechaOriginal)
+
+            // Obtener el ingreso total del mes y proceder con la comparación
+            ingresoViewModel.obtenerTotalIngresos(usuarioId)
+            ingresoViewModel.totalIngresosLiveData.observeOnce(viewLifecycleOwner) { ingresoTotal ->
+                ingresoTotal?.let {
+                    if (limite > it) {
+                        // Mostrar alerta si el límite supera el ingreso total
+                        AlertDialog.Builder(requireContext())
+                            .setTitle("Límite excedido")
+                            .setMessage("El valor de la alerta supera el ingreso total.")
+                            .setPositiveButton("OK") { alertDialog, _ -> alertDialog.dismiss() }
+                            .create()
+                            .show()
+                    } else {
+                        // Guardar la nueva alerta si no excede el ingreso total
+                        val nuevaAlerta = AlertaDTO(
+                            id_alerta = 0,
+                            nombre = nombreAlarma,
+                            descripcion = descripcion,
+                            fecha = fecha,
+                            valor = limite
+                        )
+                        alertaViewModel.registrarAlerta(usuarioId, nuevaAlerta)
+                        Toast.makeText(requireContext(), "Alerta guardada correctamente.", Toast.LENGTH_SHORT).show()
+                        cargarAlertas()
+                        dialog.dismiss() // Cerrar el diálogo principal después del guardado exitoso
+                    }
+                } ?: run {
+                    // Mostrar alerta si no se pudo obtener el ingreso total
+                    AlertDialog.Builder(requireContext())
+                        .setTitle("Error")
+                        .setMessage("No se pudo obtener el ingreso total.")
+                        .setPositiveButton("OK") { alertDialog, _ -> alertDialog.dismiss() }
+                        .create()
+                        .show()
+                }
+            }
+        }
     }
 
     private fun convertirFecha(fechaOriginal: String): String {
@@ -274,51 +300,23 @@ class FragmentAlertas : Fragment(), AlertasListener {
                     val btnEliminarAlerta = dialogView.findViewById<Button>(R.id.btnEliminarAlerta)
                     val editTextValor = dialogView.findViewById<TextInputEditText>(R.id.editTextIngresoLimite)
                     val editTextFecha = dialogView.findViewById<EditText>(R.id.editTextFecha)
+
                     val dialogModificarAlerta = AlertDialog.Builder(requireContext())
                         .setView(dialogView)
-                        .setPositiveButton("Aceptar") { dialog, _ ->
-                            val valor = editTextValor.text.toString()
-                            val fecha = editTextFecha.text.toString()
-                            if (fecha.isBlank()) {
-                                Toast.makeText(requireContext(), "Por favor, llene todos los campos", Toast.LENGTH_SHORT).show()
-                                return@setPositiveButton
-                            }
-                            if (valor.isBlank()) {
-                                Toast.makeText(requireContext(), "Por favor, llene todos los campos", Toast.LENGTH_SHORT).show()
-                                return@setPositiveButton
-                            }
-                            val parts = fecha.split("/")
-                            val dia = parts[0].padStart(2, '0')
-                            val mes = parts[1].padStart(2, '0')
-                            val anio = parts[2]
-                            val fechaFormateada = "${anio}-${mes}-${dia}"
-
-                            val alertaModificada = alerta.copy(
-                                valor = valor.toDouble(),  // Modificar solo la cantidad
-                                fecha = fechaFormateada       // Modificar solo la fecha
-                            )
-
-                            lifecycleScope.launch {
-                                withContext(Dispatchers.IO) {
-                                    alertaViewModel.modificarAlerta(idAlerta = alerta.id_alerta , alertaDTO = alertaModificada)
-                                }
-                            }
-                            dialog.dismiss()
-                        }
-                        .setNegativeButton("Cancelar") { dialog, _ ->
-                            dialog.dismiss()
-                        }
+                        .setPositiveButton("Aceptar", null) // Se asignará más tarde para no cerrar el diálogo automáticamente
+                        .setNegativeButton("Cancelar") { dialog, _ -> dialog.dismiss() }
                         .create()
 
                     textViewTitulo.text = "Modificar alerta '${alerta.nombre}'"
                     val fecha = alerta.fecha
                     val parts = fecha.split("-")
                     val fechaFormateada = "${parts[2]}/${parts[1]}/${parts[0]}"
-                    editTextFecha.setText(fechaFormateada )
+                    editTextFecha.setText(fechaFormateada)
                     editTextFecha.setOnClickListener {
                         showDatePickerDialog(editTextFecha)
                     }
                     editTextValor.setText(alerta.valor.toString())
+
                     btnEliminarAlerta.setOnClickListener {
                         lifecycleScope.launch {
                             withContext(Dispatchers.IO) {
@@ -329,6 +327,56 @@ class FragmentAlertas : Fragment(), AlertasListener {
                     }
 
                     dialogModificarAlerta.show()
+
+                    // Sobrescribir el comportamiento del botón "Aceptar"
+                    dialogModificarAlerta.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                        val valor = editTextValor.text.toString()
+                        val fecha = editTextFecha.text.toString()
+
+                        if (fecha.isBlank() || valor.isBlank()) {
+                            // Mostrar alerta sin cerrar el diálogo principal
+                            AlertDialog.Builder(requireContext())
+                                .setTitle("Campos vacíos")
+                                .setMessage("Por favor, llene todos los campos antes de guardar.")
+                                .setPositiveButton("OK") { alertDialog, _ -> alertDialog.dismiss() }
+                                .create()
+                                .show()
+                            return@setOnClickListener
+                        }
+
+                        val valorDouble = valor.toDoubleOrNull()
+                        if (valorDouble == null) {
+                            // Mostrar alerta si el valor no es válido
+                            AlertDialog.Builder(requireContext())
+                                .setTitle("Valor inválido")
+                                .setMessage("Ingrese un valor numérico válido.")
+                                .setPositiveButton("OK") { alertDialog, _ -> alertDialog.dismiss() }
+                                .create()
+                                .show()
+                            return@setOnClickListener
+                        }
+
+                        // Formatear la fecha
+                        val partsFecha = fecha.split("/")
+                        val dia = partsFecha[0].padStart(2, '0')
+                        val mes = partsFecha[1].padStart(2, '0')
+                        val anio = partsFecha[2]
+                        val fechaFormateadaModificada = "${anio}-${mes}-${dia}"
+
+                        // Crear la alerta modificada
+                        val alertaModificada = alerta.copy(
+                            valor = valorDouble,
+                            fecha = fechaFormateadaModificada
+                        )
+
+                        // Modificar la alerta
+                        lifecycleScope.launch {
+                            withContext(Dispatchers.IO) {
+                                alertaViewModel.modificarAlerta(idAlerta = alerta.id_alerta, alertaDTO = alertaModificada)
+                            }
+                        }
+                        dialogModificarAlerta.dismiss() // Cerrar el diálogo principal después del guardado exitoso
+                    }
                 }
             }
 

@@ -166,7 +166,6 @@ class ListaGastos : AppCompatActivity(), OnItemClickListener2 {
     }
 
     override fun onItemClick2(gasto: GastoDTO) {
-
         val dialogView = layoutInflater.inflate(R.layout.dialog_modificar_gasto, null)
 
         val spinnerCategoria = dialogView.findViewById<Spinner>(R.id.spinnerCategoria)
@@ -190,32 +189,7 @@ class ListaGastos : AppCompatActivity(), OnItemClickListener2 {
 
         val dialog = AlertDialog.Builder(this)
             .setView(dialogView)
-            .setPositiveButton("Guardar") { _, _ ->
-                val categoria = spinnerCategoria.selectedItem.toString()
-                val cantidad = editTextCantidad.text.toString().toDoubleOrNull()
-                val fechaOriginal = editTextFecha.text.toString()
-                val descripcion = editTextDescripcion.text.toString()
-
-                if (cantidad != null && categoria.isNotBlank() && fechaOriginal.isNotBlank() && descripcion.isNotBlank()) {
-
-                    // Realizar la conversión de fecha y guardar el nuevo gasto
-                    val parts = fechaOriginal.split("/")
-                    val dia = parts[0].padStart(2, '0')
-                    val mes = parts[1].padStart(2, '0')
-                    val anio = parts[2]
-                    val fecha = "${anio}-${mes}-${dia}"
-
-                    val gastoActualizado = gasto.copy(
-                        categoria = categoria,
-                        valor = cantidad,
-                        nombre_gasto = descripcion,
-                        fecha = fecha
-                    )
-                    gastosViewModel.modificarGasto(gasto.id_gasto, gastoActualizado)
-                } else {
-                    Toast.makeText(this, "Complete todos los campos correctamente", Toast.LENGTH_SHORT).show()
-                }
-            }
+            .setPositiveButton("Guardar", null) // Se asignará más tarde para no cerrar el diálogo automáticamente
             .setNegativeButton("Cancelar") { dialog, _ -> dialog.dismiss() }
             .create()
 
@@ -223,26 +197,72 @@ class ListaGastos : AppCompatActivity(), OnItemClickListener2 {
             gastosViewModel.eliminarGasto(gasto.id_gasto)
             dialog.dismiss()
         }
+
         dialog.show()
+
+        // Sobrescribir el comportamiento del botón "Guardar"
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+            val categoria = spinnerCategoria.selectedItem.toString()
+            val cantidad = editTextCantidad.text.toString()
+            val fechaOriginal = editTextFecha.text.toString()
+            val descripcion = editTextDescripcion.text.toString()
+
+            if (categoria.isBlank() || cantidad.isBlank() || fechaOriginal.isBlank() || descripcion.isBlank()) {
+                // Mostrar alerta sin cerrar el diálogo principal
+                AlertDialog.Builder(this)
+                    .setTitle("Campos vacíos")
+                    .setMessage("Por favor complete todos los campos antes de guardar.")
+                    .setPositiveButton("OK") { alertDialog, _ -> alertDialog.dismiss() }
+                    .create()
+                    .show()
+            } else {
+                try {
+                    val valor = cantidad.toDouble()
+                    val parts = fechaOriginal.split("/")
+                    val dia = parts[0].padStart(2, '0')
+                    val mes = parts[1].padStart(2, '0')
+                    val anio = parts[2]
+                    val fecha = "$anio-$mes-$dia"
+
+                    val gastoActualizado = gasto.copy(
+                        categoria = categoria,
+                        valor = valor,
+                        nombre_gasto = descripcion,
+                        fecha = fecha
+                    )
+                    gastosViewModel.modificarGasto(gasto.id_gasto, gastoActualizado)
+                    dialog.dismiss() // Cerrar el diálogo principal después del guardado exitoso
+                } catch (e: NumberFormatException) {
+                    AlertDialog.Builder(this)
+                        .setTitle("Cantidad inválida")
+                        .setMessage("Ingrese una cantidad numérica válida.")
+                        .setPositiveButton("OK") { alertDialog, _ -> alertDialog.dismiss() }
+                        .create()
+                        .show()
+                }
+            }
+        }
     }
 
-
     private fun showDatePickerDialog(editTextFecha: EditText) {
-        val calendar = Calendar.getInstance()
-        val year = calendar.get(Calendar.YEAR)
-        val month = calendar.get(Calendar.MONTH)
-        val day = calendar.get(Calendar.DAY_OF_MONTH)
+        // Obtener la fecha actual
+        val calendar = android.icu.util.Calendar.getInstance()
+        val year = calendar.get(android.icu.util.Calendar.YEAR)
+        val month = calendar.get(android.icu.util.Calendar.MONTH)
+        val dayOfMonth = calendar.get(android.icu.util.Calendar.DAY_OF_MONTH)
 
+        // Crear y mostrar el DatePickerDialog
         val datePickerDialog = DatePickerDialog(
             this,
-            { _, selectedYear, selectedMonth, selectedDay ->
-                val formattedDate = "${selectedDay.toString().padStart(2, '0')}/${(selectedMonth + 1).toString().padStart(2, '0')}/$selectedYear"
-                editTextFecha.setText(formattedDate)
+            { _, year1, monthOfYear, dayOfMonth1 ->
+                val fechaSeleccionada = "$dayOfMonth1/${String.format("%02d", monthOfYear + 1)}/$year1"
+                editTextFecha.setText(fechaSeleccionada)
             },
             year,
             month,
-            day
+            dayOfMonth
         )
+
         datePickerDialog.show()
     }
 }

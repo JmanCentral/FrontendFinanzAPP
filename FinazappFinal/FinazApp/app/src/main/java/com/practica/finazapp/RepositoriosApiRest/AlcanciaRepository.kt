@@ -63,4 +63,41 @@ class AlcanciaRepository(context: Context) {
             }
         })
     }
+
+    fun actualizarAlcancia(idAlcancia: Long, alcancia: AlcanciaDTO, callback: (AlcanciaDTO?, String?) -> Unit) {
+        alcanciaService.actualizarAlcancia(idAlcancia, alcancia).enqueue(object : Callback<AlcanciaDTO> {
+            override fun onResponse(call: Call<AlcanciaDTO>, response: Response<AlcanciaDTO>) {
+                if (response.isSuccessful) {
+                    callback(response.body(), null)
+                } else {
+                    callback(null, "Error al actualizar alcancía: ${response.code()}")
+                }
+
+            }
+            override fun onFailure(call: Call<AlcanciaDTO>, t: Throwable) {
+                callback(null, "Fallo en la conexión: ${t.message}")
+            }
+        })
+    }
+
+    fun eliminarAlcancia(idAlcancia: Long, callback:  (Boolean, String?)-> Unit) {
+        alcanciaService.eliminarAlcancia(idAlcancia).enqueue(object : Callback<Void> {
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                if (response.isSuccessful) {
+                    // Si la eliminación es exitosa, devuelve true
+                    callback(true, null)
+                } else {
+                    // Si hay un error, pasa un mensaje de error con el código de respuesta
+                    callback(false, "Error al eliminar el gasto: ${response.code()}")
+                }
+            }
+
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                // Si hay un fallo en la conexión, pasa el mensaje de error
+                callback(false, "Fallo en la conexión: ${t.message}")
+            }
+        })
+
+    }
+
 }

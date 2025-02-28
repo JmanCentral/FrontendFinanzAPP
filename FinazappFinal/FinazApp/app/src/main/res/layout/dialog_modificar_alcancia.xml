@@ -8,60 +8,88 @@
 
     <!-- Título del diálogo -->
     <TextView
-        android:id="@+id/titulo"
+        android:id="@+id/titulosds"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@style/TxtVerdeMedianoItalic"
-        android:text="Modificar depósito"
+        android:text="Modificar Alcancia"
         android:gravity="center" />
 
-    <!-- Campo para el monto -->
+    <!-- Campo para el nombre de la alcancía -->
     <com.google.android.material.textfield.TextInputEditText
-        android:id="@+id/editTextMonto"
-        style="@style/EstiloEditText"
+        android:id="@+id/editTextNombreAlcancia"
         android:layout_width="match_parent"
         android:layout_height="45dp"
-        android:layout_margin="8dp"
-        android:background="@drawable/bg_btn_borde_amarillo"
-        android:hint="Monto"
-        android:inputType="numberDecimal"
-        android:padding="4dp" />
-
-    <!-- Campo para el nombre del depositante -->
-    <com.google.android.material.textfield.TextInputEditText
-        android:id="@+id/editTextNombreDepositante"
-        style="@style/EstiloEditText"
-        android:layout_width="match_parent"
-        android:layout_height="45dp"
-        android:layout_margin="8dp"
-        android:background="@drawable/bg_btn_borde_amarillo"
-        android:hint="Nombre del depositante"
+        android:hint="Nombre de la alcancía"
         android:inputType="text"
-        android:padding="4dp" />
+        android:padding="4dp"
+        style="@style/EstiloEditText"
+        android:background="@drawable/bg_btn_borde_amarillo"
+        android:layout_margin="8dp"/>
 
-    <!-- Campo para la fecha -->
-    <EditText
-        android:id="@+id/editTextFecha"
+    <!-- Campo para la meta de la alcancía -->
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/editTextMeta"
         android:layout_width="match_parent"
         android:layout_height="45dp"
-        android:hint="Fecha"
+        android:hint="Meta"
+        android:inputType="numberDecimal"
+        android:padding="4dp"
+        style="@style/EstiloEditText"
+        android:background="@drawable/bg_btn_borde_amarillo"
+        android:layout_margin="8dp"/>
+
+    <!-- Campo para el saldo actual de la alcancía -->
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/editTextSaldoActual"
+        style="@style/EstiloEditText"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:layout_margin="8dp"
+        android:background="@drawable/bg_btn_borde_amarillo"
+        android:enabled="false"
+        android:hint="Saldo Actual en 0 al crearla"
+        android:inputType="numberDecimal"
+        android:padding="4dp"
+        android:textColor="@color/amarillo_oscuro" />
+
+    <!-- Campo para el código de la alcancía -->
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/editTextCodigo"
+        style="@style/EstiloEditText"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:layout_margin="8dp"
+        android:background="@drawable/bg_btn_borde_amarillo"
+        android:focusable="false"
+        android:hint="Código Generado Automaticamente"
+        android:inputType="text"
+        android:padding="4dp"
+        android:textColor="@color/amarillo_oscuro" />
+
+    <!-- Campo para la fecha de creación de la alcancía -->
+    <EditText
+        android:id="@+id/editTextFechaCreacion"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:hint="Fecha de creación"
         android:focusable="false"
         android:clickable="true"
         android:padding="4dp"
         style="@style/EstiloEditText"
         android:background="@drawable/bg_btn_borde_amarillo"
-        android:layout_margin="8dp" />
+        android:layout_margin="8dp"/>
 
     <!-- Botón para eliminar el depósito -->
     <Button
-        android:id="@+id/btnEliminarDeposito"
+        android:id="@+id/btnEliminarAlcancia"
         style="@style/EstiloBordeVerde"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="8dp"
         android:layout_marginTop="8dp"
         android:background="#001A41"
-        android:text="Eliminar depósito"
+        android:text="Eliminar alcancia"
         android:textColor="@color/blanco"
         android:textSize="20sp" />
 
@@ -71,6 +99,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@style/TxtVerdePequenoItalic"
-        android:text="Modifica los datos del depósito o elimínalo si es necesario." />
+        android:text="Modifica los datos de la alcancia o elimínala si es necesario." />
 
 </LinearLayout>

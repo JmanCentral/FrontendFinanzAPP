@@ -4,8 +4,11 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.example.finanzapp.repositories.AlcanciaRepository
 import com.practica.finazapp.Entidades.AlcanciaDTO
+import com.practica.finazapp.Entidades.GastoDTO
+import kotlinx.coroutines.launch
 
 class AlcanciaViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -49,6 +52,32 @@ class AlcanciaViewModel(application: Application) : AndroidViewModel(application
         alcanciaRepository.obtenerAlcanciasporuser(idUsuario) { alcanciasResponse, error ->
             _alcanciasPorUserLiveData.postValue(alcanciasResponse)
             _errorLiveData.postValue(error)
+        }
+    }
+
+    // Función para modificar un gasto
+    fun modificarAlcancia(idAlcancia: Long, alcancia: AlcanciaDTO) {
+        viewModelScope.launch {
+            alcanciaRepository.actualizarAlcancia(idAlcancia, alcancia) { resultado, error ->
+                if (error == null) {
+                    _operacionCoMPLETADALiveData.postValue(true)
+                } else {
+                    _errorLiveData.postValue(error)
+                }
+            }
+        }
+    }
+
+    // Función para eliminar un gasto
+    fun eliminarAlcancia(idAlcancia: Long) {
+        viewModelScope.launch {
+            alcanciaRepository.eliminarAlcancia(idAlcancia) { resultado, error ->
+                if (error == null) {
+                    _operacionCoMPLETADALiveData.postValue(true)
+                } else {
+                    _errorLiveData.postValue(error)
+                }
+            }
         }
     }
 }

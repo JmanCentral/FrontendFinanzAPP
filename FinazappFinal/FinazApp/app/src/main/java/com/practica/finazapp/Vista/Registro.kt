@@ -3,7 +3,9 @@ package com.practica.finazapp.Vista
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
 import android.text.InputType
+import android.text.TextWatcher
 import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
@@ -13,6 +15,7 @@ import com.google.android.material.textfield.TextInputEditText
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.textfield.TextInputLayout
 import com.practica.finazapp.Entidades.UsuarioDTO
 import com.practica.finazapp.R
 import com.practica.finazapp.ViewModelsApiRest.SharedViewModel
@@ -28,6 +31,8 @@ class Registro : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_registro)
+
+        validarCorreoEnTiempoReal()
 
         Log.d("Registro", "onCreate del Registro")
         usuarioViewModel = ViewModelProvider(this).get(UserViewModel::class.java)
@@ -91,6 +96,7 @@ class Registro : AppCompatActivity() {
             val contrasena = txtInputContrasena2.text.toString()
             val confirmContrasena = txtInputConf.text.toString()
             val email = txtCorreo.text.toString().trim()
+            val layoutCorreo = findViewById<TextInputLayout>(R.id.wrapperinputCorreo)
 
             when {
                 nombres.isEmpty() || apellidos.isEmpty() || usuario.isEmpty() || contrasena.isEmpty() || confirmContrasena.isEmpty() || email.isEmpty()  -> {
@@ -103,6 +109,10 @@ class Registro : AppCompatActivity() {
                 }
                 !regex.matches(contrasena) -> {
                     txtAdvertencia.text = getString(R.string.requerimientos_cont)
+                    return@setOnClickListener
+                }
+                !esCorreoValido(email) -> {
+                    layoutCorreo.error = "Correo inválido. Debe ser @gmail.com, @hotmail.com o @xxx.edu.co"
                     return@setOnClickListener
                 }
             }
@@ -135,12 +145,37 @@ class Registro : AppCompatActivity() {
         }
 
 
-
         btnVolver.setOnClickListener {
             val intent = Intent(this, Login::class.java)
             startActivity(intent)
             finish()
         }
+    }
+
+    private fun validarCorreoEnTiempoReal() {
+        val txtCorreo = findViewById<TextInputEditText>(R.id.txtinputCorreo)
+        val layoutCorreo = findViewById<TextInputLayout>(R.id.wrapperinputCorreo) // Asegúrate de tenerlo en el XML
+
+        txtCorreo.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                val email = s.toString().trim()
+                if (!esCorreoValido(email)) {
+                    layoutCorreo.error = "Correo inválido. Debe ser @gmail.com, @hotmail.com o @xxx.edu.co"
+                } else {
+                    layoutCorreo.error = null // Si es válido, elimina el mensaje de error
+                }
+            }
+        })
+    }
+
+    // Función para validar el email basado en las reglas del backend
+    private fun esCorreoValido(email: String): Boolean {
+        val patron = Regex("^[^\\s@]+@(gmail\\.com|hotmail\\.com|[a-zA-Z0-9]+\\.edu\\.co)$")
+        return patron.matches(email)
     }
 
 
@@ -163,7 +198,7 @@ class Registro : AppCompatActivity() {
 
     private fun mostrarDialogoCorreo() {
         AlertDialog.Builder(this)
-            .setTitle("Uso de los Apellidos")
+            .setTitle("Uso del correo")
             .setMessage("El correo será utilizado únicamente para la recuperación de contraseña. Asegúrese de ingresarlo correctamente.")
             .setPositiveButton("Entendido") { dialog, _ -> dialog.dismiss() }
             .create().show()
