@@ -50,6 +50,14 @@ interface GastoService {
         @Path("id_usuario") idUsuario: Long
     ): Call<Double>
 
+    @GET("rango/{id_usuario}/{fecha_inicio}/{fecha_final}/{categoria}")
+    fun ListarPorFechas(
+        @Path("id_usuario") idUsuario: Long,
+        @Path("fecha_inicio") fechaInicial: String,
+        @Path("fecha_final") fechaFinal: String,
+        @Path("categoria") categoria: String
+    ): Call<List<GastoDTO>>
+
     // Obtener gastos por fechas
     @GET("GastosMesCategoria/{id_usuario}/{fecha_inicial}/{fecha_final}")
      fun listarGastosPorFechas(

@@ -22,6 +22,12 @@
             android:id="@+id/nav_perfil"
             android:icon="@drawable/perfil"
             android:title="Consejos" />
+
+        <item
+            android:id="@+id/nav_tips"
+            android:icon="@drawable/tipsicono"
+            android:title="Tips secretos" />
+
         <item
             android:id="@+id/fragmentAlertas"
             android:icon="@android:drawable/ic_lock_idle_alarm"

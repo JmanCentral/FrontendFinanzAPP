@@ -67,7 +67,7 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.recyclerview:recyclerview:1.3.2")
     implementation ("com.squareup.retrofit2:converter-scalars:2.9.0")
-    // Reemplazar con la versión de lifecycle adecuada
+    implementation ("com.github.cooltechworks:ScratchView:v1.1")
     implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0")

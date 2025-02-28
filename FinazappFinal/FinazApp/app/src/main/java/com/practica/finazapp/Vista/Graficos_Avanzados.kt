@@ -1,5 +1,4 @@
 package com.practica.finazapp.Vista
-
 import android.animation.Animator
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog

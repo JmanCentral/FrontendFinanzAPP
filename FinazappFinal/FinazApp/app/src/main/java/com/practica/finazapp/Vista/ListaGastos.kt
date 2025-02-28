@@ -100,8 +100,12 @@ class ListaGastos : AppCompatActivity(), OnItemClickListener2 {
 
     private fun mostrarDialogoBuscarGasto() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_buscar_gasto, null)
-        val editTextNombre = dialogView.findViewById<EditText>(R.id.Busca_gasto)
+        val editTextFechaInicial = dialogView.findViewById<EditText>(R.id.Busca_gasto_fecha_inicial)
+        val editTextFechaFinal = dialogView.findViewById<EditText>(R.id.Busca_gasto_fecha_final)
         val botonBuscar = dialogView.findViewById<Button>(R.id.button3)
+
+        editTextFechaInicial.setOnClickListener { showDatePickerDialog(editTextFechaInicial) }
+        editTextFechaFinal.setOnClickListener { showDatePickerDialog(editTextFechaFinal) }
 
         val dialog = AlertDialog.Builder(this)
             .setView(dialogView)
@@ -109,32 +113,56 @@ class ListaGastos : AppCompatActivity(), OnItemClickListener2 {
             .create()
 
         botonBuscar.setOnClickListener {
-            val nombre = editTextNombre.text.toString().trim()
+            val fechaInicialStr = editTextFechaInicial.text.toString()
+            val fechaFinalStr = editTextFechaFinal.text.toString()
             val categoria = intent.getStringExtra("categoria") ?: ""
 
-            if (nombre.isNotBlank()) {
-                gastosViewModel.listarGastosPorNombre(usuarioId, nombre, categoria)
-                gastosViewModel.listarhastospornombre.observe(this) { gastos ->
-                    if (!gastos.isNullOrEmpty()) {
-                        adapter = GastoAdapterPrincipal(gastos)
-                        adapter.setOnItemClickListener2(this)
-                        recyclerView.adapter = adapter
-                        recyclerView.visibility = View.VISIBLE
-                        imgNoGastos.visibility = View.GONE
-                    } else {
-                        recyclerView.visibility = View.GONE
-                        imgNoGastos.visibility = View.VISIBLE
-                        txtNoGastos.visibility = View.VISIBLE
+            if (fechaInicialStr.isNotBlank() && fechaFinalStr.isNotBlank() && categoria.isNotBlank()) {
+                try {
+                    val fechaInicial = convertirFechaAFormatoISO(fechaInicialStr)
+                    val fechaFinal = convertirFechaAFormatoISO(fechaFinalStr)
+
+                    gastosViewModel.listarPorFechas(usuarioId, fechaInicial, fechaFinal, categoria)
+
+                    gastosViewModel.ListarPorFechasLiveData.observe(this) { gastos ->
+                        if (!gastos.isNullOrEmpty()) {
+                            adapter = GastoAdapterPrincipal(gastos)
+                            adapter.setOnItemClickListener2(this)
+                            recyclerView.adapter = adapter
+                            recyclerView.visibility = View.VISIBLE
+                            imgNoGastos.visibility = View.GONE
+                            txtNoGastos.visibility = View.GONE
+                        } else {
+                            recyclerView.visibility = View.GONE
+                            imgNoGastos.visibility = View.VISIBLE
+                            txtNoGastos.visibility = View.VISIBLE
+                        }
                     }
+                } catch (e: Exception) {
+                    Toast.makeText(this, "Formato de fecha inválido", Toast.LENGTH_SHORT).show()
                 }
             } else {
-                Toast.makeText(this, "Ingrese un nombre válido", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Ingrese todos los datos", Toast.LENGTH_SHORT).show()
             }
             dialog.dismiss()
         }
 
         dialog.show()
     }
+
+    private fun convertirFechaAFormatoISO(fecha: String): String {
+        val parts = fecha.split("/")
+        if (parts.size != 3) throw IllegalArgumentException("Formato incorrecto")
+
+        val dia = parts[0].padStart(2, '0')
+        val mes = parts[1].padStart(2, '0')
+        val anio = parts[2]
+
+        return "$anio-$mes-$dia"
+    }
+
+
+
 
     private fun AdvertenciaGastos() {
         val builder = AlertDialog.Builder(this)

@@ -13,15 +13,31 @@
         android:text="Buscar Gasto"
         android:textStyle="bold" />
 
-    <com.google.android.material.textfield.TextInputEditText
-        android:id="@+id/Busca_gasto"
+    <EditText
+        android:id="@+id/Busca_gasto_fecha_inicial"
         style="@style/EstiloEditText"
         android:layout_width="match_parent"
         android:layout_height="45dp"
         android:layout_margin="8dp"
+        android:focusable="false"
+        android:clickable="true"
         android:background="@drawable/bg_btn_borde_amarillo"
-        android:hint="Nombre del Gasto"
+        android:hint="Fecha inicial"
         android:padding="4dp" />
+
+    <EditText
+        android:id="@+id/Busca_gasto_fecha_final"
+        style="@style/EstiloEditText"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:layout_margin="8dp"
+        android:focusable="false"
+        android:clickable="true"
+        android:background="@drawable/bg_btn_borde_amarillo"
+        android:hint="Fecha Final"
+        android:padding="4dp" />
+
+
 
     <Button
         android:id="@+id/button3"

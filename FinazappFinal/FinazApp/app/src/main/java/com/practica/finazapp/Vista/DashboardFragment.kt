@@ -10,6 +10,8 @@ import android.content.pm.PackageManager
 import android.icu.util.Calendar
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -69,12 +71,18 @@ class DashboardFragment : Fragment() {
     ): View {
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
         val root: View = binding.root
+
         return root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        CambiarLayout(true)
+
+        Handler(Looper.getMainLooper()).postDelayed({
+            CambiarLayout(false) // Oculta la animación y muestra el contenido
+        }, 3000)
 
         val lottieCampana = view.findViewById<LottieAnimationView>(R.id.lottieCampana)
 
@@ -260,6 +268,19 @@ class DashboardFragment : Fragment() {
                     }
                 }
             }
+        }
+    }
+
+    private fun CambiarLayout(mostrarCargando: Boolean) {
+        val cargando = binding.lottieLoading
+        val layout = binding.Cargando
+
+        if (mostrarCargando) {
+            cargando.visibility = View.VISIBLE
+            layout.visibility = View.GONE
+        } else {
+            cargando.visibility = View.GONE
+            layout.visibility = View.VISIBLE
         }
     }
 

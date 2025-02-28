@@ -13,8 +13,8 @@ class ConsejosViewModel(application: Application) : AndroidViewModel(application
         ConsejosRepository(getApplication<Application>().applicationContext)
     }
 
-    private val _consejosResponse = MutableLiveData<ConsejosDTO?>()
-    val consejosResponse: LiveData<ConsejosDTO?> get() = _consejosResponse
+    private val _consejosResponse = MutableLiveData<List<ConsejosDTO>?>()
+    val consejosResponse: LiveData<List<ConsejosDTO>?> get() = _consejosResponse
 
     private val _errorLiveData = MutableLiveData<String?>()
     val errorLiveData: LiveData<String?> get() = _errorLiveData
@@ -23,7 +23,7 @@ class ConsejosViewModel(application: Application) : AndroidViewModel(application
     val isLoading: LiveData<Boolean> get() = _isLoading
 
     fun obtenerConsejos() {
-        _isLoading.value = true
+
         consejosRepository.ObtenerConsejos() { response, error ->
             if (response != null) {
                 _consejosResponse.postValue(response)
@@ -31,7 +31,6 @@ class ConsejosViewModel(application: Application) : AndroidViewModel(application
             } else {
                 _errorLiveData.postValue(error)
             }
-            _isLoading.postValue(false)
         }
     }
 

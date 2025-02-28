@@ -19,6 +19,13 @@
         tools:layout="@layout/fragment_reporte" >
     </fragment>
 
+    <fragment
+        android:id="@+id/nav_tips"
+        android:name="com.practica.finazapp.Vista.Tips"
+        android:label="Tips"
+        tools:layout="@layout/fragment_tips" >
+    </fragment>
+
 
     <fragment
         android:id="@+id/nav_ingresos"

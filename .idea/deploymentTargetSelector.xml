@@ -4,7 +4,7 @@
     <selectionStates>
       <SelectionState runConfigName="Finazapp.app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-02-11T03:17:55.338797Z">
+        <DropdownSelection timestamp="2025-02-28T15:11:24.251748400Z">
           <Target type="DEFAULT_BOOT">
             <handle>
               <DeviceId pluginId="PhysicalDevice" identifier="serial=AUHIJFKVJBV86HKB" />

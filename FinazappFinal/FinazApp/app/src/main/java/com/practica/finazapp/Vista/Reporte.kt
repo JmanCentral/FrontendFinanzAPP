@@ -68,7 +68,7 @@ class Reporte : Fragment() {
                 val atrasAn = binding.btonAtrasAn
                 var fechaActual = LocalDate.now()
                 Log.d("FragmentReporte", "fecha de referencia: $fechaActual")
-                listOf<String>("disponible", "Gastos hormiga", "Alimentos", "Transporte", "Servicios", "Mercado")
+                listOf<String>("disponible", "Gastos hormiga", "Alimentos", "Transporte", "Servicios", "Mercado" , "Deudas")
 
                 adelanteSem.setOnClickListener {
                     fechaActual = fechaActual.plusWeeks(1)
@@ -147,8 +147,8 @@ class Reporte : Fragment() {
                 descSem.setText("$mes de $anio")
 
                 Log.d("FragmentReporte", "rango: $fechaInfFormateada a $fechaSupFormateada")
-                gastosViewModel.listarGastosPorFechas(usuarioId, fechaInfFormateada, fechaSupFormateada)
-                gastosViewModel.gastosPorFechasLiveData.observe(viewLifecycleOwner){listaMes ->
+                gastosViewModel.listarGastosPorFechasMensual(usuarioId, fechaInfFormateada, fechaSupFormateada)
+                gastosViewModel.gastosPorFechasMensualesLiveData.observe(viewLifecycleOwner){listaMes ->
                     listaMes?.let {
                         cargarGraficoLineasMes(lineChartReporte, convertirMapaALista(getDatosPorCategoria(listaMes)))
                         Log.d("FragmentReporte", "lista gastos: $listaMes")
@@ -167,8 +167,8 @@ class Reporte : Fragment() {
                 descSem.setText("$anio")
                 Log.d("FragmentReporte", "rango: $fechaInfFormateada a $fechaSupFormateada")
 
-                gastosViewModel.listarGastosPorFechas(usuarioId, fechaInfFormateada, fechaSupFormateada)
-                gastosViewModel.gastosPorFechasLiveData.observe(viewLifecycleOwner) { listaAn ->
+                gastosViewModel.listarGastosPorFechasAnual(usuarioId, fechaInfFormateada, fechaSupFormateada)
+                gastosViewModel.gastosPorFechasAnualesLiveData.observe(viewLifecycleOwner) { listaAn ->
                     listaAn?.let {
                         Log.d("FragmentReporte", "lista gastos: $listaAn")
                         cargarGraficoLineasAn(
@@ -548,7 +548,10 @@ class Reporte : Fragment() {
             "Alimentos" to "#FF66C1",
             "Transporte" to "#339AF0",
             "Servicios" to "#EEB62B",
-            "Mercado" to "#FD8435"
+            "Mercado" to "#FD8435",
+            "Deudas" to "#00B8B3"
+
+
         )
         val color = Color.parseColor(categoriasColores[categoria])
         return color // Devuelve el color correspondiente a la categoría

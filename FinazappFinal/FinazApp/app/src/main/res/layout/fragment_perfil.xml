@@ -1,370 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/layout">
-
+    <!-- Título -->
     <TextView
         android:id="@+id/Proyecciones"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="36dp"
-        android:gravity="center"
         android:text="Consejos"
         android:textColor="#001A41"
         android:textSize="30sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="36dp"/>
 
-    <ScrollView
-        android:id="@+id/scrollView3"
-        android:layout_width="0dp"
+    <!-- RecyclerView con mejor alineación -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewConsejos"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintTop_toBottomOf="@id/Proyecciones"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/Proyecciones">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <androidx.cardview.widget.CardView
-            android:id="@+id/cardView1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            app:cardCornerRadius="8dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-                <!-- Imagen a la izquierda -->
-                <com.airbnb.lottie.LottieAnimationView
-                    android:id="@+id/lottie_consejo1"
-                    android:layout_width="151dp"
-                    android:layout_height="117dp"
-                    app:lottie_autoPlay="true"
-                    app:lottie_loop="true"
-                    app:lottie_rawRes="@raw/consejo"/>
-
-                <!-- Texto a la derecha -->
-                <TextView
-                    android:id="@+id/textViewConsejo1"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2"
-                    android:padding="16dp"
-                    android:text="Consejos 1...."
-                    android:textColor="@android:color/black"
-                    android:textSize="18sp" />
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
-            <!-- CardView 2 -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/cardView2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                app:cardCornerRadius="8dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/textViewConsejo2"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:justificationMode="inter_word"
-                        android:padding="16dp"
-                        android:text="El gasto mas bajo es..."
-                        android:textColor="@android:color/black"
-                        android:textSize="18sp" />
-
-                    <com.airbnb.lottie.LottieAnimationView
-                        android:id="@+id/lottie_consejo2"
-                        android:layout_width="151dp"
-                        android:layout_height="117dp"
-                        app:lottie_autoPlay="true"
-                        app:lottie_loop="true"
-                        app:lottie_rawRes="@raw/consejo"/>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- CardView 3 -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/cardView3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                app:cardCornerRadius="8dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <!-- Imagen a la izquierda -->
-                    <com.airbnb.lottie.LottieAnimationView
-                        android:id="@+id/lottie_consejo3"
-                        android:layout_width="151dp"
-                        android:layout_height="117dp"
-                        app:lottie_autoPlay="true"
-                        app:lottie_loop="true"
-                        app:lottie_rawRes="@raw/consejo"/>
-
-                    <!-- Texto a la derecha -->
-                    <TextView
-                        android:id="@+id/textViewConsejo3"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="2"
-                        android:padding="16dp"
-                        android:text="Recomendación 3"
-                        android:textColor="@android:color/black"
-                        android:textSize="18sp" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- CardView 4 -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/cardView4"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                app:cardCornerRadius="8dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/textViewConsejo4"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:padding="16dp"
-                        android:text="Recomendacion 4"
-                        android:justificationMode="inter_word"
-                        android:textColor="@android:color/black"
-                        android:textSize="18sp" />
-
-                    <com.airbnb.lottie.LottieAnimationView
-                        android:id="@+id/lottie_consejo4"
-                        android:layout_width="151dp"
-                        android:layout_height="117dp"
-                        app:lottie_autoPlay="true"
-                        app:lottie_loop="true"
-                        app:lottie_rawRes="@raw/consejo"/>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-            <androidx.cardview.widget.CardView
-                android:id="@+id/cardView6"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                app:cardCornerRadius="8dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <!-- Imagen a la izquierda -->
-                    <com.airbnb.lottie.LottieAnimationView
-                        android:id="@+id/lottie_consejo5"
-                        android:layout_width="151dp"
-                        android:layout_height="117dp"
-                        app:lottie_autoPlay="true"
-                        app:lottie_loop="true"
-                        app:lottie_rawRes="@raw/consejo"/>
-
-                    <!-- Texto a la derecha -->
-                    <TextView
-                        android:id="@+id/textViewConsejo5"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="2"
-                        android:padding="16dp"
-                        android:text="Recomendación 6"
-                        android:textColor="@android:color/black"
-                        android:textSize="18sp" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
-                android:id="@+id/cardView7"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                app:cardCornerRadius="8dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/textViewConsejo6"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:padding="16dp"
-                        android:text="Clickea para observar tus gastos recurrentes!!!!!"
-                        android:justificationMode="inter_word"
-                        android:textColor="@android:color/black"
-                        android:textSize="18sp" />
-
-                    <com.airbnb.lottie.LottieAnimationView
-                        android:id="@+id/lottie_consejo6"
-                        android:layout_width="151dp"
-                        android:layout_height="117dp"
-                        app:lottie_autoPlay="true"
-                        app:lottie_loop="true"
-                        app:lottie_rawRes="@raw/consejo"/>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
-                android:id="@+id/cardView8"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                app:cardCornerRadius="8dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <!-- Imagen a la izquierda -->
-                    <com.airbnb.lottie.LottieAnimationView
-                        android:id="@+id/lottie_consejo7"
-                        android:layout_width="151dp"
-                        android:layout_height="117dp"
-                        app:lottie_autoPlay="true"
-                        app:lottie_loop="true"
-                        app:lottie_rawRes="@raw/consejo"/>
-
-                    <!-- Texto a la derecha -->
-                    <TextView
-                        android:id="@+id/textViewConsejo7"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="2"
-                        android:padding="16dp"
-                        android:text="Recomendación 6"
-                        android:textColor="@android:color/black"
-                        android:textSize="18sp" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- Primer CardView: Imagen a la derecha -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/cardView9"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                app:cardCornerRadius="8dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <!-- Texto a la izquierda -->
-                    <TextView
-                        android:id="@+id/textViewConsejo8"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="2"
-                        android:padding="16dp"
-                        android:text="Recomendación 1"
-                        android:textColor="@android:color/black"
-                        android:textSize="18sp" />
-
-                    <!-- Imagen a la derecha -->
-                    <com.airbnb.lottie.LottieAnimationView
-                        android:id="@+id/lottie_consejo8"
-                        android:layout_width="151dp"
-                        android:layout_height="117dp"
-                        app:lottie_autoPlay="true"
-                        app:lottie_loop="true"
-                        app:lottie_rawRes="@raw/consejo"/>
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- Segundo CardView: Imagen a la izquierda -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="16dp"
-                app:cardCornerRadius="8dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <!-- Imagen a la izquierda -->
-                    <com.airbnb.lottie.LottieAnimationView
-                        android:id="@+id/lottie_consejo10"
-                        android:layout_width="151dp"
-                        android:layout_height="117dp"
-                        app:lottie_autoPlay="true"
-                        app:lottie_loop="true"
-                        app:lottie_rawRes="@raw/consejo"/>
-
-                    <!-- Texto a la derecha -->
-                    <TextView
-                        android:id="@+id/textViewConsejo9"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="2"
-                        android:padding="16dp"
-                        android:text="Recomendación 2"
-                        android:textColor="@android:color/black"
-                        android:textSize="18sp" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <TextView
-                android:id="@+id/textView"
-                android:layout_width="73dp"
-                android:layout_height="wrap_content"
-                android:textSize="35sp"
-                tools:ignore="MissingConstraints" />
-
-        </LinearLayout>
-    </ScrollView>
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
+    <!-- Lottie Animación de Carga (Centrada) -->
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/lottieLoading"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:visibility="visible"
         app:lottie_rawRes="@raw/cargando"
         app:lottie_autoPlay="true"
@@ -372,6 +45,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

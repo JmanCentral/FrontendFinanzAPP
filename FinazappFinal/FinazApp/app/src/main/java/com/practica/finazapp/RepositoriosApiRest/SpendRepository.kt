@@ -130,6 +130,22 @@ class SpendRepository (context: Context)  {
         })
     }
 
+    fun listarPorFechas(idUsuario: Long, fechaInicial: String, fechaFinal: String, categoria: String, callback: (List<GastoDTO>?, String?) -> Unit) {
+        gastoService.ListarPorFechas(idUsuario, fechaInicial, fechaFinal, categoria).enqueue(object : Callback<List<GastoDTO>> {
+            override fun onResponse(call: Call<List<GastoDTO>>, response: Response<List<GastoDTO>>) {
+                if (response.isSuccessful) {
+                    callback(response.body(), null)
+                } else {
+                    callback(null, "Error al obtener gastos por fechas: ${response.code()}")
+                }
+            }
+
+            override fun onFailure(call: Call<List<GastoDTO>>, t: Throwable) {
+                callback(null, "Fallo en la conexión: ${t.message}")
+            }
+        })
+    }
+
     fun listarGastosAscendentemente(idUsuario: Long, callback: (List<GastoDTO>?, String?) -> Unit) {
         gastoService.listarGastosAscendentemente(idUsuario).enqueue(object : Callback<List<GastoDTO>> {
             override fun onResponse(call: Call<List<GastoDTO>>, response: Response<List<GastoDTO>>) {

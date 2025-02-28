@@ -20,18 +20,6 @@
                       </LayoutPositions>
                     </value>
                   </entry>
-                  <entry key="fragmentCategorias">
-                    <value>
-                      <LayoutPositions>
-                        <option name="myPosition">
-                          <Point>
-                            <option name="x" value="227" />
-                            <option name="y" value="368" />
-                          </Point>
-                        </option>
-                      </LayoutPositions>
-                    </value>
-                  </entry>
                   <entry key="fragmentProyecciones">
                     <value>
                       <LayoutPositions>
@@ -110,6 +98,18 @@
                         <option name="myPosition">
                           <Point>
                             <option name="x" value="442" />
+                            <option name="y" value="12" />
+                          </Point>
+                        </option>
+                      </LayoutPositions>
+                    </value>
+                  </entry>
+                  <entry key="nav_tips">
+                    <value>
+                      <LayoutPositions>
+                        <option name="myPosition">
+                          <Point>
+                            <option name="x" value="12" />
                             <option name="y" value="12" />
                           </Point>
                         </option>

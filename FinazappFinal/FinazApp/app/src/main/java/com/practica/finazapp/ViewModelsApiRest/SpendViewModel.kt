@@ -65,6 +65,12 @@ import kotlinx.coroutines.launch
         private val _gastosPorFechasLiveData = MutableLiveData<List<GastoDTO>?>()
         val gastosPorFechasLiveData: LiveData<List<GastoDTO>?> = _gastosPorFechasLiveData
 
+        private val _gastosPorFechasMensualesLiveData = MutableLiveData<List<GastoDTO>?>()
+        val gastosPorFechasMensualesLiveData: LiveData<List<GastoDTO>?> = _gastosPorFechasMensualesLiveData
+
+        private val _gastosPorFechasAnualesLiveData = MutableLiveData<List<GastoDTO>?>()
+        val gastosPorFechasAnualesLiveData: LiveData<List<GastoDTO>?> = _gastosPorFechasAnualesLiveData
+
         // LiveData para la lista de gastos ordenados ascendentemente
         private val _gastosAscendentesLiveData = MutableLiveData<List<GastoDTO>?>()
         val gastosAscendentesLiveData: LiveData<List<GastoDTO>?> = _gastosAscendentesLiveData
@@ -80,6 +86,9 @@ import kotlinx.coroutines.launch
         // LiveData para la lista de gastos ordenados descendentemente
         private val _gastosDescendentesLiveData = MutableLiveData<List<GastoDTO>?>()
         val gastosDescendentesLiveData: LiveData<List<GastoDTO>?> = _gastosDescendentesLiveData
+
+        private val _ListarPorFechasLiveData = MutableLiveData<List<GastoDTO>?>()
+        val ListarPorFechasLiveData: LiveData<List<GastoDTO>?> = _ListarPorFechasLiveData
 
         // LiveData para el promedio de gastos
         private val _promedioGastosLiveData = MutableLiveData<Double?>()
@@ -279,7 +288,43 @@ import kotlinx.coroutines.launch
         }
     }
 
-    // Función para obtener gastos ordenados ascendentemente
+        fun listarPorFechas(idUsuario: Long, fechaInicial: String, fechaFinal: String , categoria: String) {
+            viewModelScope.launch {
+                repository.listarPorFechas(idUsuario, fechaInicial, fechaFinal , categoria) { gastos, error ->
+                    if (error == null) {
+                        _ListarPorFechasLiveData.postValue(gastos)
+                    } else {
+                        _errorLiveData.postValue(error)
+                    }
+                }
+            }
+        }
+
+        fun listarGastosPorFechasMensual(idUsuario: Long, fechaInicial: String, fechaFinal: String) {
+            viewModelScope.launch {
+                repository.listarGastosPorFechas(idUsuario, fechaInicial, fechaFinal) { gastos, error ->
+                    if (error == null) {
+                        _gastosPorFechasMensualesLiveData.postValue(gastos)
+                    } else {
+                        _errorLiveData.postValue(error)
+                    }
+                }
+            }
+        }
+
+        fun listarGastosPorFechasAnual(idUsuario: Long, fechaInicial: String, fechaFinal: String) {
+            viewModelScope.launch {
+                repository.listarGastosPorFechas(idUsuario, fechaInicial, fechaFinal) { gastos, error ->
+                    if (error == null) {
+                        _gastosPorFechasAnualesLiveData.postValue(gastos)
+                    } else {
+                        _errorLiveData.postValue(error)
+                    }
+                }
+            }
+        }
+
+        // Función para obtener gastos ordenados ascendentemente
     fun listarGastosAscendentemente(idUsuario: Long) {
         viewModelScope.launch {
             repository.listarGastosAscendentemente(idUsuario) { gastos, error ->
