@@ -78,7 +78,6 @@ dependencies {
     val room_version = "2.6.1"
     implementation("androidx.room:room-runtime:$room_version")
     implementation("androidx.core:core-splashscreen:1.0.1")
-    kapt("androidx.room:room-compiler:$room_version")
     implementation("androidx.room:room-ktx:2.6.1")
     annotationProcessor("androidx.room:room-compiler:$room_version")
     implementation ("com.squareup.retrofit2:retrofit:2.9.0")

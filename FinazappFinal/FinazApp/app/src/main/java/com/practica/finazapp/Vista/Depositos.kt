@@ -99,7 +99,7 @@ class Depositos : AppCompatActivity(), DepositoListener {
         val editTextMonto = dialogView.findViewById<EditText>(R.id.editTextMontoModificar)
         val editTextdepositante = dialogView.findViewById<EditText>(R.id.editTextNombreDepositanteModificar)
         val editTextFecha = dialogView.findViewById<EditText>(R.id.editTextFechaModificar)
-        val btnEliminar = dialogView.findViewById<Button>(R.id.btnEliminarDeposito)v
+        val btnEliminar = dialogView.findViewById<Button>(R.id.btnEliminarDeposito)
 
         editTextFecha.setText(deposito.fecha.replace("-", "/"))
 
