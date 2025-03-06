@@ -15,7 +15,7 @@ import retrofit2.Response
 class SpendRepository (context: Context)  {
 
     private val gastoService: GastoService by lazy {
-        Cliente.getCliente("http://100.115.249.2:8862/Finanzapp/Gastos/", context)
+        Cliente.getCliente("http://192.168.10.15:8862/Finanzapp/Gastos/", context)
             .create(GastoService::class.java)
     }
 

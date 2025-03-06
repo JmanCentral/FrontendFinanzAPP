@@ -49,11 +49,9 @@ class Perfil : Fragment() {
             if (!consejos.isNullOrEmpty()) {
                 consejosAdapter = ConsejosAdapter(consejos)
                 binding.recyclerViewConsejos.visibility = View.VISIBLE
-                binding.lottieLoading.visibility = View.GONE
                 binding.recyclerViewConsejos.adapter = consejosAdapter
             } else {
                 binding.recyclerViewConsejos.visibility = View.GONE
-                binding.lottieLoading.visibility = View.VISIBLE
             }
         }
 

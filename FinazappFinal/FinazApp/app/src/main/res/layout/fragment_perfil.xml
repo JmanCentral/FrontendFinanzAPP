@@ -4,7 +4,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".YourActivity">
 
     <!-- Título -->
     <TextView
@@ -21,30 +22,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="36dp"/>
 
-    <!-- RecyclerView con mejor alineación -->
+    <!-- RecyclerView ajustado correctamente -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewConsejos"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
         app:layout_constraintTop_toBottomOf="@id/Proyecciones"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
-
-    <!-- Lottie Animación de Carga (Centrada) -->
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/lottieLoading"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:visibility="visible"
-        app:lottie_rawRes="@raw/cargando"
-        app:lottie_autoPlay="true"
-        app:lottie_loop="true"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+

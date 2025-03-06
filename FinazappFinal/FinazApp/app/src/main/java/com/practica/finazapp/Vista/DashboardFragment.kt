@@ -78,12 +78,6 @@ class DashboardFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        CambiarLayout(true)
-
-        Handler(Looper.getMainLooper()).postDelayed({
-            CambiarLayout(false) // Oculta la animación y muestra el contenido
-        }, 3000)
-
         val lottieCampana = view.findViewById<LottieAnimationView>(R.id.lottieCampana)
 
         lottieCampana.setOnClickListener {
@@ -271,18 +265,6 @@ class DashboardFragment : Fragment() {
         }
     }
 
-    private fun CambiarLayout(mostrarCargando: Boolean) {
-        val cargando = binding.lottieLoading
-        val layout = binding.Cargando
-
-        if (mostrarCargando) {
-            cargando.visibility = View.VISIBLE
-            layout.visibility = View.GONE
-        } else {
-            cargando.visibility = View.GONE
-            layout.visibility = View.VISIBLE
-        }
-    }
 
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->

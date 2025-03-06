@@ -7,6 +7,6 @@ import retrofit2.http.Path
 
 interface TipsService {
 
-    @GET("{usuarioId}")
+    @GET("ObtenerTips/{usuarioId}")
     fun obtenerTips( @Path("usuarioId") idUsuario: Long): Call<List<TipsDTO>>
 }

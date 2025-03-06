@@ -211,13 +211,18 @@ class ListaGastos : AppCompatActivity(), OnItemClickListener2 {
         spinnerCategoria.adapter = adapter
 
         editTextCantidad.setText(gasto.valor.toString())
-        editTextFecha.setText(gasto.fecha.replace("-", "/"))
-        editTextDescripcion.setText(gasto.nombre_gasto)
+        val fecha = gasto.fecha
+        val parts = fecha.split("-")
+        val fechaFormateada = "${parts[2]}/${parts[1]}/${parts[0]}"
 
+        editTextFecha.setText(fechaFormateada)  // Mostrar la fecha en formato dd/MM/yyyy
+        editTextFecha.setOnClickListener {
+            showDatePickerDialog(editTextFecha)
+        }
+        editTextDescripcion.setText(gasto.nombre_gasto)
         val posicionCategoria = items.indexOf(gasto.categoria)
         if (posicionCategoria != -1) spinnerCategoria.setSelection(posicionCategoria)
 
-        editTextFecha.setOnClickListener { showDatePickerDialog(editTextFecha) }
 
         val dialog = AlertDialog.Builder(this)
             .setView(dialogView)

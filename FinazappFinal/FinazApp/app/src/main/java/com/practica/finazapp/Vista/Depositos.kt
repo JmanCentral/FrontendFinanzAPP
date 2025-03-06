@@ -110,10 +110,17 @@ class Depositos : AppCompatActivity(), DepositoListener {
         Log.d("DepositoClick", "Fecha formateada para edición: ${editTextFecha.text}")
 
         editTextMonto.setText(deposito.monto.toString())
-        editTextFecha.setText(deposito.fecha.replace("-", "/"))
+
+        val fecha = deposito.fecha
+        val parts = fecha.split("-")
+        val fechaFormateada = "${parts[2]}/${parts[1]}/${parts[0]}"
+
+        editTextFecha.setText(fechaFormateada)  // Mostrar la fecha en formato dd/MM/yyyy
+        editTextFecha.setOnClickListener {
+            showDatePickerDialog(editTextFecha)
+        }
         editTextdepositante.setText(deposito.nombre_depositante)
 
-        editTextFecha.setOnClickListener { showDatePickerDialog(editTextFecha) }
 
         val dialog = AlertDialog.Builder(this)
             .setView(dialogView)
@@ -137,6 +144,8 @@ class Depositos : AppCompatActivity(), DepositoListener {
             val monto = editTextMonto.text.toString()
             val nombre = editTextdepositante.text.toString()
             val fechaOriginal = editTextFecha.text.toString()
+
+
 
             Log.d("DepositoClick", "Valores ingresados - Monto: $monto, Nombre: $nombre, Fecha: $fechaOriginal")
 

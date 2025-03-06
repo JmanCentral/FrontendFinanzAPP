@@ -6,11 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/Cargando"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
 
     <ScrollView
         android:id="@+id/scrollView4"
@@ -560,31 +555,29 @@
                 tools:layout_editor_absoluteY="2dp"
                 tools:ignore="MissingConstraints" />
 
-
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/floatingActionButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:layout_marginTop="350dp"
+                android:layout_marginEnd="15dp"
+                android:backgroundTint="@color/verde_claro"
+                android:contentDescription="@string/desc_mas"
+                android:src="@drawable/mas"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+
     </ScrollView>
 
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/floatingActionButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:layout_marginTop="350dp"
-        android:layout_marginEnd="15dp"
-        android:backgroundTint="@color/verde_claro"
-        android:contentDescription="@string/desc_mas"
-        android:src="@drawable/mas"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/lottieLoading"
         android:layout_width="200dp"
         android:layout_height="200dp"
-        android:visibility="visible"
+        android:visibility="gone"
         app:lottie_rawRes="@raw/cargando"
         app:lottie_autoPlay="true"
         app:lottie_loop="true"
