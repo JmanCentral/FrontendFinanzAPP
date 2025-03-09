@@ -24,7 +24,6 @@ import com.practica.finazapp.Entidades.DepositoDTO
 import com.practica.finazapp.R
 import com.practica.finazapp.ViewModelsApiRest.DepositoViewModel
 import com.practica.finazapp.ViewModelsApiRest.SharedViewModel
-import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -92,121 +91,59 @@ class Depositos : AppCompatActivity(), DepositoListener {
 
     }
 
-    override fun onBackPressed() {
-        // No hagas nada para bloquear el botón atrás
-    }
-
     @SuppressLint("MissingInflatedId")
     override fun onItemClick(deposito: DepositoDTO) {
-        Log.d("DepositoClick", "Depósito seleccionado: $deposito")
 
         val dialogView = layoutInflater.inflate(R.layout.dialog_modificar_deposito, null)
 
-        val editTextMonto = dialogView.findViewById<EditText>(R.id.editTextMonto)
-        val editTextdepositante = dialogView.findViewById<EditText>(R.id.editTextNombreDepositante)
-        val editTextFecha = dialogView.findViewById<EditText>(R.id.editTextFecha)
-        val btnEliminar = dialogView.findViewById<Button>(R.id.btnEliminarDeposito)
+        val editTextMonto = dialogView.findViewById<EditText>(R.id.editTextMontoModificar)
+        val editTextdepositante = dialogView.findViewById<EditText>(R.id.editTextNombreDepositanteModificar)
+        val editTextFecha = dialogView.findViewById<EditText>(R.id.editTextFechaModificar)
+        val btnEliminar = dialogView.findViewById<Button>(R.id.btnEliminarDeposito)v
 
-        Log.d("DepositoClick", "Fecha formateada para edición: ${editTextFecha.text}")
+        editTextFecha.setText(deposito.fecha.replace("-", "/"))
 
-        editTextMonto.setText(deposito.monto.toString())
-
-        val fecha = deposito.fecha
-        val parts = fecha.split("-")
-        val fechaFormateada = "${parts[2]}/${parts[1]}/${parts[0]}"
-
-        editTextFecha.setText(fechaFormateada)  // Mostrar la fecha en formato dd/MM/yyyy
-        editTextFecha.setOnClickListener {
-            showDatePickerDialog(editTextFecha)
-        }
-        editTextdepositante.setText(deposito.nombre_depositante)
-
+        editTextFecha.setOnClickListener { showDatePickerDialog(editTextFecha) }
 
         val dialog = AlertDialog.Builder(this)
             .setView(dialogView)
-            .setPositiveButton("Guardar", null) // Se asignará más tarde para no cerrar el diálogo automáticamente
-            .setNegativeButton("Cancelar") { dialog, _ ->
-                Log.d("DepositoClick", "Edición cancelada por el usuario")
-                dialog.dismiss()
+            .setPositiveButton("Guardar") { _, _ ->
+                val monto = editTextMonto.text.toString().toDoubleOrNull()
+                val nombre = editTextdepositante.text.toString()
+                val fechaOriginal = editTextFecha.text.toString()
+
+                if (monto != null  && fechaOriginal.isNotBlank()) {
+
+                    // Realizar la conversión de fecha y guardar el nuevo gasto
+                    val parts = fechaOriginal.split("/")
+                    val dia = parts[0].padStart(2, '0')
+                    val mes = parts[1].padStart(2, '0')
+                    val anio = parts[2]
+                    val fecha = "${anio}-${mes}-${dia}"
+
+                    val DepositoActualizado = deposito.copy(
+                        monto = monto,
+                        nombre_depositante = nombre,
+                        fecha = fecha
+                    )
+                    depositoViewModel.modificarDepositos(DepositoActualizado , deposito.idDeposito , idAlcancia)
+                } else {
+                    Toast.makeText(
+                        this,
+                        "Complete todos los campos correctamente",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
+            .setNegativeButton("Cancelar") { dialog, _ -> dialog.dismiss() }
             .create()
 
         btnEliminar.setOnClickListener {
-            Log.d("DepositoClick", "Eliminando depósito con ID: ${deposito.idDeposito}")
             depositoViewModel.eliminarDepositos(deposito.idDeposito, idAlcancia)
             dialog.dismiss()
         }
-
         dialog.show()
-
-        // Sobrescribir el comportamiento del botón "Guardar"
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-            val monto = editTextMonto.text.toString()
-            val nombre = editTextdepositante.text.toString()
-            val fechaOriginal = editTextFecha.text.toString()
-
-
-
-            Log.d("DepositoClick", "Valores ingresados - Monto: $monto, Nombre: $nombre, Fecha: $fechaOriginal")
-
-            if (monto.isBlank() || nombre.isBlank() || fechaOriginal.isBlank()) {
-                // Mostrar alerta sin cerrar el diálogo principal
-                AlertDialog.Builder(this)
-                    .setTitle("Campos vacíos")
-                    .setMessage("Por favor, complete todos los campos antes de guardar.")
-                    .setPositiveButton("OK") { alertDialog, _ -> alertDialog.dismiss() }
-                    .create()
-                    .show()
-                return@setOnClickListener
-            }
-
-            val montoDouble = monto.toDoubleOrNull()
-            if (montoDouble == null) {
-                // Mostrar alerta si el monto no es válido
-                AlertDialog.Builder(this)
-                    .setTitle("Monto inválido")
-                    .setMessage("Ingrese un valor numérico válido para el monto.")
-                    .setPositiveButton("OK") { alertDialog, _ -> alertDialog.dismiss() }
-                    .create()
-                    .show()
-                return@setOnClickListener
-            }
-
-            // Validar el formato de la fecha
-            val parts = fechaOriginal.split("/")
-            if (parts.size < 3) {
-                // Mostrar alerta si el formato de la fecha es incorrecto
-                AlertDialog.Builder(this)
-                    .setTitle("Formato de fecha incorrecto")
-                    .setMessage("El formato de la fecha debe ser dd/MM/yyyy.")
-                    .setPositiveButton("OK") { alertDialog, _ -> alertDialog.dismiss() }
-                    .create()
-                    .show()
-                return@setOnClickListener
-            }
-
-            val dia = parts[0].padStart(2, '0')
-            val mes = parts[1].padStart(2, '0')
-            val anio = parts[2]
-            val fecha = "$anio-$mes-$dia"
-
-            Log.d("DepositoClick", "Fecha convertida: $fecha")
-
-            // Crear el objeto DepositoDTO actualizado
-            val depositoActualizado = deposito.copy(
-                monto = montoDouble,
-                nombre_depositante = nombre,
-                fecha = fecha
-            )
-
-            Log.d("DepositoClick", "Depósito actualizado: $depositoActualizado")
-
-            // Modificar el depósito
-            depositoViewModel.modificarDepositos(depositoActualizado, deposito.idDeposito, idAlcancia)
-            dialog.dismiss() // Cerrar el diálogo principal después del guardado exitoso
-        }
     }
-
 
 
     private fun obtenerDepositos(idAlcancia: Long) {
@@ -246,7 +183,33 @@ class Depositos : AppCompatActivity(), DepositoListener {
         val dialog = AlertDialog.Builder(this)
             .setTitle("Registrar Depósito")
             .setView(dialogView)
-            .setPositiveButton("Guardar", null) // Se asignará más tarde para no cerrar el diálogo automáticamente
+            .setPositiveButton("Guardar") { dialog, _ ->
+                val monto = dialogView.findViewById<TextInputEditText>(R.id.editTextMonto).text.toString().toDoubleOrNull() ?: 0.0
+                val nombreDepositante = dialogView.findViewById<TextInputEditText>(R.id.editTextNombreDepositante).text.toString()
+                val fecha = dialogView.findViewById<EditText>(R.id.editTextFecha).text.toString()
+
+                Log.d("Depositos", "Monto: $monto, Nombre Depositante: $nombreDepositante, Fecha: $fecha")
+
+                if (nombreDepositante.isNotEmpty() && fecha.isNotEmpty()) {
+                    val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                    val date = dateFormat.parse(fecha)
+                    val fechaoriginal = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(date)
+
+                    val depositoDTO = DepositoDTO(
+                        idDeposito = 0,
+                        monto = monto,
+                        nombre_depositante = nombreDepositante,
+                        fecha = fechaoriginal
+                    )
+
+                    Log.d("Depositos", "Registrando depósito con los datos: $depositoDTO")
+                    depositoViewModel.registrarDeposito(depositoDTO, usuarioId, idAlcancia)
+                    Toast.makeText(this, "Depósito registrado correctamente", Toast.LENGTH_SHORT).show()
+                } else {
+                    Log.w("Depositos", "Campos incompletos al registrar depósito")
+                    Toast.makeText(this, "Por favor, complete todos los campos", Toast.LENGTH_SHORT).show()
+                }
+            }
             .setNegativeButton("Cancelar") { dialog, _ ->
                 Log.d("Depositos", "Registro de depósito cancelado")
                 dialog.dismiss()
@@ -260,76 +223,22 @@ class Depositos : AppCompatActivity(), DepositoListener {
         }
 
         dialog.show()
-
-        // Sobrescribir el comportamiento del botón "Guardar"
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-            val monto = dialogView.findViewById<TextInputEditText>(R.id.editTextMonto).text.toString().toDoubleOrNull() ?: 0.0
-            val nombreDepositante = dialogView.findViewById<TextInputEditText>(R.id.editTextNombreDepositante).text.toString()
-            val fecha = dialogView.findViewById<EditText>(R.id.editTextFecha).text.toString()
-
-            Log.d("Depositos", "Monto: $monto, Nombre Depositante: $nombreDepositante, Fecha: $fecha")
-
-            if (nombreDepositante.isEmpty() || fecha.isEmpty()) {
-                // Mostrar alerta sin cerrar el diálogo principal
-                AlertDialog.Builder(this)
-                    .setTitle("Campos vacíos")
-                    .setMessage("Por favor, complete todos los campos antes de guardar.")
-                    .setPositiveButton("OK") { alertDialog, _ -> alertDialog.dismiss() }
-                    .create()
-                    .show()
-                return@setOnClickListener
-            }
-
-            // Validar el formato de la fecha
-            val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-            val date = try {
-                dateFormat.parse(fecha)
-            } catch (e: ParseException) {
-                Log.e("Depositos", "Formato de fecha incorrecto: $fecha", e)
-                // Mostrar alerta si el formato de la fecha es incorrecto
-                AlertDialog.Builder(this)
-                    .setTitle("Formato de fecha incorrecto")
-                    .setMessage("El formato de la fecha debe ser dd/MM/yyyy.")
-                    .setPositiveButton("OK") { alertDialog, _ -> alertDialog.dismiss() }
-                    .create()
-                    .show()
-                return@setOnClickListener
-            }
-
-            val fechaoriginal = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(date)
-
-            // Crear el objeto DepositoDTO
-            val depositoDTO = DepositoDTO(
-                idDeposito = 0,
-                monto = monto,
-                nombre_depositante = nombreDepositante,
-                fecha = fechaoriginal
-            )
-
-            Log.d("Depositos", "Registrando depósito con los datos: $depositoDTO")
-            depositoViewModel.registrarDeposito(depositoDTO, usuarioId, idAlcancia)
-            Toast.makeText(this, "Depósito registrado correctamente", Toast.LENGTH_SHORT).show()
-            dialog.dismiss() // Cerrar el diálogo principal después del guardado exitoso
-        }
     }
 
     private fun showDatePickerDialog(editTextFecha: EditText) {
-        // Obtener la fecha actual
-        val calendar = android.icu.util.Calendar.getInstance()
-        val year = calendar.get(android.icu.util.Calendar.YEAR)
-        val month = calendar.get(android.icu.util.Calendar.MONTH)
-        val dayOfMonth = calendar.get(android.icu.util.Calendar.DAY_OF_MONTH)
+        val calendar = Calendar.getInstance()
+        val year = calendar.get(Calendar.YEAR)
+        val month = calendar.get(Calendar.MONTH)
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
 
-        // Crear y mostrar el DatePickerDialog
         val datePickerDialog = DatePickerDialog(
             this,
-            { _, year1, monthOfYear, dayOfMonth1 ->
-                val fechaSeleccionada = "$dayOfMonth1/${String.format("%02d", monthOfYear + 1)}/$year1"
-                editTextFecha.setText(fechaSeleccionada)
+            { _, selectedYear, selectedMonth, selectedDay ->
+                val formattedDate = "${selectedDay.toString().padStart(2, '0')}/${(selectedMonth + 1).toString().padStart(2, '0')}/$selectedYear"
+                editTextFecha.setText(formattedDate)
+                Log.d("Depositos", "Fecha seleccionada: $formattedDate")
             },
-            year,
-            month,
-            dayOfMonth
+            year, month, day
         )
 
         datePickerDialog.show()
