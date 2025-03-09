@@ -12,7 +12,7 @@ import retrofit2.Response
 class ConsejosRepository(context: Context)  {
 
     private val consejosService: ConsejosService by lazy {
-        Cliente.getCliente("http://192.168.10.15:8862/Finanzapp/Consejos/", context)
+        Cliente.getCliente("http://100.115.249.2:8862/Finanzapp/Consejos/", context)
             .create(ConsejosService::class.java)
     }
 

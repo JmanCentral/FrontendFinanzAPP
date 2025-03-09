@@ -11,7 +11,7 @@ import retrofit2.Response
 class AlcanciaRepository(context: Context) {
 
     private val alcanciaService: AlcanciaService by lazy {
-        Cliente.getCliente("http://192.168.10.15:8862/Finanzapp/Alcancias/", context)
+        Cliente.getCliente("http://100.115.249.2:8862/Finanzapp/Alcancias/", context)
             .create(AlcanciaService::class.java)
     }
 
