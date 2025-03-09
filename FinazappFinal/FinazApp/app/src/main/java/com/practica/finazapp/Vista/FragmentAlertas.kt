@@ -37,6 +37,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.NumberFormat
+import kotlin.math.log
 
 class FragmentAlertas : Fragment(), AlertasListener {
 
@@ -98,7 +99,7 @@ class FragmentAlertas : Fragment(), AlertasListener {
         val editTextAlertalimite = dialogView.findViewById<EditText>(R.id.editTextAlertalimite)
 
         // Configurar el Spinner con las opciones de categorías
-        val categorias = listOf("disponible", "Gastos Hormiga", "Alimentos", "Transporte", "Servicios", "Mercado")
+        val categorias = listOf("disponible", "Gastos Hormiga", "Alimentos", "Transporte", "Servicios", "Mercado", "Deudas")
         val adapter = ArrayAdapter(requireContext(), R.layout.item_spinner, categorias)
         adapter.setDropDownViewResource(R.layout.item_spinner)
         spinnerDescripcion.adapter = adapter
@@ -203,6 +204,7 @@ class FragmentAlertas : Fragment(), AlertasListener {
         if (alertas.isEmpty()) {
             Toast.makeText(requireContext(), "No hay alertas configuradas para este mes.", Toast.LENGTH_SHORT).show()
             binding.contenedorAlerta.removeAllViews()
+            Log.d("FragmentAlertas", "No hay alertas configuradas para este mes.")
         } else {
             // Limpiar el contenedor antes de cargar nuevas alertas
             binding.contenedorAlerta.removeAllViews()
