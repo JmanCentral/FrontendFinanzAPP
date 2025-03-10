@@ -16,5 +16,9 @@ interface CalificacionService {
         @Body calificacion: CalificacionDTO
     ): Call<CalificacionDTO>
 
-
+    // Obtener ingresos casuales por año
+    @GET("ObtenerCalificaciones/{id_consejo}")
+    fun ObtenerCalificaciones(
+        @Path("id_consejo") idConsejo: Long
+    ): Call<List<CalificacionDTO>>
 }
