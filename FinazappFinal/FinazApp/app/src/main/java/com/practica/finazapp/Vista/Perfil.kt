@@ -62,7 +62,8 @@ class Perfil : Fragment() {
         consejoViewModel.obtenerConsejos()
         consejoViewModel.consejosResponse.observe(viewLifecycleOwner) { consejos ->
             if (!consejos.isNullOrEmpty()) {
-                obtenerCalificaciones(consejos) // Llamar a calificaciones cuando ya tengamos los consejos
+                Log.d("FragmentPerfil", "Consejos recibidos: ${consejos.size}")
+                obtenerTodasLasCalificaciones() // Obtener todas las calificaciones después de tener los consejos
             } else {
                 binding.recyclerViewConsejos.visibility = View.GONE
             }
@@ -75,24 +76,34 @@ class Perfil : Fragment() {
             calificaciones?.forEach { calificacion ->
                 Log.d("FragmentPerfil", "Calificación -> ConsejoID: ${calificacion.idConsejo}, Me Gusta: ${calificacion.me_gusta}, No Me Gusta: ${calificacion.no_me_gusta}")
             }
+
             val consejos = consejoViewModel.consejosResponse.value ?: return@observe
             actualizarLista(consejos, calificaciones)
         }
     }
 
-
-    private fun obtenerCalificaciones(consejos: List<ConsejosDTO>) {
-        consejos.forEach { consejo ->
-            calificacionViewModel.obtenerCalificacion(consejo.id.toLong())
-        }
+    private fun obtenerTodasLasCalificaciones() {
+        calificacionViewModel.obtenerCalificacion() // Obtener todas las calificaciones
     }
 
     private fun actualizarLista(consejos: List<ConsejosDTO>, calificaciones: List<CalificacionDTO>?) {
-        val calificacionesMap = calificaciones?.associateBy { it.idConsejo ?: 0L } ?: emptyMap()
+        val calificacionesMap = calificaciones?.groupBy { it.idConsejo ?: 0L }?.mapValues { (_, lista) ->
+            CalificacionDTO(
+                idCalificacion = null,
+                me_gusta = lista.sumOf { it.me_gusta },
+                no_me_gusta = lista.sumOf { it.no_me_gusta },
+                id_usuario = null,  // No necesitas el usuario aquí
+                idConsejo = lista.firstOrNull()?.idConsejo ?: 0L
+            )
+        } ?: emptyMap()
+
+        Log.d("FragmentPerfil", "Calificaciones Map: $calificacionesMap")
+
         consejosAdapter = ConsejosAdapter(consejos, calificacionesMap, ::onLikeClick, ::onDislikeClick)
         binding.recyclerViewConsejos.adapter = consejosAdapter
         binding.recyclerViewConsejos.visibility = View.VISIBLE
     }
+
 
     private fun onLikeClick(consejo: ConsejosDTO) {
         if (usuarioId == -1L) {
@@ -105,7 +116,7 @@ class Perfil : Fragment() {
             me_gusta = 1, // Sumar un like
             no_me_gusta = 0,
             id_usuario = usuarioId, // Usar el ID real del usuario
-            idConsejo = consejo.id.toLong()
+            idConsejo = consejo.idConsejo.toLong()
         )
         calificacionViewModel.registrarCalificacion(nuevaCalificacion)
     }
@@ -121,11 +132,10 @@ class Perfil : Fragment() {
             me_gusta = 0,
             no_me_gusta = 1, // Sumar un dislike
             id_usuario = usuarioId, // Usar el ID real del usuario
-            idConsejo = consejo.id.toLong()
+            idConsejo = consejo.idConsejo.toLong()
         )
         calificacionViewModel.registrarCalificacion(nuevaCalificacion)
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()

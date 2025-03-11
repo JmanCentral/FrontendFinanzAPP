@@ -37,8 +37,8 @@ class CalificacionRepository (context: Context) {
         }
 
 
-    fun obtenerCalificaciones(idConsejo: Long, callback: (List<CalificacionDTO>?, String?) -> Unit) {
-        calificacionService.ObtenerCalificaciones(idConsejo).enqueue(object : Callback<List<CalificacionDTO>> {
+    fun obtenerCalificaciones(callback: (List<CalificacionDTO>?, String?) -> Unit) {
+        calificacionService.ObtenerCalificaciones().enqueue(object : Callback<List<CalificacionDTO>> {
             override fun onResponse(call: Call<List<CalificacionDTO>>, response: Response<List<CalificacionDTO>>) {
                 if (response.isSuccessful) {
                     callback(response.body(), null)

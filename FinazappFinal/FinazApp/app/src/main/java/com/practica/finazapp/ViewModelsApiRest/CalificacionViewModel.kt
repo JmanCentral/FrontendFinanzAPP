@@ -35,8 +35,8 @@ class CalificacionViewModel (application: Application) : AndroidViewModel(applic
         }
     }
 
-    fun obtenerCalificacion(idConsejo: Long) {
-        calificacionRepository.obtenerCalificaciones(idConsejo) { response, error ->
+    fun obtenerCalificacion() {
+        calificacionRepository.obtenerCalificaciones() { response, error ->
             if (response != null) {
                 _calificacionList.postValue(response)
                 _errorLiveData.postValue(null)

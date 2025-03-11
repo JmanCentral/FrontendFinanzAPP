@@ -27,7 +27,7 @@ class ConsejosAdapter(
         holder.cv.setAnimation(AnimationUtils.loadAnimation(holder.itemView.context, R.anim.fade_transition))
 
         val consejo = consejosList[position]
-        val calificacion = calificacionesMap[consejo.id.toLong()] // Buscar la calificación en el mapa
+        val calificacion = calificacionesMap[consejo.idConsejo] // Buscar la calificación en el mapa
 
         holder.consejoTextView.text = consejo.consejo
         holder.likesTextView.text = calificacion?.me_gusta.toString() ?: "0"
