@@ -23,11 +23,14 @@ class CalificacionViewModel (application: Application) : AndroidViewModel(applic
     private val _errorLiveData = MutableLiveData<String?>()
     val errorLiveData: LiveData<String?> get() = _errorLiveData
 
+    private val _operacionCompletada = MutableLiveData<Boolean>()
+    val operacionCompletada: LiveData<Boolean> = _operacionCompletada
+
 
     fun registrarCalificacion(calificacionDTO: CalificacionDTO) {
         calificacionRepository.registrarCalificacion(calificacionDTO) { response, error ->
             if (response != null) {
-                _calificacionResponse.postValue(response)
+                _operacionCompletada.postValue(true)
             } else {
                 _errorLiveData.postValue(error)
                 _calificacionResponse.postValue(null)

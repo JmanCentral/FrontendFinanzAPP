@@ -78,7 +78,15 @@ class Perfil : Fragment() {
             }
 
             val consejos = consejoViewModel.consejosResponse.value ?: return@observe
+
+
             actualizarLista(consejos, calificaciones)
+
+            calificacionViewModel.operacionCompletada.observe(viewLifecycleOwner) { completada ->
+                if (completada == true) {
+                    actualizarLista(consejos, calificaciones)
+                }
+            }
         }
     }
 
