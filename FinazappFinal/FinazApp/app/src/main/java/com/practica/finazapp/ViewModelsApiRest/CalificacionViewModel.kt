@@ -5,10 +5,9 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.practica.finazapp.Entidades.CalificacionDTO
-import com.practica.finazapp.Entidades.DepositoDTO
 import com.practica.finazapp.RepositoriosApiRest.CalificacionRepository
 
-class CalificacionViewModel (application: Application) : AndroidViewModel(application) {
+class CalificacionViewModel(application: Application) : AndroidViewModel(application) {
 
     private val calificacionRepository: CalificacionRepository by lazy {
         CalificacionRepository(getApplication<Application>().applicationContext)
@@ -26,11 +25,17 @@ class CalificacionViewModel (application: Application) : AndroidViewModel(applic
     private val _operacionCompletada = MutableLiveData<Boolean>()
     val operacionCompletada: LiveData<Boolean> = _operacionCompletada
 
+    // Nuevo LiveData para notificar la posición del elemento actualizado
+    private val _posicionActualizada = MutableLiveData<Int>()
+    val posicionActualizada: LiveData<Int> get() = _posicionActualizada
 
-    fun registrarCalificacion(calificacionDTO: CalificacionDTO) {
+
+    fun registrarCalificacion(calificacionDTO: CalificacionDTO, position: Int) {
         calificacionRepository.registrarCalificacion(calificacionDTO) { response, error ->
             if (response != null) {
+                // Notificar que la operación se completó y la posición del elemento actualizado
                 _operacionCompletada.postValue(true)
+                _posicionActualizada.postValue(position)
             } else {
                 _errorLiveData.postValue(error)
                 _calificacionResponse.postValue(null)

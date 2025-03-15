@@ -12,11 +12,26 @@ import com.practica.finazapp.Entidades.ConsejosDTO
 import com.practica.finazapp.R
 
 class ConsejosAdapter(
-    private val consejosList: List<ConsejosDTO>,
-    private val calificacionesMap: Map<Long, CalificacionDTO>,
-    private val onLikeClick: (ConsejosDTO) -> Unit,
-    private val onDislikeClick: (ConsejosDTO) -> Unit
+    private var consejosList: List<ConsejosDTO>,
+    private var calificacionesMap: Map<Long, CalificacionDTO>,
+    private val onLikeClick: (ConsejosDTO, Int) -> Unit,
+    private val onDislikeClick: (ConsejosDTO, Int) -> Unit
 ) : RecyclerView.Adapter<ConsejosAdapter.ConsejosViewHolder>() {
+
+    // Método para actualizar un solo elemento
+    fun updateItem(position: Int, newCalificacion: CalificacionDTO) {
+        // Actualizar el mapa de calificaciones con la nueva calificación
+        (calificacionesMap as MutableMap)[consejosList[position].idConsejo] = newCalificacion
+        // Notificar que el elemento en la posición ha cambiado
+        notifyItemChanged(position)
+    }
+
+    // Método para actualizar toda la lista (opcional, si lo necesitas)
+    fun updateData(newConsejos: List<ConsejosDTO>, newCalificaciones: Map<Long, CalificacionDTO>) {
+        consejosList = newConsejos
+        calificacionesMap = newCalificaciones
+        notifyDataSetChanged() // Notificar cambios en toda la lista
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ConsejosViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.listconsejos, parent, false)
@@ -34,8 +49,12 @@ class ConsejosAdapter(
         holder.dislikesTextView.text = calificacion?.no_me_gusta.toString() ?: "0"
 
         // Manejo de eventos para dar me gusta o no me gusta
-        holder.likeButton.setOnClickListener { onLikeClick(consejo) }
-        holder.dislikeButton.setOnClickListener { onDislikeClick(consejo) }
+        holder.likeButton.setOnClickListener {
+            onLikeClick(consejo, position) // Pasamos la posición
+        }
+        holder.dislikeButton.setOnClickListener {
+            onDislikeClick(consejo, position) // Pasamos la posición
+        }
     }
 
     override fun getItemCount(): Int {
