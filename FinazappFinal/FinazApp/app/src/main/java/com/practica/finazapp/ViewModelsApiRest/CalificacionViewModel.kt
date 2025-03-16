@@ -43,6 +43,26 @@ class CalificacionViewModel(application: Application) : AndroidViewModel(applica
         }
     }
 
+    fun haDadoMeGusta(usuarioId: Long, consejoId: Long): Boolean {
+        // Obtener la lista actual de calificaciones
+        val calificaciones = _calificacionList.value
+
+        // Verificar si el usuario ya ha dado "me gusta" a este consejo
+        return calificaciones?.any { calificacion ->
+            calificacion.id_usuario == usuarioId && calificacion.idConsejo == consejoId && calificacion.me_gusta == 1
+        } ?: false
+    }
+
+    fun haDadoNoMeGusta(usuarioId: Long, consejoId: Long): Boolean {
+        // Obtener la lista actual de calificaciones
+        val calificaciones = _calificacionList.value
+
+        // Verificar si el usuario ya ha dado "me gusta" a este consejo
+        return calificaciones?.any { calificacion ->
+            calificacion.id_usuario == usuarioId && calificacion.idConsejo == consejoId && calificacion.no_me_gusta == 1
+        } ?: false
+    }
+
     fun obtenerCalificacion() {
         calificacionRepository.obtenerCalificaciones() { response, error ->
             if (response != null) {

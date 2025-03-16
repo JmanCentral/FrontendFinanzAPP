@@ -47,7 +47,7 @@ class Recordatorios_Usuario : AppCompatActivity() , RecordatorioListener {
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: RecordatorioAdapter
     private lateinit var imgNoGastos1: LottieAnimationView
-    private lateinit var txtNoGastos1: TextView
+    private lateinit var tv_no_recordatorios: TextView
     private var recordatoriosAnteriores: List<RecordatorioDTO> = emptyList()
 
     @SuppressLint("MissingInflatedId")
@@ -63,6 +63,7 @@ class Recordatorios_Usuario : AppCompatActivity() , RecordatorioListener {
         usuarioId = intent.getLongExtra("usuarioId", -1)
 
         imgNoGastos1 = findViewById(R.id.lottie_no_gastos)
+        tv_no_recordatorios = findViewById(R.id.tv_no_recordatorios)
 
         fetchRecordatorios()
 
@@ -313,11 +314,11 @@ class Recordatorios_Usuario : AppCompatActivity() , RecordatorioListener {
                         recyclerView.adapter = adapter
                         recyclerView.visibility = View.VISIBLE
                         imgNoGastos1.visibility = View.GONE
-                       // txtNoGastos1.visibility = View.GONE
+                        tv_no_recordatorios.visibility = View.GONE
                     } else {
                         recyclerView.visibility = View.GONE
                         imgNoGastos1.visibility = View.VISIBLE
-                      //  txtNoGastos1.visibility = View.VISIBLE
+                        tv_no_recordatorios.visibility = View.VISIBLE
                     }
                 }
             } else {
@@ -360,7 +361,7 @@ class Recordatorios_Usuario : AppCompatActivity() , RecordatorioListener {
                     recyclerView.adapter = adapter
                     recyclerView.visibility = View.VISIBLE
                     imgNoGastos1.visibility = View.GONE
-                   // txtNoGastos1.visibility = View.GONE
+                    tv_no_recordatorios.visibility = View.GONE
 
                     // Reprogramar alarmas necesarias
                     recordatorioslist.forEach { recordatorio ->
@@ -373,7 +374,7 @@ class Recordatorios_Usuario : AppCompatActivity() , RecordatorioListener {
                 } else {
                     recyclerView.visibility = View.GONE
                     imgNoGastos1.visibility = View.VISIBLE
-                  //  txtNoGastos1.visibility = View.VISIBLE
+                    tv_no_recordatorios.visibility = View.VISIBLE
                     recordatoriosAnteriores = emptyList()
                 }
             }

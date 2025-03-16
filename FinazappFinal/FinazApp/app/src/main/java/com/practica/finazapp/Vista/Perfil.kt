@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -129,6 +130,15 @@ class Perfil : Fragment() {
             return
         }
 
+        // Verificar si el usuario ya ha dado "me gusta" a este consejo
+        val yaDioMeGusta = calificacionViewModel.haDadoMeGusta(usuarioId, consejo.idConsejo.toLong())
+
+        if (yaDioMeGusta) {
+            // Mostrar un AlertDialog informando que ya ha dado "me gusta"
+            showAlreadyLikedDialog()
+            return
+        }
+
         Log.d("FragmentPerfil", "Registrando Me gusta para el consejo ID: ${consejo.idConsejo}, Posición: $position")
 
         val nuevaCalificacion = CalificacionDTO(
@@ -141,13 +151,44 @@ class Perfil : Fragment() {
         calificacionViewModel.registrarCalificacion(nuevaCalificacion, position)
     }
 
+    private fun showAlreadyLikedDialog() {
+        val alertDialog = AlertDialog.Builder(requireContext())
+            .setTitle("Aviso")
+            .setMessage("Ya has dado me gusta a este consejo")
+            .setPositiveButton("Aceptar") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .create()
+        alertDialog.show()
+    }
+
+    private fun showAlreadyNotLikedDialog() {
+        val alertDialog = AlertDialog.Builder(requireContext())
+            .setTitle("Aviso")
+            .setMessage("Ya has dado no me gusta a este consejo")
+            .setPositiveButton("Aceptar") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .create()
+        alertDialog.show()
+    }
+
     private fun onDislikeClick(consejo: ConsejosDTO, position: Int) {
         if (usuarioId == -1L) {
             Log.e("FragmentPerfil", "Error: usuarioId no válido")
             return
         }
 
+        val yaDioNoMeGusta = calificacionViewModel.haDadoNoMeGusta(usuarioId, consejo.idConsejo.toLong())
+
+        if (yaDioNoMeGusta) {
+            // Mostrar un AlertDialog informando que ya ha dado "me gusta"
+            showAlreadyNotLikedDialog()
+            return
+        }
+
         Log.d("FragmentPerfil", "Registrando No me gusta para el consejo ID: ${consejo.idConsejo}, Posición: $position")
+
 
         val nuevaCalificacion = CalificacionDTO(
             idCalificacion = null,

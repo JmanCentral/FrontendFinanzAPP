@@ -45,8 +45,8 @@ class ConsejosAdapter(
         val calificacion = calificacionesMap[consejo.idConsejo] // Buscar la calificación en el mapa
 
         holder.consejoTextView.text = consejo.consejo
-        holder.likesTextView.text = calificacion?.me_gusta.toString() ?: "0"
-        holder.dislikesTextView.text = calificacion?.no_me_gusta.toString() ?: "0"
+        holder.likesTextView.text = (calificacion?.me_gusta ?: 0).toString()
+        holder.dislikesTextView.text = (calificacion?.no_me_gusta ?: 0).toString()
 
         // Manejo de eventos para dar me gusta o no me gusta
         holder.likeButton.setOnClickListener {
