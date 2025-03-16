@@ -37,6 +37,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.NumberFormat
+import kotlin.math.log
 
 class FragmentAlertas : Fragment(), AlertasListener {
 
@@ -98,7 +99,7 @@ class FragmentAlertas : Fragment(), AlertasListener {
         val editTextAlertalimite = dialogView.findViewById<EditText>(R.id.editTextAlertalimite)
 
         // Configurar el Spinner con las opciones de categorías
-        val categorias = listOf("disponible", "Gastos Hormiga", "Alimentos", "Transporte", "Servicios", "Mercado")
+        val categorias = listOf("disponible", "Gastos Hormiga", "Alimentos", "Transporte", "Servicios", "Mercado", "Deudas")
         val adapter = ArrayAdapter(requireContext(), R.layout.item_spinner, categorias)
         adapter.setDropDownViewResource(R.layout.item_spinner)
         spinnerDescripcion.adapter = adapter
@@ -200,10 +201,8 @@ class FragmentAlertas : Fragment(), AlertasListener {
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("SetTextI18n")
     override fun onAlertasCargadas(alertas: List<AlertaDTO>, ingresoTotal: Double) {
-        if (alertas.isEmpty()) {
-            Toast.makeText(requireContext(), "No hay alertas configuradas para este mes.", Toast.LENGTH_SHORT).show()
-            binding.contenedorAlerta.removeAllViews()
-        } else {
+
+
             // Limpiar el contenedor antes de cargar nuevas alertas
             binding.contenedorAlerta.removeAllViews()
 
@@ -230,7 +229,7 @@ class FragmentAlertas : Fragment(), AlertasListener {
             if (hayExceso) {
                 Toast.makeText(requireContext(), "Hay alertas que exceden tu ingreso total.", Toast.LENGTH_LONG).show()
             }
-        }
+
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

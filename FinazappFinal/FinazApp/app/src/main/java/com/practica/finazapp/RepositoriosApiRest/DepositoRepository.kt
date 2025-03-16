@@ -11,7 +11,11 @@ import retrofit2.Response
 class DepositoRepository(context: Context) {
 
     private val depositoService: DepositoService by lazy {
+<<<<<<< HEAD
         Cliente.getCliente("http://100.106.18.126:8862/Finanzapp/Deposito/", context)
+=======
+        Cliente.getCliente("http://100.115.249.2:8862/Finanzapp/Deposito/", context)
+>>>>>>> develop
             .create(DepositoService::class.java)
     }
 

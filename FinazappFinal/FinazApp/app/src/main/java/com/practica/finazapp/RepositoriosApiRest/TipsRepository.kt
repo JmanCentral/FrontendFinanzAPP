@@ -13,7 +13,11 @@ import retrofit2.Response
 class TipsRepository (context: Context) {
 
     private val tipsService: TipsService by lazy {
+<<<<<<< HEAD
         Cliente.getCliente("http://100.106.18.126:8862/Finanzapp/Tips/", context)
+=======
+        Cliente.getCliente("http://100.115.249.2:8862/Finanzapp/Tips/", context)
+>>>>>>> develop
             .create(TipsService::class.java)
     }
 

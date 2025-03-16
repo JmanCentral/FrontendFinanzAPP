@@ -2,7 +2,7 @@ package com.practica.finazapp.Entidades
 
 data class ConsejosDTO (
 
-    var id: String,
+    var idConsejo: Long,
     var consejo: String
 
     )
