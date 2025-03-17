@@ -13,7 +13,7 @@ import retrofit2.Response
 class CalificacionRepository (context: Context) {
 
     private val calificacionService: CalificacionService by lazy {
-        Cliente.getCliente("http://100.115.249.2:8862/Finanzapp/calificaciones/", context)
+        Cliente.getCliente("http://100.96.16.104:8862/Finanzapp/Calificaciones/", context)
             .create(CalificacionService::class.java)
     }
 

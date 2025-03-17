@@ -13,11 +13,8 @@ import retrofit2.Response
 class PasswordRepository (context: Context) {
 
     private val recuperadorService: RecuperadorService by lazy {
-<<<<<<< HEAD
-        Cliente.getCliente("http://100.106.18.126:8862/api/password/", context)
-=======
-        Cliente.getCliente("http://100.115.249.2:8862/api/password/", context)
->>>>>>> develop
+
+        Cliente.getCliente("http://100.96.16.104:8862/api/password/", context)
             .create(RecuperadorService::class.java)
     }
 

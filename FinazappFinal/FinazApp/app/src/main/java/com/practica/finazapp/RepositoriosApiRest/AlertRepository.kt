@@ -13,11 +13,8 @@ class AlertRepository (context: Context) {
 
 
     private val alertaService: AlertaService by lazy {
-<<<<<<< HEAD
-        Cliente.getCliente("http://100.106.18.126:8862/Finanzapp/Alertas/", context)
-=======
-        Cliente.getCliente("http://100.115.249.2:8862/Finanzapp/Alertas/", context)
->>>>>>> develop
+
+        Cliente.getCliente("http://100.96.16.104:8862/Finanzapp/Alertas/", context)
             .create(AlertaService::class.java)
     }
 
