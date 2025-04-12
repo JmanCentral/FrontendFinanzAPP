@@ -130,8 +130,9 @@ class Registro : AppCompatActivity() {
         }
 
         usuarioViewModel.errorLiveData1.observe(this) { error ->
+            Log.d("Activity", "Observador recibió: $error")
             if (!error.isNullOrEmpty()) {
-                mostrarDialogoError()
+                mostrarDialogoError(error)
             }
         }
 
@@ -211,15 +212,16 @@ class Registro : AppCompatActivity() {
             .create().show()
     }
 
-    private fun mostrarDialogoError(){
+    private fun mostrarDialogoError(errorMessage: String) {
+        Log.d("Dialogo", "Mostrando AlertDialog con mensaje: $errorMessage")
         AlertDialog.Builder(this)
             .setTitle("Error al registrarse")
             .setIcon(R.drawable.problem)
-            .setMessage("El nombre de usuario o correo electrónico ya existen en la aplicación. Porfavor intenta con otro nombre de usuario o correo.")
+            .setMessage(errorMessage)
             .setPositiveButton("Entendido") { dialog, _ -> dialog.dismiss() }
             .create().show()
-
     }
+
 
 }
 

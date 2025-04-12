@@ -1,8 +1,11 @@
 package com.practica.finazapp.Repositories
 
 import android.content.Context
+import android.util.Log
+import com.google.gson.Gson
 import com.practica.finazapp.Entidades.LoginDTO
 import com.practica.finazapp.Entidades.LoginResponseDTO
+import com.practica.finazapp.Entidades.ErrorRespuestaDTO
 import com.practica.finazapp.Entidades.UsuarioDTO
 import com.practica.finazapp.Utils.Cliente
 import com.practica.finazapp.Utils.UsuarioService
@@ -24,16 +27,27 @@ class UserRepository (context: Context) {
                 if (response.isSuccessful) {
                     callback(response.body(), null)
                 } else {
-                    // 🔴 Manejar error 400 como si fuera un fallo
-                    onFailure(call, Throwable("Error en la solicitud: ${response.code()}"))
+                    val errorMensaje = try {
+                        // Intentar parsear el error JSON
+                        val gson = Gson()
+                        val errorJson = response.errorBody()?.string()
+                        val errorRespuesta = gson.fromJson(errorJson, ErrorRespuestaDTO::class.java)
+                        errorRespuesta.error
+                    } catch (e: Exception) {
+                        // Si falla al parsear, usa un mensaje genérico
+                        "Error desconocido: ${response.code()}"
+                    }
+
+                    // Llamada al callback con el mensaje de error adecuado
+                    callback(null, errorMensaje)
                 }
             }
-
             override fun onFailure(call: Call<UsuarioDTO>, t: Throwable) {
                 callback(null, "Fallo en la conexión: ${t.message}")
             }
         })
     }
+
 
     // ✅ Login de usuario
     fun iniciarSesion(username: String, contrasena: String, callback: (LoginResponseDTO?, String?) -> Unit) {
