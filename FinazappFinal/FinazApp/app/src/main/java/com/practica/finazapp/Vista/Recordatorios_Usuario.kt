@@ -384,6 +384,8 @@ class Recordatorios_Usuario : AppCompatActivity() , RecordatorioListener {
     private fun reprogramarAlarma(recordatorio: RecordatorioDTO) {
         // Verificar si el estado del recordatorio es "Activo"
         if (recordatorio.estado == "Activo") {
+            val prefs = getSharedPreferences("RecordatoriosPrefs", Context.MODE_PRIVATE)
+            prefs.edit().remove("alarma_cancelada_${recordatorio.id_recordatorio}").apply()
             val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
             val intent = Intent(this, RecordatorioReceiver::class.java).apply {
                 putExtra("id_recordatorio", recordatorio.id_recordatorio.toInt())

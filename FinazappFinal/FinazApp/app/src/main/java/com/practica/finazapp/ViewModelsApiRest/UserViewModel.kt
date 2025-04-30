@@ -44,10 +44,8 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
         userRepository.iniciarSesion(loginDTO.username, loginDTO.contrasena) { response, error ->
             if (response != null) {
                 _loginResponse.postValue(response)
-                _errorLiveData.postValue(null)
             } else {
-                _errorLiveData.postValue(error)
-                _loginResponse.postValue(null)
+                _errorLiveData1.postValue(error)
             }
         }
     }

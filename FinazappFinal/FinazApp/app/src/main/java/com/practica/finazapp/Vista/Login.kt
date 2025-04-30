@@ -78,9 +78,10 @@ class Login : AppCompatActivity() {
         }
 
 
-        userViewModel.errorLiveData.observe(this) { error ->
+        userViewModel.errorLiveData1.observe(this) { error ->
+            Log.d("Activity", "Observador recibió: $error")
             if (!error.isNullOrEmpty()) {
-                mostrarDialogoError()
+                mostrarDialogoError(error)
             }
         }
 
@@ -127,14 +128,14 @@ class Login : AppCompatActivity() {
         }
     }
 
-    private fun mostrarDialogoError(){
+    private fun mostrarDialogoError(errorMessage: String) {
+        Log.d("Dialogo", "Mostrando AlertDialog con mensaje: $errorMessage")
         AlertDialog.Builder(this)
             .setTitle("Error al iniciar sesión")
             .setIcon(R.drawable.problem)
-            .setMessage("Credenciales incorrectas. Por favor, verifica tu nombre de usuario y contraseña e inténtalo de nuevo.")
+            .setMessage(errorMessage)
             .setPositiveButton("Entendido") { dialog, _ -> dialog.dismiss() }
             .create().show()
-
     }
 
     private fun mostrarDialogoEnvio(){

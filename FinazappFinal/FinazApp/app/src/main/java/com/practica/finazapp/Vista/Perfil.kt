@@ -195,7 +195,7 @@ class Perfil : Fragment() {
             me_gusta = 0, // Reiniciar el like
             no_me_gusta = 1, // Sumar un dislike
             id_usuario = usuarioId, // Usar el ID real del usuario
-            idConsejo = consejo.idConsejo.toLong()
+            idConsejo = consejo.idConsejo
         )
         calificacionViewModel.registrarCalificacion(nuevaCalificacion, position)
     }

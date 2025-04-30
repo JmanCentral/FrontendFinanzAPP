@@ -57,16 +57,19 @@ class UserRepository (context: Context) {
                 if (response.isSuccessful) {
                     callback(response.body(), null)
                 } else {
-                    when (response.code()) {
-                        401, 403 -> callback(
-                            null,
-                            "Acceso denegado: Usuario o contraseña incorrectos"
-                        )  // ✅ Mensaje más preciso
-                        else -> callback(
-                            null,
-                            "Error inesperado: ${response.code()}"
-                        )  // ❗ Maneja otros errores
+                    val errorMensaje = try {
+                        // Intentar parsear el error JSON
+                        val gson = Gson()
+                        val errorJson = response.errorBody()?.string()
+                        val errorRespuesta = gson.fromJson(errorJson, ErrorRespuestaDTO::class.java)
+                        errorRespuesta.error
+                    } catch (e: Exception) {
+                        // Si falla al parsear, usa un mensaje genérico
+                        "Error desconocido: ${response.code()}"
                     }
+
+                    // Llamada al callback con el mensaje de error adecuado
+                    callback(null, errorMensaje)
                 }
             }
 

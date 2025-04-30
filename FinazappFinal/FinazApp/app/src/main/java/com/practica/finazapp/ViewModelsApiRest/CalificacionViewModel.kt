@@ -33,7 +33,17 @@ class CalificacionViewModel(application: Application) : AndroidViewModel(applica
     fun registrarCalificacion(calificacionDTO: CalificacionDTO, position: Int) {
         calificacionRepository.registrarCalificacion(calificacionDTO) { response, error ->
             if (response != null) {
-                // Notificar que la operación se completó y la posición del elemento actualizado
+                val listaActual = _calificacionList.value?.toMutableList() ?: mutableListOf()
+
+                // Eliminar cualquier calificación anterior para el mismo consejo y usuario
+                val nuevaLista = listaActual.filterNot {
+                    it.id_usuario == calificacionDTO.id_usuario && it.idConsejo == calificacionDTO.idConsejo
+                }.toMutableList()
+
+                // Agregar la nueva calificación
+                nuevaLista.add(calificacionDTO)
+
+                _calificacionList.postValue(nuevaLista)
                 _operacionCompletada.postValue(true)
                 _posicionActualizada.postValue(position)
             } else {
@@ -42,6 +52,8 @@ class CalificacionViewModel(application: Application) : AndroidViewModel(applica
             }
         }
     }
+
+
 
     fun haDadoMeGusta(usuarioId: Long, consejoId: Long): Boolean {
         // Obtener la lista actual de calificaciones
